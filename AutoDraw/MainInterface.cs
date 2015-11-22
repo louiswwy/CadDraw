@@ -66,7 +66,8 @@ namespace AutoDraw
 
                     //db.AddToCurrentSpace(TqLines);
                     db.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer);//, rectangleSign);
-
+                    ObjectId spaceId = db.CurrentSpaceId;//当期空间ID
+                    spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0);
                     
                     trans.Commit();
                     m_DocumentLock.Dispose();
@@ -109,7 +110,8 @@ namespace AutoDraw
         public Entity[] MakeSignatureTable(Point2d insertPoint,string nameTable ,string[] t)//, Point2d innerEndPoint)
         {
             #region 绘制签名图签
-            Point2d tqDownRight = new Point2d(insertPoint.X, insertPoint.Y);//图签右下
+            //Point2d tqDownRight = new Point2d(insertPoint.X, insertPoint.Y);//图签右下
+            Point2d tqDownRight = new Point2d(0, 0);//图签右下
             Point2d tqUpLeft = new Point2d(tqDownRight.X - 180, tqDownRight.Y + 37.44);//图签左上
 
             //图签外框
@@ -170,37 +172,37 @@ namespace AutoDraw
             }
 
             Point2d Hline3A = new Point2d(tqUpLeft.X + 25, tqUpLeft.Y - 10.44);
-            Point2d Hline3B = new Point2d(tqUpLeft.X + 25, insertPoint.Y);
+            Point2d Hline3B = new Point2d(tqUpLeft.X + 25, tqDownRight.Y);
             Polyline Hline3 = new Polyline();
             Hline3.CreatePolyline(Hline3A, Hline3B);
 
             Point2d Hline4A = new Point2d(tqUpLeft.X + 50, tqUpLeft.Y - 10.44);
-            Point2d Hline4B = new Point2d(tqUpLeft.X + 50, insertPoint.Y);
+            Point2d Hline4B = new Point2d(tqUpLeft.X + 50, tqDownRight.Y);
             Polyline Hline4 = new Polyline();
             Hline4.CreatePolyline(Hline4A, Hline4B);
 
-            Point2d Hline5A = new Point2d(insertPoint.X - 50, tqUpLeft.Y - 10.44);
-            Point2d Hline5B = new Point2d(insertPoint.X - 50, insertPoint.Y);
+            Point2d Hline5A = new Point2d(tqDownRight.X - 50, tqUpLeft.Y - 10.44);
+            Point2d Hline5B = new Point2d(tqDownRight.X - 50, tqDownRight.Y);
             Polyline Hline5 = new Polyline();
             Hline5.CreatePolyline(Hline5A, Hline5B);
 
-            Point2d Hline6A = new Point2d(insertPoint.X - 35, tqUpLeft.Y - 10.44);
-            Point2d Hline6B = new Point2d(insertPoint.X - 35, insertPoint.Y + 7);
+            Point2d Hline6A = new Point2d(tqDownRight.X - 35, tqUpLeft.Y - 10.44);
+            Point2d Hline6B = new Point2d(tqDownRight.X - 35, tqDownRight.Y + 7);
             Polyline Hline6 = new Polyline();
             Hline6.CreatePolyline(Hline6A, Hline6B);
 
-            Point2d Vline4A = new Point2d(insertPoint.X - 50, tqUpLeft.Y - 10.44 - 6);
-            Point2d Vline4B = new Point2d(insertPoint.X, tqUpLeft.Y - 10.44 - 6);
+            Point2d Vline4A = new Point2d(tqDownRight.X - 50, tqUpLeft.Y - 10.44 - 6);
+            Point2d Vline4B = new Point2d(tqDownRight.X, tqUpLeft.Y - 10.44 - 6);
             Polyline Vline4 = new Polyline();
             Vline4.CreatePolyline(Vline4A, Vline4B);
 
-            Point2d Vline5A = new Point2d(insertPoint.X - 50, tqUpLeft.Y - 10.44 - 6 - 7);
-            Point2d Vline5B = new Point2d(insertPoint.X, tqUpLeft.Y - 10.44 - 6 - 7);
+            Point2d Vline5A = new Point2d(tqDownRight.X - 50, tqUpLeft.Y - 10.44 - 6 - 7);
+            Point2d Vline5B = new Point2d(tqDownRight.X, tqUpLeft.Y - 10.44 - 6 - 7);
             Polyline Vline5 = new Polyline();
             Vline5.CreatePolyline(Vline5A, Vline5B);
 
-            Point2d Vline6A = new Point2d(insertPoint.X - 50, tqUpLeft.Y - 10.44 - 6 - 7 - 7);
-            Point2d Vline6B = new Point2d(insertPoint.X, tqUpLeft.Y - 10.44 - 6 - 7 - 7);
+            Point2d Vline6A = new Point2d(tqDownRight.X - 50, tqUpLeft.Y - 10.44 - 6 - 7 - 7);
+            Point2d Vline6B = new Point2d(tqDownRight.X, tqUpLeft.Y - 10.44 - 6 - 7 - 7);
             Polyline Vline6 = new Polyline();
             Vline6.CreatePolyline(Vline6A, Vline6B);
 
@@ -225,7 +227,7 @@ namespace AutoDraw
             text2.AlignmentPoint = text2.Position;
 
             DBText text3 = new DBText();
-            text3.Position = new Point3d(insertPoint.X - 35 - 7.5, insertPoint.Y + 24, 0);
+            text3.Position = new Point3d(tqDownRight.X - 35 - 7.5, tqDownRight.Y + 24, 0);
             text3.Height = 3;
             text3.TextString = "图号";
             //text1.
@@ -234,7 +236,7 @@ namespace AutoDraw
             text3.AlignmentPoint = text3.Position;
 
             DBText text4 = new DBText();
-            text4.Position = new Point3d(insertPoint.X - 35 - 7.5, insertPoint.Y + 17.5, 0);
+            text4.Position = new Point3d(tqDownRight.X - 35 - 7.5, tqDownRight.Y + 17.5, 0);
             text4.Height = 3;
             text4.TextString = "比例尺";
             //text1.
@@ -243,7 +245,7 @@ namespace AutoDraw
             text4.AlignmentPoint = text4.Position;
 
             DBText text5 = new DBText();
-            text5.Position = new Point3d(insertPoint.X - 35 - 7.5, insertPoint.Y + 10.5, 0);
+            text5.Position = new Point3d(tqDownRight.X - 35 - 7.5, tqDownRight.Y + 10.5, 0);
             text5.Height = 3;
             text5.TextString = "日期";
             //text1.
