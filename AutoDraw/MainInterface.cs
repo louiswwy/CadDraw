@@ -35,39 +35,60 @@ namespace AutoDraw
                 Point2d outerStartPoint=new Point2d(0,0);
                 Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
                 Polyline rectangleOuterLayer = new Polyline();
-                rectangleOuterLayer.CreateNewRectangle(outerStartPoint, outerEndPoint);
 
                 Point2d innerStartPoint = new Point2d(outerStartPoint.X + 25, outerStartPoint.Y + 5);
                 Point2d innerEndPoint = new Point2d(outerEndPoint.X - 5, outerEndPoint.Y - 5);
                 Polyline rectangleInnerLayer = new Polyline();
-                rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
-                
+
+                try
+                {
+                    rectangleOuterLayer.CreateNewRectangle(outerStartPoint, outerEndPoint);
+                    rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
+
+                }
+                catch (System.Exception ee)
+                {
+                    
+                    MessageBox.Show("出现错误！" + System.Environment.NewLine + "\t错误信息:" + ee.ToString(), "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 #endregion
 
                 try
                 {
                     DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
-                    string[] t = new string[1];
-                    Entity[] TqLines;
-                    TqLines = MakeSignatureTable(new Point2d(innerStartPoint.X + 390, innerStartPoint.Y), "三级图签", t);
+                    //string[] t = new string[1];
+                    //Entity[] TqLines;
+                    //TqLines = 
                     //ObjectId styleId = createFont();
                     
-                    foreach (Entity entity in TqLines)
+                    /*foreach (Entity entity in TqLines)
                     {
-
                         DBText textAdd = entity as DBText;
                         if (textAdd != null)
                         {
                             TextStyleTable newTextStyleTable = trans.GetObject(db.TextStyleTableId, OpenMode.ForRead) as TextStyleTable;
-                            string a = textAdd.TextStyleName;
+                            string a = textAdd.TextStyleName;                            
                         }
                         //if(entity.)
                     }
+                     */
 
-                    //db.AddToCurrentSpace(TqLines);
-                    db.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer);//, rectangleSign);
+                    db.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer);
+                    checkBlock(true);
                     ObjectId spaceId = db.CurrentSpaceId;//当期空间ID
-                    spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0);
+
+                    //块属性的字典对象
+                    //图签块
+                    Dictionary<string, string> attST = new Dictionary<string, string>();
+                    attST.Add("项目名称", "新建吉林至珲春铁路工程");
+                    attST.Add("图纸名称", "吉珲施防-01");
+                    attST.Add("图纸比例", "1：100");
+
+                    attST.Add("绘制日期", "2013.5");
+                    attST.Add("页数", "第一张，共1张");
+
+                    //插入图块
+                    spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0, attST);
                     
                     trans.Commit();
                     m_DocumentLock.Dispose();
@@ -100,6 +121,15 @@ namespace AutoDraw
             return styleId;
         }
          */
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="withoutScale"></param>
+        public void checkBlock(bool withoutScale)//Point2d innerStartPoint,
+        {
+            string[] t = new string[1];
+            MakeSignatureTable("三级图签", withoutScale);
+        }
 
         /// <summary>
         /// 生成三级或四级签名块
@@ -107,7 +137,7 @@ namespace AutoDraw
         /// <param name="insertPoint">设置插入点，插入点为图框右下角</param>
         /// <param name="nameTable">签名块设置</param>
         /// <returns></returns>
-        public Entity[] MakeSignatureTable(Point2d insertPoint,string nameTable ,string[] t)//, Point2d innerEndPoint)
+        public Entity[] MakeSignatureTable(string nameTable ,bool withoutScale)//, Point2d innerEndPoint)
         {
             #region 绘制签名图签
             //Point2d tqDownRight = new Point2d(insertPoint.X, insertPoint.Y);//图签右下
@@ -346,13 +376,13 @@ namespace AutoDraw
             TqLines[21] = text8;
             TqLines[22] = text9;
 
-            MakeTableRecode(nameTable, TqLines);
+            MakeTableRecode(nameTable, TqLines, withoutScale);
             #endregion
 
             return TqLines;
         }
 
-        public ObjectId MakeTableRecode(string blockName,Entity[] entitys)
+        public ObjectId MakeTableRecode(string blockName,Entity[] entitys,bool withoutScale)
         {
             ObjectId blockId = new ObjectId();//块参照ID
             
@@ -364,7 +394,27 @@ namespace AutoDraw
                     BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
                     if (!bt.Has(blockName))
                     {
-                        blockId = db.AddBlockTableRecord(blockName, entitys);
+                        if (withoutScale)
+                        {
+                            Point2d LScaleA = new Point2d(-35, 14);
+                            Point2d LScaleB = new Point2d(0, 21);
+                            Polyline LScale = new Polyline();
+                            LScale.CreatePolyline(LScaleA, LScaleB);
+
+                            Entity[] tmpEntitys = new Entity[entitys.Length + 1];
+                            for (int i = 0; i < entitys.Length; i++)
+                            {
+                                tmpEntitys[i] = entitys[i];
+                            }
+                            tmpEntitys[entitys.Length] = LScale;
+                            blockId = db.AddBlockTableRecord(blockName, tmpEntitys);
+                        }
+                        else
+                        {
+                            blockId = db.AddBlockTableRecord(blockName, entitys);
+                        }
+                        AttributeDefinition[] attD = addAttSignaTable(withoutScale);
+                        blockId.AddAttsToBlock(attD);
                         trans.Commit();
                     }
                     else
@@ -383,14 +433,70 @@ namespace AutoDraw
             return blockId;
         }
 
-        public void addAttributes(string blockName, Entity[] entitys)
+        /// <summary>
+        /// 添加属性快
+        /// </summary>
+        /// <param name="invisibilityScale">是否显示比例尺可视性，true时不显示；false时显示</param>
+        /// <returns>返回块属性</returns>
+        public AttributeDefinition[] addAttSignaTable(bool invisibilityScale)//string blockName, Entity[] entitys)
         {
-            Database db = HostApplicationServices.WorkingDatabase;
-            ObjectId blockId = MakeTableRecode(blockName, entitys);
+            /*Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
                 //AttributeDefinition 
-            }
+            }*/
+
+            AttributeDefinition[] attD = new AttributeDefinition[5];
+
+            //表示门符号的属性定义
+            AttributeDefinition attProjetName = new AttributeDefinition(Point3d.Origin, "xx铁路", "项目名称", "输入项目名称：", ObjectId.Null);
+            //表示属性定义的通用样式
+            setStyleForAtt(attProjetName, 3, false);
+            //对其点
+            attProjetName.AlignmentPoint = new Point3d(-45, 32.22, 0);
+
+            //表示门符号的属性定义
+            AttributeDefinition attDrawName = new AttributeDefinition(Point3d.Origin, "xxx防-xx-xx", "图纸名称", "输入图纸名称：", ObjectId.Null);
+            //表示属性定义的通用样式
+            setStyleForAtt(attDrawName, 3, false);
+            //对其点
+            attDrawName.AlignmentPoint = new Point3d(-17.5, 24, 0);
+
+            //表示门符号的属性定义
+            AttributeDefinition attScale = new AttributeDefinition(Point3d.Origin, "1：100", "图纸比例", "输入图纸比例：", ObjectId.Null);
+            //表示属性定义的通用样式
+            setStyleForAtt(attScale, 3, invisibilityScale);
+            //对其点
+            attScale.AlignmentPoint = new Point3d(-17.5, 17.5, 0);
+
+            //表示门符号的属性定义
+            AttributeDefinition attYearMonth = new AttributeDefinition(Point3d.Origin, "xxxx.xx", "绘制日期", "输入图纸绘制日期：", ObjectId.Null);
+            //表示属性定义的通用样式
+            setStyleForAtt(attYearMonth, 3, false);
+            //对其点
+            attYearMonth.AlignmentPoint = new Point3d(-17.5, 10.5, 0);
+
+            //表示门符号的属性定义
+            AttributeDefinition attPage = new AttributeDefinition(Point3d.Origin, "第 x 张,共 x 张", "页数", "输入图纸页数：", ObjectId.Null);
+            //表示属性定义的通用样式
+            setStyleForAtt(attPage, 3, false);
+            //对其点
+            attPage.AlignmentPoint = new Point3d(-25, 3.5, 0);
+
+            attD[0] = attProjetName;
+            attD[1] = attDrawName;
+            attD[2] = attYearMonth;
+            attD[3] = attPage;
+            attD[4] = attScale;
+
+            return attD;
+        }
+        private void setStyleForAtt(AttributeDefinition att, double height, bool invisible)
+        {
+            att.Height = height;//文字高度
+            att.HorizontalMode = TextHorizontalMode.TextCenter;
+            att.VerticalMode = TextVerticalMode.TextVerticalMid;
+            att.Invisible = invisible;
         }
     }
 }
