@@ -14,7 +14,7 @@ namespace AutoDraw
     {
         public 更改比例尺()
         {
-            InitializeComponent();
+            //InitializeComponent();
         }
     }
 }

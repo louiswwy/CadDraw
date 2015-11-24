@@ -32,12 +32,13 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.比例尺ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.比例尺ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.button2 = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -81,6 +82,12 @@
             this.设置ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
             this.设置ToolStripMenuItem.Text = "设置";
             // 
+            // 比例尺ToolStripMenuItem
+            // 
+            this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
+            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.比例尺ToolStripMenuItem.Text = "比例尺";
+            // 
             // panel1
             // 
             this.panel1.Controls.Add(this.splitContainer);
@@ -98,6 +105,7 @@
             // 
             // splitContainer.Panel1
             // 
+            this.splitContainer.Panel1.Controls.Add(this.button2);
             this.splitContainer.Panel1.Controls.Add(this.comboBox1);
             this.splitContainer.Panel1.Controls.Add(this.button1);
             // 
@@ -107,6 +115,14 @@
             this.splitContainer.Size = new System.Drawing.Size(463, 258);
             this.splitContainer.SplitterDistance = 341;
             this.splitContainer.TabIndex = 0;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(42, 191);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 20);
+            this.comboBox1.TabIndex = 1;
             // 
             // button1
             // 
@@ -127,19 +143,15 @@
             this.B_Draw.UseVisualStyleBackColor = true;
             this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
             // 
-            // comboBox1
+            // button2
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(42, 191);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 20);
-            this.comboBox1.TabIndex = 1;
-            // 
-            // 比例尺ToolStripMenuItem
-            // 
-            this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
-            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.比例尺ToolStripMenuItem.Text = "比例尺";
+            this.button2.Location = new System.Drawing.Point(187, 216);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // MainInterface
             // 
@@ -178,5 +190,6 @@
         private System.Windows.Forms.Button B_Draw;
         private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem;
         private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button button2;
     }
 }
