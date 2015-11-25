@@ -652,6 +652,11 @@ namespace AutoDraw
             createNumberTable("工程数量表");
             //绘制设备数量表
             createNumberTable("设备数量表");
+
+
+
+
+
         }
     }
 }
