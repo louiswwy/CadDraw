@@ -126,13 +126,15 @@ namespace AutoDraw
             if (pr.Status == PromptStatus.OK)
 
             {
+                int tabCol = 3; //暂定
+
                 Table tb = new Table();
 
                 tb.TableStyle = db.Tablestyle;
 
                 tb.NumRows = 5;
 
-                tb.NumColumns = 3;
+                tb.NumColumns = tabCol;
 
                 tb.SetRowHeight(3);
 
