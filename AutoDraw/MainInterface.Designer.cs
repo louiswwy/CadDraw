@@ -35,10 +35,12 @@
             this.比例尺ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.button2 = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.图签名称ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.比例尺ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -84,9 +86,13 @@
             // 
             // 比例尺ToolStripMenuItem
             // 
+            this.比例尺ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.图签名称ToolStripMenuItem,
+            this.比例尺ToolStripMenuItem1});
             this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
-            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.比例尺ToolStripMenuItem.Text = "比例尺";
+            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.比例尺ToolStripMenuItem.Text = "图纸属性";
+            this.比例尺ToolStripMenuItem.Click += new System.EventHandler(this.比例尺ToolStripMenuItem_Click);
             // 
             // panel1
             // 
@@ -116,6 +122,16 @@
             this.splitContainer.SplitterDistance = 341;
             this.splitContainer.TabIndex = 0;
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(187, 216);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // comboBox1
             // 
             this.comboBox1.FormattingEnabled = true;
@@ -132,6 +148,7 @@
             this.button1.TabIndex = 0;
             this.button1.Text = "添加";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // B_Draw
             // 
@@ -143,15 +160,19 @@
             this.B_Draw.UseVisualStyleBackColor = true;
             this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
             // 
-            // button2
+            // 图签名称ToolStripMenuItem
             // 
-            this.button2.Location = new System.Drawing.Point(187, 216);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.图签名称ToolStripMenuItem.Name = "图签名称ToolStripMenuItem";
+            this.图签名称ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.图签名称ToolStripMenuItem.Text = "图签名称";
+            this.图签名称ToolStripMenuItem.Click += new System.EventHandler(this.图签名称ToolStripMenuItem_Click);
+            // 
+            // 比例尺ToolStripMenuItem1
+            // 
+            this.比例尺ToolStripMenuItem1.Name = "比例尺ToolStripMenuItem1";
+            this.比例尺ToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.比例尺ToolStripMenuItem1.Text = "比例尺";
+            this.比例尺ToolStripMenuItem1.Click += new System.EventHandler(this.比例尺ToolStripMenuItem1_Click);
             // 
             // MainInterface
             // 
@@ -164,6 +185,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainInterface";
             this.Text = "MainInterface";
+            this.Load += new System.EventHandler(this.MainInterface_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
@@ -191,5 +213,7 @@
         private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.ToolStripMenuItem 图签名称ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem1;
     }
 }

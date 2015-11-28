@@ -14,6 +14,7 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 
 using DotNetARX;
+using System.Resources;
 
 
 namespace AutoDraw
@@ -660,6 +661,79 @@ namespace AutoDraw
 
 
 
+        }
+
+        private void 比例尺ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void 图签名称ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Resources.ResourceWriter rw = new ResourceWriter(@"..\..\abc.txt");
+            rw.AddResource("abc", new byte[10000000]);
+            rw.Generate();
+            rw.Close();
+
+            TuQian tQ = new TuQian();
+            tQ.Owner = this;
+            tQ.Show();
+        }
+
+        private void 比例尺ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        string filePath;
+        private void MainInterface_Load(object sender, EventArgs e)
+        {
+            
+            /* //另存为，
+            Document acDoc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            string strDWGName = acDoc.Name;
+            object obj = Autodesk.AutoCAD.ApplicationServices.Application.GetSystemVariable("DWGTITLED");
+            // Check to see if the drawing has been named
+            if (System.Convert.ToInt16(obj) == 0)
+            {
+                // If the drawing is using a default name (Drawing1, Drawing2, etc)
+                // then provide a new name
+                strDWGName = "c:\\MyDrawing.dwg";
+            }
+            // Save the active drawing
+            acDoc.Database.SaveAs(strDWGName,  DwgVersion.Current);//,, acDoc.Database.SecurityParameters);
+            */
+
+            getFilePath();
+            
+            /* */
+        }
+
+        private string getFilePath()
+        {
+            string p;
+            
+            Document acDoc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            Database db = acDoc.Database;
+            string strDWGName = acDoc.Name;
+            object obj = Autodesk.AutoCAD.ApplicationServices.Application.GetSystemVariable("DWGTITLED");
+            // Check to see if the drawing has been named
+            if (System.Convert.ToInt16(obj) == 0) //未保存过
+            {
+                p = db.Filename;
+            }
+            else if (System.Convert.ToInt16(obj) != 1) //保存过的
+            {
+                p = db.Filename;
+            }
+            
+            p = db.Filename;
+
+            return p;
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            getFilePath();
         }
     }
 }

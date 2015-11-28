@@ -12,7 +12,7 @@ using Autodesk.AutoCAD.Windows;
 //[assembly: CommandClass(typeof(AutoDraw.ProjetStarter))]
 namespace AutoDraw
 {
-    public class ProjetStarter
+    public class ProjetStarter//:IExtensionApplication
     {
         Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
         MainInterface form;
@@ -34,5 +34,18 @@ namespace AutoDraw
                 form.Activate();
             }
         }
+
+        /*public void Initialize()
+        {
+            Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            
+
+        }
+
+        public void Terminate()
+        {
+            throw new NotImplementedException();
+        }*/
     }
 }
