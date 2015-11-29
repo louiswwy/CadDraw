@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace AutoDraw
             textBox1.Text = bit.ToString();
             if (settingP == "")
             {
-                
+                settingP = "c:\\temp";
             }
 
         }
@@ -34,6 +35,14 @@ namespace AutoDraw
         private void B_Valide_Click(object sender, EventArgs e)
         {
             //写文件
+            if (settingP == "c:\\temp")
+            {
+                Directory.CreateDirectory(@"c:\\temp");
+                using (File.Create(@"c:\\temp\\Setting.xml"))
+                {
+
+                }
+            }
         }
 
         private void B_Cancel_Click(object sender, EventArgs e)

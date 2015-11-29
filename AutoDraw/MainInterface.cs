@@ -31,29 +31,14 @@ namespace AutoDraw
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
-                #region 绘制图框
+                
                 //
                 Point2d outerStartPoint=new Point2d(0,0);
-                Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
-                Polyline rectangleOuterLayer = new Polyline();
+                Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);                
 
                 Point2d innerStartPoint = new Point2d(outerStartPoint.X + 25, outerStartPoint.Y + 5);
                 Point2d innerEndPoint = new Point2d(outerEndPoint.X - 5, outerEndPoint.Y - 5);
-                Polyline rectangleInnerLayer = new Polyline();
-
-                try
-                {
-                    rectangleOuterLayer.CreateNewRectangle(outerStartPoint, outerEndPoint);
-                    rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
-
-                }
-                catch (System.Exception ee)
-                {
-                    
-                    MessageBox.Show("出现错误！" + System.Environment.NewLine + "\t错误信息:" + ee.ToString(), "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                #endregion
-
+                
                 try
                 {
                     DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
@@ -61,7 +46,7 @@ namespace AutoDraw
                     //Entity[] TqLines;
                     //TqLines = 
                     //ObjectId styleId = createFont();
-                    
+
                     /*foreach (Entity entity in TqLines)
                     {
                         DBText textAdd = entity as DBText;
@@ -73,9 +58,26 @@ namespace AutoDraw
                         //if(entity.)
                     }
                      */
+                    #region 绘制图框
+                    Polyline rectangleOuterLayer = new Polyline();
+                    Polyline rectangleInnerLayer = new Polyline();
+                    rectangleOuterLayer.CreateNewRectangle(outerStartPoint, outerEndPoint);
+                    rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
+                    #endregion
 
-                    db.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer);
-                    checkBlock(true);
+                    #region 图表
+                    //绘制工程数量表 innerStartPoint
+                    Point2d tableInsertPoint = new Point2d(innerStartPoint.X, innerEndPoint.Y);
+
+
+                    Entity[] NumbEng = createNumberTable("工程数量表", tableInsertPoint);
+                    //绘制设备数量表
+                    Entity[] NumbEqu = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 100));
+                    #endregion
+
+                    #region 添加图签
+                    
+                    checkBlock(true); //检查图块
                     ObjectId spaceId = db.CurrentSpaceId;//当期空间ID
 
                     //块属性的字典对象
@@ -84,13 +86,18 @@ namespace AutoDraw
                     attST.Add("项目名称", "新建吉林至珲春铁路工程");
                     attST.Add("图纸名称", "吉珲施防-01");
                     attST.Add("图纸比例", "1：100");
-
                     attST.Add("绘制日期", "2013.5");
                     attST.Add("页数", "第一张，共1张");
+                    #endregion
 
+                    #region 添加图形
                     //插入图块
                     spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0, attST);
-                    
+                    db.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer);
+                    db.AddToCurrentSpace(NumbEng);
+                    db.AddToCurrentSpace(NumbEqu);
+                    #endregion
+
                     trans.Commit();
                     m_DocumentLock.Dispose();
 
@@ -106,153 +113,115 @@ namespace AutoDraw
 
         //
         //todo
-        public void createNumberTable(string tableName)//Database db,Point2d insertPoint,Dictionary<string, string> ItemNumber)
+        public Entity[] createNumberTable(string stringTableName,Point2d insertPoint)//Database db,Point2d insertPoint,Dictionary<string, string> ItemNumber)
         {
-            /*Table tb = new Table();
-            tb.TableStyle = db.Tablestyle;
-            tb.NumRows = ItemNumber.Count;
-            tb.NumColumns = 6;
-            tb.SetRowHeight(3);
-            tb.SetColumnWidth(15);
-            tb.IsAutoScale(2, 2);
-            tb.Position = new Point3d(insertPoint.X, insertPoint.Y, 0);*/
-            Document doc =  Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            Entity[] tableAndname = new Entity[2];
 
-            Database db = doc.Database;
+            #region 绘制表名
+            DBText tableName = new DBText();
+            tableName.Position = new Point3d(insertPoint.X + 75, insertPoint.Y - 8, 0);
+            tableName.Height = 4.5;
+            tableName.TextString = stringTableName;
 
-            Editor ed = doc.Editor;
+            tableName.HorizontalMode = TextHorizontalMode.TextCenter;
+            tableName.VerticalMode = TextVerticalMode.TextVerticalMid;
+            tableName.AlignmentPoint = tableName.Position;
+            #endregion
+
+            #region
+            int tabCol = 6; //暂定
+
+            Table tb = new Table();
+
+            //tb.TableStyle = db.Tablestyle;
+
+            tb.NumRows = 5;
+
+            tb.NumColumns = tabCol;
+
+            tb.SetRowHeight(6);
+
+            
+	
+		    tb.SetColumnWidth(15);
+            //tb.Columns[1].Width = 20;
 
 
-            PromptPointResult pr = ed.GetPoint("\nEnter table insertion point: ");
+            tb.Position = new Point3d(insertPoint.X, insertPoint.Y, 0);
 
-            if (pr.Status == PromptStatus.OK)
+            // Create a 2-dimensional array
 
+            // of our table contents
+
+            string[,] str = new string[10, 6];
+
+            for (int i = 0; i < 10; i++)
             {
-                int tabCol = 3; //暂定
-
-                Table tb = new Table();
-
-                tb.TableStyle = db.Tablestyle;
-
-                tb.NumRows = 5;
-
-                tb.NumColumns = tabCol;
-
-                tb.SetRowHeight(3);
-
-                tb.SetColumnWidth(15);
-
-                tb.Position = pr.Value;
-
-                // Create a 2-dimensional array
-
-                // of our table contents
-
-                string[,] str = new string[5, 3];
-
-                str[0, 0] = "Part No.";
-
-                str[0, 1] = "Name ";
-
-                str[0, 2] = "Materialaaaaaaaaaaaaaaaaaaaaaa ";
-
-                str[1, 0] = "1876-1";
-
-                str[1, 1] = "Flange";
-
-                str[1, 2] = "Perspex";
-
-                str[2, 0] = "0985-4";
-
-                str[2, 1] = "Bolt";
-
-                str[2, 2] = "Steel";
-
-                str[3, 0] = "3476-K";
-
-                str[3, 1] = "Tile";
-
-                str[3, 2] = "Ceramic";
-
-                str[4, 0] = "8734-3";
-
-                str[4, 1] = "Kean";
-
-                str[4, 2] = "Mostly water";
-
-
-                // Use a nested loop to add and format each cell
-
-                for (int i = 0; i < 5; i++)
-
+                for (int j = 0; j < 6; j++)
                 {
-
-                    for (int j = 0; j < 3; j++)
-
-                    {
-
-                        tb.SetTextHeight(i, j, 1);
-
-                        tb.SetTextString(i, j, str[i, j]);
-
-                        tb.SetAlignment(i, j, CellAlignment.MiddleCenter);
-
-                    }
-
+                    str[i, j] = "";
                 }
-                tb.GenerateLayout();
+            }
+                str[0, 0] = "编号";
+            str[0, 1] = "工程名称 ";
+            str[0, 2] = "说明";
+            str[0, 3] = "单位";
+            str[0, 4] = "数量";
+            str[0, 5] = "备注";
 
+            str[1, 0] = "1";
+            str[2, 0] = "2";
+            str[3, 0] = "3";
+            str[4, 0] = "4";
+            str[5, 0] = "5";
+            str[6, 0] = "6";
+            str[7, 0] = "7";
+            str[8, 0] = "8";
 
-                try
+            str[2, 1] = "Bolt";
+            str[2, 2] = "Steel";
+            str[2, 3] = "Steel";
+            str[2, 4] = "Steel";
+            str[2, 5] = "Steel";
+
+            str[3, 1] = "Tile";
+            str[3, 2] = "Ceramic";
+            str[3, 3] = "Ceramic";
+            str[3, 4] = "Ceramic";
+            str[3, 5] = "Ceramic";
+
+            str[4, 1] = "Kean";
+            str[4, 2] = "Mostly water";
+            str[4, 3] = "Mostly water";
+            str[4, 4] = "Mostly water";
+            str[4, 5] = "Mostly water";
+
+            str[5, 1] = "Kean";
+            str[5, 2] = "Mostly water";
+            str[5, 3] = "Mostly water";
+            str[5, 4] = "Mostly water";
+            str[5, 5] = "Mostly water";
+
+            // Use a nested loop to add and format each cell
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 6; j++)
                 {
-                    DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
-
-                    Transaction tr =
-
-                              doc.TransactionManager.StartTransaction();
-
-                    using (tr)
-
-                    {
-
-                        BlockTable bt =
-
-                          (BlockTable)tr.GetObject(
-
-                            doc.Database.BlockTableId,
-
-                            OpenMode.ForRead
-
-                          );
-
-                        BlockTableRecord btr =
-
-                          (BlockTableRecord)tr.GetObject(
-
-                            bt[BlockTableRecord.ModelSpace],
-
-                            OpenMode.ForWrite
-
-                          );
-
-                        btr.AppendEntity(tb);
-
-                        tr.AddNewlyCreatedDBObject(tb, true);
-
-                        tr.Commit();
-                        m_DocumentLock.Dispose();
-                    }
+                    tb.SetTextHeight(i, j, 3);
+                    tb.SetTextString(i, j, str[i, j]);
+                    tb.SetAlignment(i, j, CellAlignment.MiddleCenter);
                 }
-                catch (System.Exception)
-                {
-
-                    throw;
-                }
-
+            }
+            tb.GenerateLayout();
+            #endregion
+            
+            tableAndname[0] = tb;
+            tableAndname[1] = tableName;
+            return tableAndname;
             }
 
-
-        }
+        
+        
 
         /*
         //创建字体
@@ -652,37 +621,31 @@ namespace AutoDraw
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //绘制工程数量表
-            createNumberTable("工程数量表");
-            //绘制设备数量表
-            createNumberTable("设备数量表");
-
-
-
+           
 
 
         }
 
-        private void 比例尺ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void 图签名称ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            System.Resources.ResourceWriter rw = new ResourceWriter(@"..\..\abc.txt");
-            rw.AddResource("abc", new byte[10000000]);
-            rw.Generate();
-            rw.Close();
+            if (MessageBox.Show("功能未完成","注意",MessageBoxButtons.OK)!=DialogResult.OK)
+            {
+                System.Resources.ResourceWriter rw = new ResourceWriter(@"..\..\abc.txt");
+                rw.AddResource("abc", new byte[10000000]);
+                rw.Generate();
+                rw.Close();
 
-            TuQian tQ = new TuQian();
-            tQ.Owner = this;
-            tQ.Show();
+                string filePath = "";
+                TuQian tQ = new TuQian(filePath);
+                tQ.Owner = this;
+                tQ.Show(); 
+            }
         }
 
         private void 比例尺ToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("功能未完成", "注意", MessageBoxButtons.OK);
         }
 
         string filePath;
@@ -704,7 +667,7 @@ namespace AutoDraw
             acDoc.Database.SaveAs(strDWGName,  DwgVersion.Current);//,, acDoc.Database.SecurityParameters);
             */
 
-            getFilePath();
+            toolStripStatusLabel1.Text = getFilePath();
             
             /* */
         }
@@ -731,7 +694,9 @@ namespace AutoDraw
 
             return p;
         }
-        private void button1_Click(object sender, EventArgs e)
+
+
+        private void B_Add_Click(object sender, EventArgs e)
         {
             getFilePath();
         }
