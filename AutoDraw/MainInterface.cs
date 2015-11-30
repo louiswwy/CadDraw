@@ -45,7 +45,7 @@ namespace AutoDraw
                     //string[] t = new string[1];
                     //Entity[] TqLines;
                     //TqLines = 
-                    //ObjectId styleId = createFont();
+                    ObjectId styleId = createFont();
 
                     /*foreach (Entity entity in TqLines)
                     {
@@ -70,9 +70,9 @@ namespace AutoDraw
                     Point2d tableInsertPoint = new Point2d(innerStartPoint.X, innerEndPoint.Y);
 
 
-                    Entity[] NumbEng = createNumberTable("工程数量表", tableInsertPoint);
+                    Entity[] NumbEng = createNumberTable("工程数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y), styleId);
                     //绘制设备数量表
-                    Entity[] NumbEqu = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 100));
+                    Entity[] NumbEqu = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), styleId);
                     #endregion
 
                     #region 添加图签
@@ -113,19 +113,21 @@ namespace AutoDraw
 
         //
         //todo
-        public Entity[] createNumberTable(string stringTableName,Point2d insertPoint)//Database db,Point2d insertPoint,Dictionary<string, string> ItemNumber)
+        public Entity[] createNumberTable(string stringTableName,Point2d insertPoint,ObjectId styleId)//Database db,Point2d insertPoint,Dictionary<string, string> ItemNumber)
         {
             Entity[] tableAndname = new Entity[2];
 
             #region 绘制表名
             DBText tableName = new DBText();
-            tableName.Position = new Point3d(insertPoint.X + 75, insertPoint.Y - 8, 0);
+            tableName.Position = new Point3d(insertPoint.X + 52 + 5, insertPoint.Y - 5, 0);
             tableName.Height = 4.5;
             tableName.TextString = stringTableName;
 
             tableName.HorizontalMode = TextHorizontalMode.TextCenter;
             tableName.VerticalMode = TextVerticalMode.TextVerticalMid;
-            tableName.AlignmentPoint = tableName.Position;
+            tableName.AlignmentPoint = tableName.Position; 
+            tableName.WidthFactor = 0.7;
+
             #endregion
 
             #region
@@ -153,7 +155,7 @@ namespace AutoDraw
             tb.Columns[5].Width = 12;
 
 
-            tb.Position = new Point3d(insertPoint.X, insertPoint.Y, 0);
+            tb.Position = new Point3d(insertPoint.X+5, insertPoint.Y-10, 0);
 
             // Create a 2-dimensional array
 
@@ -188,13 +190,13 @@ namespace AutoDraw
             str[2, 2] = "SPTYWPL23-16B芯 ";
             str[2, 3] = "m";
             str[2, 4] = "2445";
-            str[2, 5] = "Steel";
+            str[2, 5] = "";
 
             str[3, 1] = "Tile";
             str[3, 2] = "SPTYWPL23-16B芯 ";
             str[3, 3] = "m";
             str[3, 4] = "2445";
-            str[3, 5] = "Ceramic";
+            str[3, 5] = "";
 
             str[4, 1] = "Kean";
             str[4, 2] = "SPTYWPL23-16B芯  ";
@@ -223,16 +225,16 @@ namespace AutoDraw
                     //文字内容
                     tb.Cells[i, j].TextString = str[i, j];
                     //文字宽度
-                    //tb.Cells[i,j].
+                    tb.Cells[i, j].TextStyleId = styleId;
 
                     //文字宽度
                     if (i == 0)
                     {
-                        tb.Cells[i, j].TextHeight = 4;
+                        tb.Cells[i, j].TextHeight = 3;
                     }
                     else if (i > 0 || i < 10)
                     {
-                        tb.Cells[i, j].TextHeight = 3.5;
+                        tb.Cells[i, j].TextHeight = 3;
                     }
                     
 
@@ -249,7 +251,7 @@ namespace AutoDraw
         
         
 
-        /*
+        
         //创建字体
         public ObjectId createFont()
         {
@@ -259,14 +261,15 @@ namespace AutoDraw
             ObjectId styleId;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
-
-                styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc");
+                styleId = db.AddTextStyle("仿宋-0.7", "simfang.ttf");
+                //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc");
+                //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc", false, false, 134, 2 | 0);
                 styleId.SetTextStyleProp(3, 0.7, 0, false, false, false, AnnotativeStates.True, true);
 
             }
             return styleId;
         }
-         */
+        
         /// <summary>
         /// 
         /// </summary>
