@@ -135,16 +135,22 @@ namespace AutoDraw
 
             //tb.TableStyle = db.Tablestyle;
 
-            tb.NumRows = 5;
+            tb.NumRows = 10;
 
             tb.NumColumns = tabCol;
 
             tb.SetRowHeight(6);
-
-            
-	
-		    tb.SetColumnWidth(15);
-            //tb.Columns[1].Width = 20;
+               
+            /* //cad2008
+            tb.SetColumnWidth(15);
+             */
+            //cad2010
+            tb.Columns[0].Width = 10;
+            tb.Columns[1].Width = 27;
+            tb.Columns[2].Width = 27;
+            tb.Columns[3].Width = 13;
+            tb.Columns[4].Width = 15;
+            tb.Columns[5].Width = 12;
 
 
             tb.Position = new Point3d(insertPoint.X, insertPoint.Y, 0);
@@ -159,7 +165,7 @@ namespace AutoDraw
             {
                 for (int j = 0; j < 6; j++)
                 {
-                    str[i, j] = "";
+                    str[i, j] = " ";
                 }
             }
                 str[0, 0] = "编号";
@@ -179,37 +185,57 @@ namespace AutoDraw
             str[8, 0] = "8";
 
             str[2, 1] = "Bolt";
-            str[2, 2] = "Steel";
-            str[2, 3] = "Steel";
-            str[2, 4] = "Steel";
+            str[2, 2] = "SPTYWPL23-16B芯 ";
+            str[2, 3] = "m";
+            str[2, 4] = "2445";
             str[2, 5] = "Steel";
 
             str[3, 1] = "Tile";
-            str[3, 2] = "Ceramic";
-            str[3, 3] = "Ceramic";
-            str[3, 4] = "Ceramic";
+            str[3, 2] = "SPTYWPL23-16B芯 ";
+            str[3, 3] = "m";
+            str[3, 4] = "2445";
             str[3, 5] = "Ceramic";
 
             str[4, 1] = "Kean";
-            str[4, 2] = "Mostly water";
-            str[4, 3] = "Mostly water";
-            str[4, 4] = "Mostly water";
-            str[4, 5] = "Mostly water";
+            str[4, 2] = "SPTYWPL23-16B芯  ";
+            str[4, 3] = "m";
+            str[4, 4] = "2445";
+            str[4, 5] = "";
 
             str[5, 1] = "Kean";
-            str[5, 2] = "Mostly water";
-            str[5, 3] = "Mostly water";
-            str[5, 4] = "Mostly water";
-            str[5, 5] = "Mostly water";
+            str[5, 2] = "SPTYWPL23-16B芯 ";
+            str[5, 3] = "m";
+            str[5, 4] = "2445";
+            str[5, 5] = "";
 
             // Use a nested loop to add and format each cell
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 6; j++)
                 {
+                    /* //CAD2008
                     tb.SetTextHeight(i, j, 3);
                     tb.SetTextString(i, j, str[i, j]);
                     tb.SetAlignment(i, j, CellAlignment.MiddleCenter);
+                     * */
+
+                    //CAD2010
+                    //文字内容
+                    tb.Cells[i, j].TextString = str[i, j];
+                    //文字宽度
+                    //tb.Cells[i,j].
+
+                    //文字宽度
+                    if (i == 0)
+                    {
+                        tb.Cells[i, j].TextHeight = 4;
+                    }
+                    else if (i > 0 || i < 10)
+                    {
+                        tb.Cells[i, j].TextHeight = 3.5;
+                    }
+                    
+
                 }
             }
             tb.GenerateLayout();
@@ -366,6 +392,7 @@ namespace AutoDraw
             text1.HorizontalMode = TextHorizontalMode.TextCenter;
             text1.VerticalMode = TextVerticalMode.TextVerticalMid;
             text1.AlignmentPoint = text1.Position;
+            text1.WidthFactor = 0.7;
 
             DBText text2 = new DBText();
             text2.Position = new Point3d(tqUpLeft.X + 80, tqUpLeft.Y - 5.22, 0);
@@ -375,6 +402,7 @@ namespace AutoDraw
             text2.HorizontalMode = TextHorizontalMode.TextCenter;
             text2.VerticalMode = TextVerticalMode.TextVerticalMid;
             text2.AlignmentPoint = text2.Position;
+            text2.WidthFactor = 0.7;
 
             DBText text3 = new DBText();
             text3.Position = new Point3d(tqDownRight.X - 35 - 7.5, tqDownRight.Y + 24, 0);
@@ -384,6 +412,7 @@ namespace AutoDraw
             text3.HorizontalMode = TextHorizontalMode.TextCenter;
             text3.VerticalMode = TextVerticalMode.TextVerticalMid;
             text3.AlignmentPoint = text3.Position;
+            text3.WidthFactor = 0.7;
 
             DBText text4 = new DBText();
             text4.Position = new Point3d(tqDownRight.X - 35 - 7.5, tqDownRight.Y + 17.5, 0);
@@ -393,6 +422,7 @@ namespace AutoDraw
             text4.HorizontalMode = TextHorizontalMode.TextCenter;
             text4.VerticalMode = TextVerticalMode.TextVerticalMid;
             text4.AlignmentPoint = text4.Position;
+            text4.WidthFactor = 0.7;
 
             DBText text5 = new DBText();
             text5.Position = new Point3d(tqDownRight.X - 35 - 7.5, tqDownRight.Y + 10.5, 0);
@@ -402,6 +432,7 @@ namespace AutoDraw
             text5.HorizontalMode = TextHorizontalMode.TextCenter;
             text5.VerticalMode = TextVerticalMode.TextVerticalMid;
             text5.AlignmentPoint = text5.Position;
+            text5.WidthFactor = 0.7;
 
             DBText text6 = new DBText();
             if (nameTable=="三级图签")
@@ -418,6 +449,7 @@ namespace AutoDraw
             text6.HorizontalMode = TextHorizontalMode.TextCenter;
             text6.VerticalMode = TextVerticalMode.TextVerticalMid;
             text6.AlignmentPoint = text6.Position;
+            text6.WidthFactor = 0.7;
 
             DBText text7 = new DBText();
             if (nameTable == "三级图签")
@@ -434,6 +466,7 @@ namespace AutoDraw
             text7.HorizontalMode = TextHorizontalMode.TextCenter;
             text7.VerticalMode = TextVerticalMode.TextVerticalMid;
             text7.AlignmentPoint = text7.Position;
+            text7.WidthFactor = 0.7;
    
 
 
@@ -451,7 +484,8 @@ namespace AutoDraw
             //text1.
             text8.HorizontalMode = TextHorizontalMode.TextCenter;
             text8.VerticalMode = TextVerticalMode.TextVerticalMid;
-            text8.AlignmentPoint = text8.Position; 
+            text8.AlignmentPoint = text8.Position;
+            text8.WidthFactor = 0.7;
            
 
             DBText text9 = new DBText();
@@ -464,9 +498,10 @@ namespace AutoDraw
                 text9.HorizontalMode = TextHorizontalMode.TextCenter;
                 text9.VerticalMode = TextVerticalMode.TextVerticalMid;
                 text9.AlignmentPoint = text9.Position;
-                
+
             }
-            DBText text10 = new DBText();//四级图签时可用
+            text9.WidthFactor = 0.7;
+
 
             Entity[] TqLines = new Entity[23]; 
             ArrayList  a=new ArrayList ();
