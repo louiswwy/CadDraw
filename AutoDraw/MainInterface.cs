@@ -21,6 +21,7 @@ namespace AutoDraw
 {
     public partial class MainInterface : Form
     {
+        private string filePath;
         public MainInterface()
         {
             InitializeComponent();
@@ -99,6 +100,8 @@ namespace AutoDraw
                     #endregion
 
                     trans.Commit();
+                    //db.SaveAs(this.Text.ToString().Replace(" ", ""), DwgVersion.AC1021);
+                    db.SaveAs(db.Filename, DwgVersion.AC1021);
                     m_DocumentLock.Dispose();
 
                 }
@@ -689,7 +692,32 @@ namespace AutoDraw
         string filePath;
         private void MainInterface_Load(object sender, EventArgs e)
         {
-            
+            //创建新数据库并储存
+            using (Database db = new Database())
+            {
+                using (Transaction trans = db.TransactionManager.StartTransaction())
+                {
+                    PromptSaveFileOptions opt = new PromptSaveFileOptions("请选择文件储存位置。");
+                    opt.Filter = "图形(*.dwg)|*.dwg|图形(*.dxf)|*.dxf";
+                    opt.FilterIndex = 0; //默认选项
+                    opt.DialogCaption = "项目另存为";
+                    opt.InitialDirectory = @"c:\";//默认位置
+                    opt.InitialFileName = "防灾";
+                    Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
+                    PromptFileNameResult result = ed.GetFileNameForSave(opt);
+                    if (result.Status != PromptStatus.OK) 
+                    {
+                        MessageBox.Show("请选择文件储存位置！", "注意！", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return; //如果未选择则退出
+                    }
+
+                    this.Text = result.StringResult; //文件名
+                    //DwgVersion.AC1021为2008版本
+                    db.SaveAs(result.StringResult, DwgVersion.AC1021);//保存为当前版本
+
+
+                }
+            }
             /* //另存为，
             Document acDoc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
             string strDWGName = acDoc.Name;
