@@ -15,7 +15,7 @@ using Autodesk.AutoCAD.Runtime;
 
 using DotNetARX;
 using System.Resources;
-
+using System.IO;
 
 namespace AutoDraw
 {
@@ -32,14 +32,14 @@ namespace AutoDraw
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
-                
+
                 //
-                Point2d outerStartPoint=new Point2d(0,0);
-                Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);                
+                Point2d outerStartPoint = new Point2d(0, 0);
+                Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
 
                 Point2d innerStartPoint = new Point2d(outerStartPoint.X + 25, outerStartPoint.Y + 5);
                 Point2d innerEndPoint = new Point2d(outerEndPoint.X - 5, outerEndPoint.Y - 5);
-                
+
                 try
                 {
                     DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
@@ -77,7 +77,7 @@ namespace AutoDraw
                     #endregion
 
                     #region 添加图签
-                    
+
                     checkBlock(true); //检查图块
                     ObjectId spaceId = db.CurrentSpaceId;//当期空间ID
 
@@ -99,9 +99,11 @@ namespace AutoDraw
                     db.AddToCurrentSpace(NumbEqu);
                     #endregion
 
-                    trans.Commit();
                     //db.SaveAs(this.Text.ToString().Replace(" ", ""), DwgVersion.AC1021);
-                    db.SaveAs(db.Filename, DwgVersion.AC1021);
+                    //db.SaveAs(db.Filename, DwgVersion.AC1021);
+
+                    trans.Commit();
+                    //saveFile(db, trans);
                     m_DocumentLock.Dispose();
 
                 }
@@ -116,7 +118,7 @@ namespace AutoDraw
 
         //
         //todo
-        public Entity[] createNumberTable(string stringTableName,Point2d insertPoint,ObjectId styleId)//Database db,Point2d insertPoint,Dictionary<string, string> ItemNumber)
+        public Entity[] createNumberTable(string stringTableName, Point2d insertPoint, ObjectId styleId)//Database db,Point2d insertPoint,Dictionary<string, string> ItemNumber)
         {
             Entity[] tableAndname = new Entity[2];
 
@@ -128,7 +130,7 @@ namespace AutoDraw
 
             tableName.HorizontalMode = TextHorizontalMode.TextCenter;
             tableName.VerticalMode = TextVerticalMode.TextVerticalMid;
-            tableName.AlignmentPoint = tableName.Position; 
+            tableName.AlignmentPoint = tableName.Position;
             tableName.WidthFactor = 0.7;
 
             #endregion
@@ -145,7 +147,7 @@ namespace AutoDraw
             tb.NumColumns = tabCol;
 
             tb.SetRowHeight(6);
-               
+
             /* //cad2008
             tb.SetColumnWidth(15);
              */
@@ -158,7 +160,7 @@ namespace AutoDraw
             tb.Columns[5].Width = 12;
 
 
-            tb.Position = new Point3d(insertPoint.X+5, insertPoint.Y-10, 0);
+            tb.Position = new Point3d(insertPoint.X + 5, insertPoint.Y - 10, 0);
 
             // Create a 2-dimensional array
 
@@ -173,7 +175,7 @@ namespace AutoDraw
                     str[i, j] = " ";
                 }
             }
-                str[0, 0] = "编号";
+            str[0, 0] = "编号";
             str[0, 1] = "工程名称 ";
             str[0, 2] = "说明";
             str[0, 3] = "单位";
@@ -239,22 +241,22 @@ namespace AutoDraw
                     {
                         tb.Cells[i, j].TextHeight = 3;
                     }
-                    
+
 
                 }
             }
             tb.GenerateLayout();
             #endregion
-            
+
             tableAndname[0] = tb;
             tableAndname[1] = tableName;
             return tableAndname;
-            }
+        }
 
-        
-        
 
-        
+
+
+
         //创建字体
         public ObjectId createFont()
         {
@@ -272,7 +274,7 @@ namespace AutoDraw
             }
             return styleId;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -289,7 +291,7 @@ namespace AutoDraw
         /// <param name="insertPoint">设置插入点，插入点为图框右下角</param>
         /// <param name="nameTable">签名块设置</param>
         /// <returns></returns>
-        public Entity[] MakeSignatureTable(string nameTable ,bool withoutScale)//, Point2d innerEndPoint)
+        public Entity[] MakeSignatureTable(string nameTable, bool withoutScale)//, Point2d innerEndPoint)
         {
             #region 绘制签名图签
             //Point2d tqDownRight = new Point2d(insertPoint.X, insertPoint.Y);//图签右下
@@ -328,7 +330,7 @@ namespace AutoDraw
             Point2d Vline7A = new Point2d();
             Point2d Vline7B = new Point2d();
 
-            if (nameTable=="三级图签")
+            if (nameTable == "三级图签")
             {
                 Vline2A = new Point2d(tqUpLeft.X, tqUpLeft.Y - 19.44);
                 Vline2B = new Point2d(tqUpLeft.X + 50, tqUpLeft.Y - 19.44);
@@ -336,9 +338,9 @@ namespace AutoDraw
 
                 Vline3A = new Point2d(tqUpLeft.X, tqUpLeft.Y - 19.44 - 9);
                 Vline3B = new Point2d(tqUpLeft.X + 50, tqUpLeft.Y - 19.44 - 9);
-                Vline3.CreatePolyline(Vline3A, Vline3B); 
+                Vline3.CreatePolyline(Vline3A, Vline3B);
             }
-            else if(nameTable=="四级图签")
+            else if (nameTable == "四级图签")
             {
                 Vline2A = new Point2d(tqUpLeft.X, tqUpLeft.Y - 16.44);
                 Vline2B = new Point2d(tqUpLeft.X + 50, tqUpLeft.Y - 16.44);
@@ -350,7 +352,7 @@ namespace AutoDraw
 
                 Vline7A = new Point2d(tqUpLeft.X, tqUpLeft.Y - 16.44 - 14);
                 Vline7B = new Point2d(tqUpLeft.X + 50, tqUpLeft.Y - 16.44 - 14);
-                Vline7.CreatePolyline(Vline7A, Vline7B); 
+                Vline7.CreatePolyline(Vline7A, Vline7B);
             }
 
             Point2d Hline3A = new Point2d(tqUpLeft.X + 25, tqUpLeft.Y - 10.44);
@@ -441,7 +443,7 @@ namespace AutoDraw
             text5.WidthFactor = 0.7;
 
             DBText text6 = new DBText();
-            if (nameTable=="三级图签")
+            if (nameTable == "三级图签")
             {
                 text6.Position = new Point3d(tqUpLeft.X + 12.5, tqUpLeft.Y - 14.94, 0);
             }
@@ -465,7 +467,7 @@ namespace AutoDraw
             else if (nameTable == "四级图签")
             {
                 text7.Position = new Point3d(tqUpLeft.X + 12.5, tqUpLeft.Y - 19.94, 0);
-            } 
+            }
             text7.Height = 3;
             text7.TextString = "复核";
             //text1.
@@ -473,7 +475,7 @@ namespace AutoDraw
             text7.VerticalMode = TextVerticalMode.TextVerticalMid;
             text7.AlignmentPoint = text7.Position;
             text7.WidthFactor = 0.7;
-   
+
 
 
             DBText text8 = new DBText();
@@ -492,7 +494,7 @@ namespace AutoDraw
             text8.VerticalMode = TextVerticalMode.TextVerticalMid;
             text8.AlignmentPoint = text8.Position;
             text8.WidthFactor = 0.7;
-           
+
 
             DBText text9 = new DBText();
             if (nameTable == "四级图签")
@@ -509,8 +511,8 @@ namespace AutoDraw
             text9.WidthFactor = 0.7;
 
 
-            Entity[] TqLines = new Entity[23]; 
-            ArrayList  a=new ArrayList ();
+            Entity[] TqLines = new Entity[23];
+            ArrayList a = new ArrayList();
             TqLines[0] = rectangleSign;
             TqLines[1] = Hline1;
             TqLines[2] = Hline2;
@@ -518,7 +520,7 @@ namespace AutoDraw
             TqLines[4] = Hline4;
             TqLines[5] = Hline5;
             TqLines[6] = Hline6;
-            
+
             TqLines[7] = Vline1;
             TqLines[8] = Vline2;
             TqLines[9] = Vline3;
@@ -543,10 +545,10 @@ namespace AutoDraw
             return TqLines;
         }
 
-        public ObjectId MakeTableRecode(string blockName,Entity[] entitys,bool withoutScale)
+        public ObjectId MakeTableRecode(string blockName, Entity[] entitys, bool withoutScale)
         {
             ObjectId blockId = new ObjectId();//块参照ID
-            
+
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
@@ -589,7 +591,7 @@ namespace AutoDraw
 
                     MessageBox.Show("发生错误!" + System.Environment.NewLine + "\t错误信息:" + ex.ToString(), "错误！", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     trans.Abort();
-                }  
+                }
             }
             return blockId;
         }
@@ -662,7 +664,7 @@ namespace AutoDraw
 
         private void button2_Click(object sender, EventArgs e)
         {
-           
+
 
 
         }
@@ -670,7 +672,7 @@ namespace AutoDraw
 
         private void 图签名称ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("功能未完成","注意",MessageBoxButtons.OK)!=DialogResult.OK)
+            if (MessageBox.Show("功能未完成", "注意", MessageBoxButtons.OK) != DialogResult.OK)
             {
                 System.Resources.ResourceWriter rw = new ResourceWriter(@"..\..\abc.txt");
                 rw.AddResource("abc", new byte[10000000]);
@@ -680,7 +682,7 @@ namespace AutoDraw
                 string filePath = "";
                 TuQian tQ = new TuQian(filePath);
                 tQ.Owner = this;
-                tQ.Show(); 
+                tQ.Show();
             }
         }
 
@@ -689,59 +691,45 @@ namespace AutoDraw
             MessageBox.Show("功能未完成", "注意", MessageBoxButtons.OK);
         }
 
-        string filePath;
-        private void MainInterface_Load(object sender, EventArgs e)
+        //用处不大
+        /*
+        public void saveFile(Database db, Transaction trans)
         {
             //创建新数据库并储存
-            using (Database db = new Database())
+
+            PromptSaveFileOptions opt = new PromptSaveFileOptions("请选择文件储存位置。");
+            opt.Filter = "图形(*.dwg)|*.dwg|图形(*.dxf)|*.dxf";
+            opt.FilterIndex = 0; //默认选项
+            opt.DialogCaption = "项目另存为";
+            opt.InitialDirectory = @"c:\";//默认位置
+            opt.InitialFileName = "防灾";
+            Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
+            PromptFileNameResult result = ed.GetFileNameForSave(opt);
+            if (result.Status != PromptStatus.OK)
             {
-                using (Transaction trans = db.TransactionManager.StartTransaction())
-                {
-                    PromptSaveFileOptions opt = new PromptSaveFileOptions("请选择文件储存位置。");
-                    opt.Filter = "图形(*.dwg)|*.dwg|图形(*.dxf)|*.dxf";
-                    opt.FilterIndex = 0; //默认选项
-                    opt.DialogCaption = "项目另存为";
-                    opt.InitialDirectory = @"c:\";//默认位置
-                    opt.InitialFileName = "防灾";
-                    Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
-                    PromptFileNameResult result = ed.GetFileNameForSave(opt);
-                    if (result.Status != PromptStatus.OK) 
-                    {
-                        MessageBox.Show("请选择文件储存位置！", "注意！", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return; //如果未选择则退出
-                    }
-
-                    this.Text = result.StringResult; //文件名
-                    //DwgVersion.AC1021为2008版本
-                    db.SaveAs(result.StringResult, DwgVersion.AC1021);//保存为当前版本
-
-
-                }
+                MessageBox.Show("请选择文件储存位置！", "注意！", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return; //如果未选择则退出
             }
-            /* //另存为，
-            Document acDoc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
-            string strDWGName = acDoc.Name;
-            object obj = Autodesk.AutoCAD.ApplicationServices.Application.GetSystemVariable("DWGTITLED");
-            // Check to see if the drawing has been named
-            if (System.Convert.ToInt16(obj) == 0)
-            {
-                // If the drawing is using a default name (Drawing1, Drawing2, etc)
-                // then provide a new name
-                strDWGName = "c:\\MyDrawing.dwg";
-            }
-            // Save the active drawing
-            acDoc.Database.SaveAs(strDWGName,  DwgVersion.Current);//,, acDoc.Database.SecurityParameters);
-            */
 
+            this.Text = result.StringResult; //文件名
+                                             //DwgVersion.AC1021为2008版本
+            db.SaveAs(result.StringResult, DwgVersion.AC1021);//保存为当前版本
+            //db.Save();
+
+        }
+        */
+
+        //string filePath;
+        private void MainInterface_Load(object sender, EventArgs e)
+        {
             toolStripStatusLabel1.Text = getFilePath();
             
-            /* */
         }
 
         private string getFilePath()
         {
             string p;
-            
+
             Document acDoc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
             Database db = acDoc.Database;
             string strDWGName = acDoc.Name;
@@ -755,7 +743,7 @@ namespace AutoDraw
             {
                 p = db.Filename;
             }
-            
+
             p = db.Filename;
 
             return p;
@@ -765,6 +753,120 @@ namespace AutoDraw
         private void B_Add_Click(object sender, EventArgs e)
         {
             getFilePath();
+        }
+
+        private void 导入图块ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog fileDialog = new OpenFileDialog())
+            {
+                fileDialog.Multiselect = false;
+                fileDialog.Title = "请选择文件.";
+                fileDialog.Filter = "cad|*.dwg|所有文件(*.*)|*.*";
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string importFilePath = fileDialog.FileName;
+
+                    //从目标文件导入图块
+                    GetBlocksFromDwgs(importFilePath);
+
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// 从目标文件导入图块
+        /// </summary>
+        /// <param name="openFilePath">目标文件</param>
+        public void GetBlocksFromDwgs(string openFilePath)
+        {
+
+            bool proEnd = false;
+            Database db = HostApplicationServices.WorkingDatabase;
+            ObjectId spaceId = db.CurrentSpaceId;//获取当前空间(模型空间或图纸空间)
+            Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
+            // 提示用户选择文件
+            //PromptFileNameResult result = ed.GetFileNameForOpen("请选择需要预览的文件");
+            //if (result.Status != PromptStatus.OK) return; // 如果未选择，则返回
+            //string filename = result.StringResult; // 获取带有路径的文件名
+            string filename = openFilePath;
+            // 在C盘根目录下创建一个临时文件夹，用来存放文件中的块预览图标
+            string path = string.Empty;
+#if DEBUG
+
+            path = "C:\\Temp";//  StockLocation;
+
+            //string b=
+#else
+            path = "..\\Resourse\\";
+#endif
+
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
+
+                    // 导入外部文件中的块
+                    db.ImportBlocksFromDwg(filename);
+                    //打开块表
+                    BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
+                    // 循环遍历块表中的块表记录
+                    //int i=0;
+                    foreach (ObjectId blockRecordId in bt)
+                    {
+                        // 打开 块表 记录对象
+                        BlockTableRecord btRecord = (BlockTableRecord)trans.GetObject(blockRecordId, OpenMode.ForRead);
+                        // 如果是匿名块、布局块及没有预览图形的块，则返回
+                        if (btRecord.IsAnonymous || btRecord.IsLayout || !btRecord.HasPreviewIcon) continue;
+                        autoFitBlock(btRecord);
+                        Bitmap preview;
+                        try
+                        {
+                            StringBuilder str = new StringBuilder();
+                            if (!btRecord.IsDynamicBlock)
+                            {
+                                str.Append("Dynamique");
+                            }
+
+                            if (btRecord.ExtensionDictionary == null)
+                            {
+                                str.Append("Extension");
+                            }
+
+                            // 获取块预览图案（适用于AutoCAD 2008及以下版本）
+                            //preview = BlockThumbnailHelper.GetBlockThumbanail(btr.ObjectId);
+
+                            preview = btRecord.PreviewIcon; // 适用于AutoCAD 2009及以上版本 
+                            preview.Save(path + "\\" + btRecord.Name + "_" + str.ToString() + ".bmp"); // 保存块预览图案
+                        }
+                        catch (Autodesk.AutoCAD.Runtime.Exception ee)
+                        {
+                            trans.Abort();
+                            ed.WriteMessage("错误;  " + ee.ToString());
+                            //preview = btr.PreviewIcon; // 适用于AutoCAD 2009及以上版本
+                        }
+
+
+                    }
+                    m_DocumentLock.Dispose();
+                }
+
+
+                catch (System.Exception ee)
+                {
+                    trans.Abort();
+                    ed.WriteMessage("错误;  " + ee.ToString());
+                    //preview = btr.PreviewIcon; // 适用于AutoCAD 2009及以上版本
+                }
+            }
+        }
+
+        public void autoFitBlock(BlockTableRecord btRecord)
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+
         }
     }
 }
