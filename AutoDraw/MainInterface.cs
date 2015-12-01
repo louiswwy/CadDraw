@@ -804,10 +804,10 @@ namespace AutoDraw
                     BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
                     // 循环遍历块表中的块表记录
                     //int i=0;
-                    foreach (ObjectId blockRecordId in bt)
+                    foreach (ObjectId blockTableId in bt)
                     {
                         // 打开 块表 记录对象
-                        BlockTableRecord btRecord = (BlockTableRecord)trans.GetObject(blockRecordId, OpenMode.ForRead);
+                        BlockTableRecord btRecord = (BlockTableRecord)trans.GetObject(blockTableId, OpenMode.ForRead);
                         // 如果是匿名块、布局块及没有预览图形的块，则返回
                         if (btRecord.IsAnonymous || btRecord.IsLayout || !btRecord.HasPreviewIcon) continue;
                         autoFitBlock(btRecord);
@@ -856,6 +856,11 @@ namespace AutoDraw
         public void autoFitBlock(BlockTableRecord btRecord)
         {
             Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                //ObjectId bObjectId=db.GetObjectId()
+                //Entity bEntity= trans.GetObject()
+            }
 
         }
     }
