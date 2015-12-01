@@ -30,19 +30,18 @@
         {
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.比例尺ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.图签名称ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.比例尺ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.导入图块ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.button2 = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.B_Add = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
-            this.导入图块ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -55,8 +54,7 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1,
-            this.toolStripProgressBar1});
+            this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 283);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.ManagerRenderMode;
@@ -69,11 +67,6 @@
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(131, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
-            // 
-            // toolStripProgressBar1
-            // 
-            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
             // 
             // menuStrip1
             // 
@@ -100,7 +93,7 @@
             this.图签名称ToolStripMenuItem,
             this.比例尺ToolStripMenuItem1});
             this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
-            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.比例尺ToolStripMenuItem.Text = "图纸属性";
             // 
             // 图签名称ToolStripMenuItem
@@ -116,6 +109,13 @@
             this.比例尺ToolStripMenuItem1.Size = new System.Drawing.Size(124, 22);
             this.比例尺ToolStripMenuItem1.Text = "比例尺";
             this.比例尺ToolStripMenuItem1.Click += new System.EventHandler(this.比例尺ToolStripMenuItem1_Click);
+            // 
+            // 导入图块ToolStripMenuItem
+            // 
+            this.导入图块ToolStripMenuItem.Name = "导入图块ToolStripMenuItem";
+            this.导入图块ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
+            this.导入图块ToolStripMenuItem.Text = "导入图块";
+            this.导入图块ToolStripMenuItem.Click += new System.EventHandler(this.导入图块ToolStripMenuItem_Click);
             // 
             // panel1
             // 
@@ -183,13 +183,6 @@
             this.B_Draw.UseVisualStyleBackColor = true;
             this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
             // 
-            // 导入图块ToolStripMenuItem
-            // 
-            this.导入图块ToolStripMenuItem.Name = "导入图块ToolStripMenuItem";
-            this.导入图块ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
-            this.导入图块ToolStripMenuItem.Text = "导入图块";
-            this.导入图块ToolStripMenuItem.Click += new System.EventHandler(this.导入图块ToolStripMenuItem_Click);
-            // 
             // MainInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -231,7 +224,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ToolStripMenuItem 图签名称ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripMenuItem 导入图块ToolStripMenuItem;
     }
 }
