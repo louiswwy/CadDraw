@@ -42,6 +42,7 @@
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.B_Add = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -134,6 +135,7 @@
             // 
             // splitContainer.Panel1
             // 
+            this.splitContainer.Panel1.Controls.Add(this.richTextBox1);
             this.splitContainer.Panel1.Controls.Add(this.button2);
             this.splitContainer.Panel1.Controls.Add(this.comboBox1);
             this.splitContainer.Panel1.Controls.Add(this.B_Add);
@@ -183,6 +185,14 @@
             this.B_Draw.UseVisualStyleBackColor = true;
             this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
             // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Location = new System.Drawing.Point(187, 53);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(100, 96);
+            this.richTextBox1.TabIndex = 3;
+            this.richTextBox1.Text = "";
+            // 
             // MainInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -225,5 +235,6 @@
         private System.Windows.Forms.ToolStripMenuItem 图签名称ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem 导入图块ToolStripMenuItem;
+        private System.Windows.Forms.RichTextBox richTextBox1;
     }
 }

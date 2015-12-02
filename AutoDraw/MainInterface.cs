@@ -654,7 +654,7 @@ namespace AutoDraw
 
         private void button2_Click(object sender, EventArgs e)
         {
-
+            ExplodingABlock();
 
 
         }
@@ -742,7 +742,8 @@ namespace AutoDraw
 
         private void B_Add_Click(object sender, EventArgs e)
         {
-            getFilePath();
+            string a = getFilePath();
+            toolStripStatusLabel1.Text = a.ToString();
         }
 
         private void 导入图块ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -810,7 +811,9 @@ namespace AutoDraw
                         BlockTableRecord btRecord = (BlockTableRecord)trans.GetObject(blockTableId, OpenMode.ForRead);
                         // 如果是匿名块、布局块及没有预览图形的块，则返回
                         if (btRecord.IsAnonymous || btRecord.IsLayout || !btRecord.HasPreviewIcon) continue;
-                        autoFitBlock(btRecord);
+
+                        //统一大小
+                        autoFitBlock(db, btRecord);
                         Bitmap preview;
                         try
                         {
@@ -830,6 +833,7 @@ namespace AutoDraw
 
                             preview = btRecord.PreviewIcon; // 适用于AutoCAD 2009及以上版本 
                             preview.Save(path + "\\" + btRecord.Name + "_" + str.ToString() + ".bmp"); // 保存块预览图案
+                            trans.Commit();
                         }
                         catch (Autodesk.AutoCAD.Runtime.Exception ee)
                         {
@@ -853,13 +857,144 @@ namespace AutoDraw
             }
         }
 
-        public void autoFitBlock(BlockTableRecord btRecord)
+        public void autoFitBlock(Database db, BlockTableRecord blockTR)
         {
-            Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
                 //ObjectId bObjectId=db.GetObjectId()
                 //Entity bEntity= trans.GetObject()
+                try
+                {
+                    blockTR.UpgradeOpen();
+                    DBObjectCollection EntityInOldBlock = new DBObjectCollection();
+                    string blockName = blockTR.Name;
+                    StringBuilder sb = new StringBuilder();
+
+                    sb.Append(blockName);
+                    foreach (ObjectId entId in blockTR)
+                    {
+
+                        DBObject objSubBlock = (DBObject)trans.GetObject(entId, OpenMode.ForWrite);
+
+                        Entity acEnt = objSubBlock as Entity;
+
+                        EntityInOldBlock.Add(objSubBlock);
+                        //Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("Exploded Object: " + acEnt.GetRXClass().DxfName);//显示名字
+                        sb.Append("Exploded Object: " + acEnt.GetRXClass().DxfName);
+                        richTextBox1.Text = sb.ToString();
+
+                        Point3d maxP = acEnt.GeometricExtents.MaxPoint;
+                        Point3d minP = acEnt.GeometricExtents.MinPoint;
+
+                        Circle c1 = new Circle(maxP,new Vector3d(1,1,1),3);
+                        Circle c2 = new Circle(maxP, new Vector3d(1, 1, 1), 3);
+                        blockTR.AppendEntity(c1);
+                        blockTR.AppendEntity(c2);
+                    }
+                }
+                catch (Autodesk.AutoCAD.Runtime.Exception ee)
+                {
+                    trans.Abort();
+                    MessageBox.Show("错误;  " + ee.ToString());
+                    //preview = btr.PreviewIcon; // 适用于AutoCAD 2009及以上版本
+                }
+            }
+        }
+
+        public void ExplodingABlock()
+        {
+            // Get the current database and start a transaction
+            Database acCurDb;
+            acCurDb = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Database;
+
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
+                // Open the Block table for read
+                BlockTable acBlkTbl;
+                acBlkTbl = acTrans.GetObject(acCurDb.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                ObjectId blkRecId = ObjectId.Null;
+
+                if (!acBlkTbl.Has("CircleBlock"))
+                {
+                    using (BlockTableRecord acBlkTblRec = new BlockTableRecord())
+                    {
+                        acBlkTblRec.Name = "CircleBlock";
+
+                        // Set the insertion point for the block
+                        acBlkTblRec.Origin = new Point3d(0, 0, 0);
+
+                        // Add a circle to the block
+                        using (Circle acCirc = new Circle())
+                        {
+                            acCirc.Center = new Point3d(0, 0, 0);
+                            acCirc.Radius = 2;
+
+                            DBText mt = new DBText();
+                            mt.TextString = "11";
+                            mt.Position = Point3d.Origin;
+                            mt.Height = 3;
+
+                            acBlkTblRec.AppendEntity(acCirc);
+                            acBlkTblRec.AppendEntity(mt);
+
+                            acBlkTbl.UpgradeOpen();
+                            acBlkTbl.Add(acBlkTblRec);
+                            acTrans.AddNewlyCreatedDBObject(acBlkTblRec, true);
+                        }
+
+                        blkRecId = acBlkTblRec.Id;
+                    }
+                }
+                else
+                {
+                    blkRecId = acBlkTbl["CircleBlock"];
+                }
+
+                // Insert the block into the current space
+                if (blkRecId != ObjectId.Null)
+                {
+                    using (BlockReference acBlkRef = new BlockReference(new Point3d(0, 0, 0), blkRecId))
+                    {
+                        BlockTableRecord acCurSpaceBlkTblRec;
+                        acCurSpaceBlkTblRec = acTrans.GetObject(acCurDb.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
+
+                        //acCurSpaceBlkTblRec.AppendEntity(acBlkRef);
+                        //acTrans.AddNewlyCreatedDBObject(acBlkRef, true);
+                        StringBuilder sbb = new StringBuilder();
+                        using (DBObjectCollection dbObjCol = new DBObjectCollection())
+                        {
+                            acBlkRef.Explode(dbObjCol);
+
+                            foreach (DBObject dbObj in dbObjCol)
+                            {
+                                Entity acEnt = dbObj as Entity;
+
+                                int c = acEnt.ColorIndex;
+                                acEnt.ColorIndex = c - 1;
+                                //Point3d p = acEnt.Bounds.Value.MaxPoint;
+                                //Point3d p1 = acEnt.Bounds.Value.MaxPoint;
+                                //sbb.Append("x:" + p.X + ", y:" + p.Y + " ,z:" + p.Z);
+                                //sbb.Append("x:" + p1.X + ", y:" + p1.Y + " ,z:" + p1.Z);
+
+                                acCurSpaceBlkTblRec.AppendEntity(acEnt);
+                                acTrans.AddNewlyCreatedDBObject(dbObj, true);
+
+                                acEnt = acTrans.GetObject(dbObj.ObjectId, OpenMode.ForWrite) as Entity;
+
+
+                                Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("Exploded Object: " + acEnt.GetRXClass().DxfName);
+                            }
+                        }
+
+                    }
+                }
+                // Save the new object to the database
+                acTrans.Commit();
+
+                // Dispose of the transaction            
+                m_DocumentLock.Dispose();
             }
 
         }
