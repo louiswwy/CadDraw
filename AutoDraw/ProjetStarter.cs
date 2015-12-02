@@ -8,8 +8,8 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 
-//[assembly: ExtensionApplication(typeof(AutoDraw.ProjetStarter))]
-//[assembly: CommandClass(typeof(AutoDraw.ProjetStarter))]
+[assembly: ExtensionApplication(typeof(AutoDraw.InitProject))]
+[assembly: CommandClass(typeof(AutoDraw.ProjetStarter))]
 namespace AutoDraw
 {
     public class ProjetStarter//:IExtensionApplication
@@ -47,5 +47,20 @@ namespace AutoDraw
         {
             throw new NotImplementedException();
         }*/
+    }
+
+    public class InitProject : Autodesk.AutoCAD.Runtime.IExtensionApplication
+    {
+        Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
+        public void Initialize()
+        {
+            string dTime = DateTime.Now.ToLongDateString();
+            ed.WriteMessage(dTime+": 功能已载入.");
+        }
+
+        public void Terminate()
+        {
+
+        }
     }
 }

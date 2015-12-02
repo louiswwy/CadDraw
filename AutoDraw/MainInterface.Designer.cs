@@ -38,11 +38,11 @@
             this.导入图块ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.B_Add = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -147,6 +147,14 @@
             this.splitContainer.SplitterDistance = 341;
             this.splitContainer.TabIndex = 0;
             // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Location = new System.Drawing.Point(3, 3);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(335, 153);
+            this.richTextBox1.TabIndex = 3;
+            this.richTextBox1.Text = "";
+            // 
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(187, 216);
@@ -184,14 +192,6 @@
             this.B_Draw.Text = "绘图";
             this.B_Draw.UseVisualStyleBackColor = true;
             this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
-            // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Location = new System.Drawing.Point(187, 53);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(100, 96);
-            this.richTextBox1.TabIndex = 3;
-            this.richTextBox1.Text = "";
             // 
             // MainInterface
             // 
