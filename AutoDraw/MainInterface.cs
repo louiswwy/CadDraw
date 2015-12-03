@@ -861,11 +861,9 @@ namespace AutoDraw
         {
             Database db = HostApplicationServices.WorkingDatabase;
             ObjectId spaceId = db.CurrentSpaceId;//当前空间（模型空间或图纸空间）的Id
-
+            Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
-                //ObjectId bObjectId=db.GetObjectId()
-                //Entity bEntity= trans.GetObject()
                 try
                 {
                     DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
@@ -873,6 +871,7 @@ namespace AutoDraw
                    //blockTable 中每一项
                     foreach (ObjectId blockTableId in bt)
                     {
+                        int count = 0;
                         double minX = new double();
                         double minY = new double();
 
@@ -886,80 +885,105 @@ namespace AutoDraw
                         //块中的实体集合
                         blockTR.UpgradeOpen();
 
-                        DBObjectCollection EntityInOldBlock = new DBObjectCollection();
+                        ObjectIdCollection EntityIdInOldBlock = new ObjectIdCollection();
+
+                        DateTime dt = DateTime.Now;
+                        string tmp = dt.ToString();
+                        ed.WriteMessage(tmp + ":块:" + blockTR.Name + "\n");
                         //块中每一个实体
+
+                        if (blockTR.Name.ToString() == "*Model_Space") continue;
+                        else if (blockTR.Name.ToString() == "*Paper_Space") continue;
+                        else if (blockTR.Name.ToString() == "*Paper_Space0") continue;
+                        else if (blockTR.Name.ToString() == "*E991") continue;
                         foreach (ObjectId entId in blockTR)
                         {
+                            EntityIdInOldBlock.Add(entId);
 
                             DBObject objSubBlock = (DBObject)trans.GetObject(entId, OpenMode.ForWrite);
                             Entity acEnt = objSubBlock as Entity;
                             string entityType = (string)acEnt.GetType().ToString();
 
-                            //向objectCollection中添加实体
-                            EntityInOldBlock.Add(acEnt);
+                            ed.WriteMessage("计数:" + count + "实体类型：" + entityType + "\n" + "ID:" + entId.ToString() + "\n");
+                            if (acEnt.GetType().ToString().ToLower() == "autodesk.autocad.databaseservices.dbtext")
+                            {
+                                //DBText dT = acEnt as DBText;
+                                //ed.WriteMessage("计数:" + count + "实体类型：" + entityType + "文字：" + dT.ToString() + "\n");
+                                continue;
+                            }
+                            else if (acEnt.GetType().ToString().ToLower() == "autodesk.autocad.databaseservices.blockreference")
+                            {
+                                continue;
+                            }
+                            else if (acEnt.GetType().ToString().ToLower() == "autodesk.autocad.databaseservices.attributedefinition")
+                            {
+                                continue;
+                            }
 
                             //更新块的最大最小值
-                            if (minX > acEnt.GeometricExtents.MinPoint.X)
+                            if (count == 0 || minX > acEnt.GeometricExtents.MinPoint.X)
                             {
                                 minX = acEnt.GeometricExtents.MinPoint.X;
                             }
-                            if (minY > acEnt.GeometricExtents.MinPoint.Y)
+                            if (count == 0 || minY > acEnt.GeometricExtents.MinPoint.Y)
                             {
                                 minY = acEnt.GeometricExtents.MinPoint.Y;
                             }
 
-                            if (maxX < acEnt.GeometricExtents.MaxPoint.X)
+                            if (count == 0 || maxX < acEnt.GeometricExtents.MaxPoint.X)
                             {
                                 maxX = acEnt.GeometricExtents.MaxPoint.X;
                             }
-                            if (maxY < acEnt.GeometricExtents.MaxPoint.Y)
+                            if (count == 0 || maxY < acEnt.GeometricExtents.MaxPoint.Y)
                             {
                                 maxY = acEnt.GeometricExtents.MaxPoint.Y;
                             }
+                            count++;
                         }
 
+                        //deepcloneObject
+                        //make model space as owner for new entity 
+                        ObjectId ModelSpaceId = SymbolUtilityServices.GetBlockModelSpaceId(db);
+                        IdMapping mapping = new IdMapping();
+                        db.DeepCloneObjects(EntityIdInOldBlock, ModelSpaceId, mapping, false);
+                        DBObjectCollection EntityInNewBlock = new DBObjectCollection();
+
+                        foreach (ObjectId item in EntityIdInOldBlock)
+                        {                            
+                            //get the map.
+                            IdPair pair1 = mapping[item];
+
+                            //new object
+                            Entity ent = trans.GetObject(pair1.Value, OpenMode.ForWrite) as Entity;
+                            EntityInNewBlock.Add(ent);
+                            ed.WriteMessage("New ID:" + pair1.Value.ToString() + "\n");
+                        }
 
                         //便利所有实体后获得'max' 'min' 两个点，并绘制extents框
                         Polyline rectangleExtents = new Polyline();
                         rectangleExtents.CreateNewRectangle(new Point2d(minX, minY), new Point2d(maxX, maxY));
 
-                        EntityInOldBlock.Add(rectangleExtents);
+                        //EntityInNewBlock.Add(rectangleExtents);
+                        /*
                         ObjectId a = blockTR.Id;
 
                         //acBlkRef.Explode(dbObjCol);
-
-                        Entity[] entityCollection = new Entity[EntityInOldBlock.Count];
-                        int i=0;
-                        foreach (Object arrayEntity in EntityInOldBlock)
+*/
+                        List<Entity> entityCollection = new List<Entity>();
+                        foreach (Object objEntity in EntityInNewBlock)
                         {
-                            entityCollection[i] = arrayEntity as Entity;
-                            i++;
+                            entityCollection.Add(objEntity as Entity);
                         }
-                       /*
-                        string blockName = blockTR.Name;
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append(blockName);
-                        * 
-
-                            acEnt.GeometricExtents.
-                            EntityInOldBlock.Add(objSubBlock);
-                            //Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("Exploded Object: " + acEnt.GetRXClass().DxfName);//显示名字
-                            sb.Append("Exploded Object: " + acEnt.GetRXClass().DxfName);
-                            richTextBox1.Text = sb.ToString();
-
-                            Point3d maxP = acEnt.GeometricExtents.MaxPoint;
-                            Point3d minP = acEnt.GeometricExtents.MinPoint;
-
-                            Circle c1 = new Circle(maxP, new Vector3d(1, 1, 1), 3);
-                            Circle c2 = new Circle(maxP, new Vector3d(1, 1, 1), 3);
-                            blockTR.AppendEntity(c1);
-                            blockTR.AppendEntity(c2);
-                        }*/
+                        //blockTR.AppendEntity(rectangleExtents);
                         //新建块
-                        if (entityCollection.Length != 0)
+                        if (entityCollection.Count != 0)
                         {
-                            //db.de
-                            //db.AddBlockTableRecord(blockTR.Name + "_ZTZX", entityCollection);
+                            if (true)
+                            {
+                                string entityNewName = blockTR.Name + "_ZTZX";
+                                db.AddBlockTableRecord(entityNewName, entityCollection); 
+                            }
+
                         }
                     }
                     trans.Commit();
@@ -973,6 +997,8 @@ namespace AutoDraw
                     //preview = btr.PreviewIcon; // 适用于AutoCAD 2009及以上版本
                 }
             }
+
+
         }
 
         public void ExplodingABlock()
