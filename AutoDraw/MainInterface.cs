@@ -125,7 +125,7 @@ namespace AutoDraw
 
             #endregion
 
-            #region
+            #region 表格
             int tabCol = 6; //暂定
 
             Table tb = new Table();
@@ -759,7 +759,7 @@ namespace AutoDraw
 
                     //从目标文件导入图块
                     GetBlocksFromDwgs(importFilePath);
-                    autoFitBlock();
+                    //autoFitBlock();
                 }
 
             }
@@ -882,7 +882,6 @@ namespace AutoDraw
                         // 打开 块表 记录对象
                         BlockTableRecord blockTR = (BlockTableRecord)trans.GetObject(blockTableId, OpenMode.ForRead);
 
-                        //块中的实体集合
                         blockTR.UpgradeOpen();
 
                         ObjectIdCollection EntityIdInOldBlock = new ObjectIdCollection();
@@ -1095,6 +1094,130 @@ namespace AutoDraw
 
                 // Dispose of the transaction            
                 m_DocumentLock.Dispose();
+            }
+
+        }
+
+        //再次尝试
+        private void button1_Click(object sender, EventArgs e)
+        {
+             Database db = HostApplicationServices.WorkingDatabase;
+            ObjectId spaceId = db.CurrentSpaceId;//当前空间（模型空间或图纸空间）的Id
+            Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
+                    BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
+
+                    List<Entity> le = new List<Entity>();
+                    //blockTable 中每一项
+                    foreach (ObjectId blockTableId in bt)
+                    {
+                        int count = 0;
+                        double minX = new double();
+                        double minY = new double();
+
+                        double maxX = new double();
+                        double maxY = new double();
+
+
+                        // 打开 块表 记录对象
+                        BlockTableRecord blockTR = (BlockTableRecord)trans.GetObject(blockTableId, OpenMode.ForRead);
+                        blockTR.UpgradeOpen();
+
+                        PromptPointOptions prPointOptions = new PromptPointOptions("Select a point");
+                        PromptPointResult prPointRes;
+                        prPointRes = ed.GetPoint(prPointOptions);
+                        if (prPointRes.Status != PromptStatus.OK)
+                        {
+                            ed.WriteMessage("Error");
+                            continue;
+                        }
+                        Point3d p3 = prPointRes.Value;
+                        
+                        ObjectIdCollection EntityIdInOldBlock = new ObjectIdCollection();
+
+                        DateTime dt = DateTime.Now;
+                        string tmp = dt.ToString();
+                        ed.WriteMessage(tmp + ":块:" + blockTR.Name + "\n");
+                        //块中每一个实体
+
+                        if (blockTR.Name.ToString() == "*Model_Space") continue;
+                        else if (blockTR.Name.ToString() == "*Paper_Space") continue;
+                        else if (blockTR.Name.ToString() == "*Paper_Space0") continue;
+                        else if (blockTR.Name.ToString() == "*E991") continue;
+
+                        spaceId.InsertBlockReference("0", blockTR.Name, prPointRes.Value, new Scale3d(1), 0);
+                        foreach (ObjectId entId in blockTR)
+                        {
+                            EntityIdInOldBlock.Add(entId);
+
+                            DBObject objSubBlock = (DBObject)trans.GetObject(entId, OpenMode.ForWrite);
+                            Entity acEnt = objSubBlock as Entity;
+                            string entityType = (string)acEnt.GetType().ToString();
+
+                            ed.WriteMessage("计数:" + count + "实体类型：" + entityType + "\n" + "ID:" + entId.ToString() + "\n");
+                            if (acEnt.GetType().ToString().ToLower() == "autodesk.autocad.databaseservices.dbtext")
+                            {
+                                //DBText dT = acEnt as DBText;
+                                //ed.WriteMessage("计数:" + count + "实体类型：" + entityType + "文字：" + dT.ToString() + "\n");
+                                continue;
+                            }
+                            else if (acEnt.GetType().ToString().ToLower() == "autodesk.autocad.databaseservices.blockreference")
+                            {
+                                continue;
+                            }
+                            else if (acEnt.GetType().ToString().ToLower() == "autodesk.autocad.databaseservices.attributedefinition")
+                            {
+                                continue;
+                            }
+
+                            //更新块的最大最小值
+                            if (count == 0 || minX > acEnt.GeometricExtents.MinPoint.X)
+                            {
+                                minX = acEnt.GeometricExtents.MinPoint.X;
+                            }
+                            if (count == 0 || minY > acEnt.GeometricExtents.MinPoint.Y)
+                            {
+                                minY = acEnt.GeometricExtents.MinPoint.Y;
+                            }
+
+                            if (count == 0 || maxX < acEnt.GeometricExtents.MaxPoint.X)
+                            {
+                                maxX = acEnt.GeometricExtents.MaxPoint.X;
+                            }
+                            if (count == 0 || maxY < acEnt.GeometricExtents.MaxPoint.Y)
+                            {
+                                maxY = acEnt.GeometricExtents.MaxPoint.Y;
+                            }
+                            count++;
+                        }
+                        Polyline rectangleExtents = new Polyline();
+                        rectangleExtents.CreateNewRectangle(new Point2d(minX + p3.X, minY + p3.Y), new Point2d(maxX, maxY));
+
+                        
+                        le.Add(rectangleExtents);
+                        
+                    }
+
+                    Entity[] arrE=new Entity[le.Count];
+                    int i=0;
+                    foreach (Entity ent in le)
+                    {
+                        arrE[i] = ent;
+                        i++;
+                    }
+                    db.AddToCurrentSpace(arrE);
+                    trans.Commit();
+                }
+                catch (Autodesk.AutoCAD.Runtime.Exception ee)
+                {
+                    trans.Abort();
+                    MessageBox.Show("错误;  " + ee.ToString());
+                    //preview = btr.PreviewIcon; // 适用于AutoCAD 2009及以上版本
+                }
             }
 
         }
