@@ -1221,5 +1221,16 @@ namespace AutoDraw
             }
 
         }
+
+        private void B_AddWayPoint_Click(object sender, EventArgs e)
+        {
+            //写XML文件
+        }
+
+        //读XML文件
+        public void loadXmlFile(string filePath)
+        {
+
+        }
     }
 }
