@@ -95,7 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\abc.txt" />
-    <None Include="XMLSchema1.xsd">
+    <None Include="XmlSPro.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
