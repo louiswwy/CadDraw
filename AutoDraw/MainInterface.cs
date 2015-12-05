@@ -16,6 +16,7 @@ using Autodesk.AutoCAD.Runtime;
 using DotNetARX;
 using System.Resources;
 using System.IO;
+using System.Xml;
 
 namespace AutoDraw
 {
@@ -709,10 +710,14 @@ namespace AutoDraw
         }
         */
 
+
         //string filePath;
         private void MainInterface_Load(object sender, EventArgs e)
         {
+
             //toolStripStatusLabel1.Text = getFilePath();
+            //combobox添加项
+            //TypeWayPoint.ad
             
         }
 
@@ -742,8 +747,26 @@ namespace AutoDraw
 
         private void B_Add_Click(object sender, EventArgs e)
         {
-            string a = getFilePath();
-            toolStripStatusLabel1.Text = a.ToString();
+
+            string CadFilePath = getFilePath();
+            string[] Names = CadFilePath.Split(new char[1] { '\\' });
+            string name = Names[Names.Length - 1];
+            //写XML文件
+            if (name != "acadiso.dwt")
+            {
+                string filePath = "c://defaut.xml";
+                if (!File.Exists(filePath))
+                {
+                    createXml(filePath);
+                }
+            }
+            else
+            {
+                MessageBox.Show("请先保存文件.");
+            }
+
+            //string a = getFilePath();
+            //toolStripStatusLabel1.Text = a.ToString();
         }
 
         private void 导入图块ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -771,8 +794,6 @@ namespace AutoDraw
         /// <param name="openFilePath">目标文件</param>
         public void GetBlocksFromDwgs(string openFilePath)
         {
-
-            bool proEnd = false;
             Database db = HostApplicationServices.WorkingDatabase;
             ObjectId spaceId = db.CurrentSpaceId;//获取当前空间(模型空间或图纸空间)
             Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
@@ -1222,14 +1243,238 @@ namespace AutoDraw
 
         }
 
+        Dictionary<string, string> InfoStation = new Dictionary<string, string>();
         private void B_AddWayPoint_Click(object sender, EventArgs e)
         {
-            //写XML文件
+            //.SelectedText
+            if (TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.ToString() != "")
+            {
+                string a = T_SLocation.Text.ToString().ToUpper();
+                string b = T_SName.Text.ToString();
+                string c = TypeWayPoint.SelectedItem.ToString();
+                InfoStation.Add(T_SLocation.Text.ToString().ToUpper(), T_SName.Text.ToString() + "," + TypeWayPoint.SelectedItem);
+
+                treeView1.Nodes.Clear();
+                refreshTreeview();
+            }
+
+
+            //TreeNode
+            //
+            
         }
+
+        public void createXml(string filePath)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            //创建类型声明节点  
+            XmlNode node = xmlDoc.CreateXmlDeclaration("1.0", "gb2312", "");
+            xmlDoc.AppendChild(node);
+            //创建根节点  
+            XmlNode root = xmlDoc.CreateElement("User");
+            xmlDoc.AppendChild(root);
+            CreateNode(xmlDoc, root, "name", "xuwei");
+            CreateNode(xmlDoc, root, "sex", "male");
+            CreateNode(xmlDoc, root, "age", "25");
+            try
+            {
+                xmlDoc.Save(filePath);
+            }
+            catch (System.Exception e)
+            {
+                //显示错误信息  
+                MessageBox.Show("发生错误！" + e.ToString(), "错误", MessageBoxButtons.OK);
+            }
+            //Console.ReadLine();  
+        }
+
+        /// <summary>    
+        /// 创建节点    
+        /// </summary>    
+        /// <param name="xmldoc"></param>  xml文档  
+        /// <param name="parentnode"></param>父节点    
+        /// <param name="name"></param>  节点名  
+        /// <param name="value"></param>  节点值  
+        ///   
+        public void CreateNode(XmlDocument xmlDoc, XmlNode parentNode, string name, string value)
+        {
+            XmlNode node = xmlDoc.CreateNode(XmlNodeType.Element, name, null);
+            node.InnerText = value;
+            parentNode.AppendChild(node);
+        }  
 
         //读XML文件
         public void loadXmlFile(string filePath)
         {
+            StringBuilder tb = new StringBuilder();
+            XmlTextReader xtr = new XmlTextReader(filePath);
+            string str = "";
+            try
+            {
+                while (xtr.Read())
+
+                ///此时，xtr里面有着当前节点的信息也就是从刚刚获得数据的那个节点的信息。也就是xtr.value就是当前元素的值，可以用if（str.name==“”）来获得感兴趣的元素的值
+                {
+                    switch (xtr.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            str += "Element:" + xtr.Name;
+                            break;
+                        case XmlNodeType.Text:
+                            str += "Text:" + xtr.Value;
+                            break;
+                        case XmlNodeType.EndElement:
+                            str += "EndElement:" + xtr.Name;
+                            break;
+                        default:
+                            break;
+                    }
+
+
+                }
+                //tb.AppendText(str);
+                tb.Append(str);
+
+                xtr.Close();
+
+            }
+
+            catch
+            {
+
+            }
+        }
+
+        public void refreshTreeview()
+        {
+            foreach (var item in InfoStation)
+            {
+
+                TreeNode node1 = new TreeNode();
+                node1.Text = item.Value.Split(new char[] { ',' })[0];
+                treeView1.Nodes.Add(node1);
+
+                TreeNode node1_1 = new TreeNode();
+                node1_1.Text = item.Value.Split(new char[] { ',' })[1];
+                node1.Nodes.Add(node1_1);
+
+                TreeNode node1_2 = new TreeNode();
+                node1_2.Text = item.Key;
+                node1.Nodes.Add(node1_2);
+            }
+        }
+
+        private void 删除ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            supprimeTreeView();
+        }
+
+        private void supprimeTreeView()
+        {
+            if (treeView1.SelectedNode!=null)
+            {
+                TreeNode selectNode = treeView1.SelectedNode;
+                int a = selectNode.Level;
+                if (selectNode.Level == 0)
+                {
+                    TreeNode selectKeyNode = selectNode.LastNode;
+
+                    if (MessageBox.Show("确定删除项:\n里程:" + selectKeyNode.Text.ToString() + "\n类型:" + selectNode.FirstNode.Text.ToString() + "\n站名" + selectNode.Text.ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                    {
+                        treeView1.Nodes.Clear();
+                        InfoStation.Remove(selectKeyNode.Text.ToString());
+
+                        refreshTreeview();
+                    }
+                }
+                else if (selectNode.Level == 1)
+                {
+                    if (selectNode.Text.ToString().Split(new char[] { '+' }).Length > 0)
+                    {
+                        TreeNode selectKeyNode = selectNode.NextNode;
+                        TreeNode selectParentNode = selectNode.Parent;
+
+                        if (MessageBox.Show("确定删除项:\n里程:" + selectKeyNode.Text.ToString() + "\n类型:" + selectNode.Text.ToString() + "\n站名" + selectParentNode.Text.ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                        {
+                            treeView1.Nodes.Clear();
+                            InfoStation.Remove(selectKeyNode.Text.ToString());
+
+                            refreshTreeview();
+                        }
+
+                    }
+                    else if (selectNode.Text.ToString().Split(new char[] { '+' }).Length == 0)
+                    {
+                        TreeNode selectKeyNode = selectNode;
+                        TreeNode selectParentNode = selectNode.Parent;
+                        TreeNode nextNode = selectNode.NextNode;
+
+                        if (MessageBox.Show("确定删除项:\n里程:" + selectKeyNode.Text.ToString() + "\n类型:" + nextNode.Text.ToString() + "\n站名" + selectParentNode.Text.ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                        {
+                            treeView1.Nodes.Clear();
+                            InfoStation.Remove(selectKeyNode.Text.ToString());
+
+                            refreshTreeview();
+                        }
+                    }
+                } 
+            }
+            else
+            {
+                MessageBox.Show("未选择项目.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        private void B_SupWayPoint_Click(object sender, EventArgs e)
+        {
+            supprimeTreeView();
+            
+        }
+
+        private void TypeWayPoint_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //this.
+            //int widthT = T_SLocation.Size.Width;
+            if (TypeWayPoint.SelectedItem.ToString() == "桥梁")
+            {
+                T_SLocation.Text = " - ";
+                T_SLocation.Size = new Size(45, 21);
+
+                Label tempLabel = new Label();
+                tempLabel.Text = "<->";
+                tempLabel.Location = new Point(107, 72);
+                tempLabel.Size = new Size(23, 12);
+
+                TextBox tempText = new TextBox();
+                tempText.Location = new Point(132, 69);
+                tempText.Size = new Size(45, 21);
+
+                //components.Add(tempLabel);
+                //components.Add(tempText);
+                //this.
+                //this.
+                this.splitContainer1.Panel1.Controls.Add(tempLabel);
+                this.splitContainer1.Panel1.Controls.Add(tempText);
+                //this.Controls.Add(tempLabel);
+                //this.Controls.Add(tempText);
+                
+            }
+            else if (TypeWayPoint.SelectedItem.ToString() != "桥梁" && T_SLocation.Size.Width == 45)
+            {
+                int i = 0;
+                foreach (var component in splitContainer1.Panel1.Controls)
+                {
+                    TextBox a = component as TextBox;
+                    if (a != null)
+                    {
+                        i++;
+                        if (a.Name == "tempText" || a.Name == "tempLabel")
+                        {
+                            this.splitContainer1.Panel1.Controls.Remove(a);
+                        }
+                    }
+                }
+               
+            }
 
         }
     }
