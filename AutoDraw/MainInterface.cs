@@ -1249,10 +1249,32 @@ namespace AutoDraw
             //.SelectedText
             if (TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.ToString() != "")
             {
-                string a = T_SLocation.Text.ToString().ToUpper();
-                string b = T_SName.Text.ToString();
-                string c = TypeWayPoint.SelectedItem.ToString();
-                InfoStation.Add(T_SLocation.Text.ToString().ToUpper(), T_SName.Text.ToString() + "," + TypeWayPoint.SelectedItem);
+                string sLocation = "";
+                string sName = T_SName.Text.ToString();
+                string sType = TypeWayPoint.SelectedItem.ToString();
+                
+                if (sType == "桥梁")
+                {
+                    string locationPart2 = "";
+                    foreach (var component in splitContainer1.Panel1.Controls)
+                    {
+                        TextBox temp = component as TextBox;
+                        
+                        if (temp != null)
+                        {
+                            if (temp.Name == "tempText")
+                            {
+                                locationPart2 = temp.Text.ToString();
+                            }
+                        }
+                    }
+                    sLocation = T_SLocation.Text.ToString().ToUpper() + "-" + locationPart2;
+                }
+                else
+                {
+                    sLocation = T_SLocation.Text.ToString().ToUpper();
+                }
+                InfoStation.Add(sLocation, sName + "," + sType);
 
                 treeView1.Nodes.Clear();
                 refreshTreeview();
@@ -1432,46 +1454,58 @@ namespace AutoDraw
 
         private void TypeWayPoint_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //this.
-            //int widthT = T_SLocation.Size.Width;
             if (TypeWayPoint.SelectedItem.ToString() == "桥梁")
             {
-                T_SLocation.Text = " - ";
+                T_SLocation.Text = "";
                 T_SLocation.Size = new Size(45, 21);
 
                 Label tempLabel = new Label();
                 tempLabel.Text = "<->";
+                tempLabel.Name = "tempLabel";
                 tempLabel.Location = new Point(107, 72);
                 tempLabel.Size = new Size(23, 12);
 
                 TextBox tempText = new TextBox();
                 tempText.Location = new Point(132, 69);
+                tempText.Name = "tempText";
                 tempText.Size = new Size(45, 21);
 
-                //components.Add(tempLabel);
-                //components.Add(tempText);
-                //this.
-                //this.
+                //添加控件
                 this.splitContainer1.Panel1.Controls.Add(tempLabel);
                 this.splitContainer1.Panel1.Controls.Add(tempText);
-                //this.Controls.Add(tempLabel);
-                //this.Controls.Add(tempText);
                 
             }
             else if (TypeWayPoint.SelectedItem.ToString() != "桥梁" && T_SLocation.Size.Width == 45)
             {
+
+                T_SLocation.Size = new System.Drawing.Size(121, 21);
                 int i = 0;
                 foreach (var component in splitContainer1.Panel1.Controls)
                 {
-                    TextBox a = component as TextBox;
-                    if (a != null)
+                    
+
+                    TextBox tempT = component as TextBox;
+                    Label tempL = component as Label;
+                    //如果控件为不为空(控件为textbox、label)
+                    if (tempT != null)// || tempL != null)
                     {
-                        i++;
-                        if (a.Name == "tempText" || a.Name == "tempLabel")
+                        if (tempT.Name == "tempText")
                         {
-                            this.splitContainer1.Panel1.Controls.Remove(a);
+                            //移除控件
+                            this.splitContainer1.Panel1.Controls.Remove(tempT);
                         }
+                        continue;
                     }
+                    if (tempL != null)// || tempL != null)
+                    {
+                        if (tempL.Name == "tempLabel")
+                        {
+                            //移除控件
+                            this.splitContainer1.Panel1.Controls.Remove(tempL);
+                        }
+                        continue;
+                    }
+                    i++;
                 }
                
             }
