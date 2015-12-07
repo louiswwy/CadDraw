@@ -718,6 +718,8 @@ namespace AutoDraw
             //toolStripStatusLabel1.Text = getFilePath();
             //combobox添加项
             //TypeWayPoint.ad
+
+
             
         }
 
