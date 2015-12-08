@@ -670,8 +670,8 @@ namespace AutoDraw
                 rw.Generate();
                 rw.Close();
 
-                string filePath = "";
-                TuQian tQ = new TuQian(filePath);
+                string TuQianFilePath = "";
+                TuQian tQ = new TuQian(TuQianFilePath);
                 tQ.Owner = this;
                 tQ.Show();
             }
@@ -746,7 +746,14 @@ namespace AutoDraw
             return p;
         }
 
+        //string icon 
+        string xmlFilePath;
 
+        /// <summary>
+        /// 写入xml信息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void B_Add_Click(object sender, EventArgs e)
         {
 
@@ -756,10 +763,10 @@ namespace AutoDraw
             //写XML文件
             if (name != "acadiso.dwt")
             {
-                string filePath = "c://defaut.xml";
-                if (!File.Exists(filePath))
+                xmlFilePath = "c://defaut.xml";
+                if (!File.Exists(xmlFilePath))
                 {
-                    createXml(filePath);
+                    createXml(xmlFilePath);
                 }
             }
             else
@@ -1245,6 +1252,9 @@ namespace AutoDraw
 
         }
 
+        /// <summary>
+        /// 添加站点信息
+        /// </summary>
         Dictionary<string, string> InfoStation = new Dictionary<string, string>();
         private void B_AddWayPoint_Click(object sender, EventArgs e)
         {
@@ -1399,7 +1409,7 @@ namespace AutoDraw
             }
         }
 
-        public void createXml(string filePath)
+        public void createXml(string CreatXmlFilePath)
         {
             XmlDocument xmlDoc = new XmlDocument();
             //创建类型声明节点  
@@ -1413,7 +1423,7 @@ namespace AutoDraw
             CreateNode(xmlDoc, root, "age", "25");
             try
             {
-                xmlDoc.Save(filePath);
+                xmlDoc.Save(CreatXmlFilePath);
             }
             catch (System.Exception e)
             {
@@ -1439,10 +1449,10 @@ namespace AutoDraw
         }  
 
         //读XML文件
-        public void loadXmlFile(string filePath)
+        public void loadXmlFile(string loadXmlFilePath)
         {
             StringBuilder tb = new StringBuilder();
-            XmlTextReader xtr = new XmlTextReader(filePath);
+            XmlTextReader xtr = new XmlTextReader(loadXmlFilePath);
             string str = "";
             try
             {
@@ -1525,6 +1535,9 @@ namespace AutoDraw
             supprimeTreeView();
         }
 
+        /// <summary>
+        /// 删除选中路点信息功能
+        /// </summary>
         bool modifData = false;
         private void supprimeTreeView()
         {
@@ -1582,6 +1595,12 @@ namespace AutoDraw
                 MessageBox.Show("未选择项目.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+
+        /// <summary>
+        /// 删除treeview中选中的路点信息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void B_SupWayPoint_Click(object sender, EventArgs e)
         {
             if (modifData == false)
