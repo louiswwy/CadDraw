@@ -56,7 +56,14 @@ namespace AutoDraw
         {
             string dTime = DateTime.Now.ToLongDateString();
             ed.WriteMessage(dTime+": 功能已载入.");
+
+            //Application.DocumentManager.DocumentLockModeChanged += new DocumentLockModeChangedEventHandler(callback_DocumentManager_DocumentLockModeChanged);
         }
+
+        /*private void callback_DocumentManager_DocumentLockModeChanged(object sender, DocumentLockModeChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }*/
 
         public void Terminate()
         {

@@ -22,7 +22,11 @@ namespace AutoDraw
 {
     public partial class MainInterface : Form
     {
-        private string filePath;
+        private string filePath;  //文件位置
+        private string newFilePath;
+        string xmlFilePath;       //xml文件位置
+        private string imgStoragePath; //图像文件位置 imgPath
+
         public MainInterface()
         {
             InitializeComponent();
@@ -714,15 +718,105 @@ namespace AutoDraw
         //string filePath;
         private void MainInterface_Load(object sender, EventArgs e)
         {
+            try
+            {
+                //添加eventHandler监控文件状态更改（保存，另存为）
+                //Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.DocumentLockModeChanged += new DocumentLockModeChangedEventHandler(callback_DocumentManager_DocumentLockModeChanged);
+
+                //添加commandEnded事件,当每个命令完成后触发
+                Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.CommandEnded += new CommandEventHandler(doc_CommandEnded);
+            }
+            catch (Autodesk.AutoCAD.Runtime.Exception ee)
+            {
+                MessageBox.Show("发生错误!", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+           
 
             //toolStripStatusLabel1.Text = getFilePath();
             //combobox添加项
             //TypeWayPoint.ad
 
+            string a= getFilePath();
+            if (getFilePath().ToLower().Contains("template"))
+            {
+                toolStripStatusLabel1.Text = "未保存的文件.";
+            }
+            else
+            {
+                filePath = a; ;  //文件位置
+                xmlFilePath = a + "\\setting";       //xml文件位置
+                imgStoragePath = a + "\\icon"; //图像文件位置 imgPath
+            }
 
             
         }
 
+        //当文件状态将改变时触发，废弃。
+        private void callback_DocumentManager_DocumentLockModeChanged(object sender, DocumentLockModeChangedEventArgs e)
+        {
+            if (e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVE" || e.GlobalCommandName == "SAVEAS")
+            {
+                // do you code
+
+                toolStripStatusLabel1.Text = getFilePath();
+
+            }
+        }
+        
+        /// <summary>
+        /// 当保存完文件以后触发
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void doc_CommandEnded(object sender, CommandEventArgs e)
+        {
+            if (e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVE" || e.GlobalCommandName == "SAVEAS")
+            {
+                newFilePath = getFilePath();
+
+                toolStripStatusLabel1.Text = newFilePath;
+
+                //当第一次运行切找不到setting文件时
+                if (filePath == "" || filePath == null)
+                {
+                    filePath = newFilePath;
+                }
+                else
+                {
+                    //调用库位置变更功能
+                    moveDictionary(newFilePath);
+                    //设置新库位置
+                    filePath = newFilePath;
+
+                }
+                if (filePath != newFilePath)
+                {
+                    //文件位置
+                    
+                }
+                
+                Document doc = sender as Document;
+                if (!doc.Editor.IsQuiescent) return;
+                else { MessageBox.Show("doc IsQuiescent?"); }
+
+                //DoSomeWork();
+            }
+        }
+
+        /// <summary>
+        /// 当图纸换边储存位置时，将setting文件及icon文件移动至新文件夹
+        /// </summary>
+        /// <param name="newFilePath"></param>
+        private void moveDictionary(string newFilePath)
+        {
+            //todo
+           
+        }
+    
+        /// <summary>
+        /// 获得当前文件储存位置
+        /// </summary>
+        /// <returns>文件位置</returns>
         private string getFilePath()
         {
             string p;
@@ -747,7 +841,7 @@ namespace AutoDraw
         }
 
         //string icon 
-        string xmlFilePath;
+
 
         /// <summary>
         /// 写入xml信息
@@ -790,7 +884,7 @@ namespace AutoDraw
                     string importFilePath = fileDialog.FileName;
 
                     //从目标文件导入图块
-                    GetBlocksFromDwgs(importFilePath);
+                    GetBlocksFromDwgs(importFilePath, imgStoragePath);
                     //autoFitBlock();
                 }
 
@@ -801,7 +895,7 @@ namespace AutoDraw
         /// 从目标文件导入图块
         /// </summary>
         /// <param name="openFilePath">目标文件</param>
-        public void GetBlocksFromDwgs(string openFilePath)
+        public void GetBlocksFromDwgs(string openFilePath,string imgPath)
         {
             Database db = HostApplicationServices.WorkingDatabase;
             ObjectId spaceId = db.CurrentSpaceId;//获取当前空间(模型空间或图纸空间)
@@ -815,7 +909,7 @@ namespace AutoDraw
             string path = string.Empty;
 #if DEBUG
 
-            path = "C:\\Temp";//  StockLocation;
+            path = imgPath;//  StockLocation;
 
             //string b=
 #else
@@ -1745,6 +1839,10 @@ namespace AutoDraw
             
         }
 
+
+
+
+        
     }
 }
  
