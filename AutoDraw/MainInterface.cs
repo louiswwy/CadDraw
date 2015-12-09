@@ -849,8 +849,9 @@ namespace AutoDraw
             if (!Directory.Exists(directory + "\\icon"))
             {
                 Directory.CreateDirectory(directory + "\\icon");
-                imgStoragePath = directory + "\\icon"; //icon位置
+                
             }
+            imgStoragePath = directory + "\\icon"; //icon位置
             //创建
             if (!File.Exists(directory + "\\setting\\Setting.xml"))
             {
@@ -958,6 +959,25 @@ namespace AutoDraw
                         //从目标文件导入图块
                         GetBlocksFromDwgs(importFilePath, imgStoragePath);
                         //autoFitBlock();
+                        if (imgStoragePath != "" || imgStoragePath != null)
+                        {
+                            Size defSize = new System.Drawing.Size(30, 30);
+                            fillImageList(imgStoragePath, defSize);
+                            fileListView(imgStoragePath);
+
+                            C_Equipement.Items.Clear(); //清除combobox项
+                            DirectoryInfo Dir = new DirectoryInfo(imgStoragePath);
+                            foreach (FileInfo f in Dir.GetFiles("*.bmp")) //查找文件
+                            {
+                                C_Equipement.Items.Add(f.Name.ToString().Split(new char[] { '_' })[0]); //添加项
+                            }
+
+                            
+                        }
+                        else
+                        {
+                            MessageBox.Show("指定块图案存储位置", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
                     }
 
                 }
@@ -1935,6 +1955,63 @@ namespace AutoDraw
                 }
             }
             
+        }
+
+        ImageList imageList1;
+        List<string> filename;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmgFilesLocation"></param>
+        /// <param name="imgSize"></param>
+        private void fillImageList(string bmgFilesLocation, Size imgSize)
+        {
+            DirectoryInfo Dir = new DirectoryInfo(bmgFilesLocation);
+            imageList1 = new ImageList();
+            filename = new List<string>();
+            try
+            {
+
+                foreach (FileInfo f in Dir.GetFiles("*.bmp")) //查找文件
+                {
+                    imageList1.Images.Add(Bitmap.FromFile(@"" + bmgFilesLocation + "\\" + f));
+                    imageList1.ImageSize = imgSize;
+                    filename.Add(f.ToString().Split('.')[0]);
+                    //imageListSmall.Images.Add(Bitmap.FromFile(@"..\..\绘图.bmp"));
+                }
+            }
+            catch (System.Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmgFilesLocation"></param>
+        private void fileListView(string bmgFilesLocation)
+        {
+            //to do           
+
+            this.listView1.View = View.LargeIcon;
+            this.listView1.LargeImageList = imageList1;
+
+            this.listView1.BeginUpdate();
+            for (int i = 0; i < imageList1.Images.Count; i++)
+            {
+                ListViewItem lvi = new ListViewItem();
+
+                lvi.ImageIndex = i;
+
+                lvi.Text = filename[i] + ""; //imageList1.Images[i].;
+
+                this.listView1.Items.Add(lvi);
+            }
+
+            this.listView1.EndUpdate();  //结束数据处理，UI界面一次性绘制。  
         }
 
 

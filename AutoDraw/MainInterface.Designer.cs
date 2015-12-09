@@ -64,17 +64,17 @@
             this.D_Equipe2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.D_Equipe3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.D_Equipe4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.B_refresh = new System.Windows.Forms.Button();
             this.B_CanChange = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.B_AppChange = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.C_Equipement = new System.Windows.Forms.ComboBox();
             this.listView1 = new System.Windows.Forms.ListView();
             this.button1 = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.B_refresh = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -409,7 +409,7 @@
             this.splitContainer3.Panel2.Controls.Add(this.textBox1);
             this.splitContainer3.Panel2.Controls.Add(this.B_AppChange);
             this.splitContainer3.Panel2.Controls.Add(this.label5);
-            this.splitContainer3.Panel2.Controls.Add(this.comboBox1);
+            this.splitContainer3.Panel2.Controls.Add(this.C_Equipement);
             this.splitContainer3.Size = new System.Drawing.Size(697, 247);
             this.splitContainer3.SplitterDistance = 218;
             this.splitContainer3.TabIndex = 1;
@@ -463,6 +463,15 @@
             this.D_Equipe4.HeaderText = "设备4";
             this.D_Equipe4.Name = "D_Equipe4";
             // 
+            // B_refresh
+            // 
+            this.B_refresh.Location = new System.Drawing.Point(3, 2);
+            this.B_refresh.Name = "B_refresh";
+            this.B_refresh.Size = new System.Drawing.Size(23, 23);
+            this.B_refresh.TabIndex = 8;
+            this.B_refresh.Text = "R";
+            this.B_refresh.UseVisualStyleBackColor = true;
+            // 
             // B_CanChange
             // 
             this.B_CanChange.Location = new System.Drawing.Point(565, 1);
@@ -506,13 +515,13 @@
             this.label5.TabIndex = 5;
             this.label5.Text = "设备类型";
             // 
-            // comboBox1
+            // C_Equipement
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(300, 3);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 20);
-            this.comboBox1.TabIndex = 2;
+            this.C_Equipement.FormattingEnabled = true;
+            this.C_Equipement.Location = new System.Drawing.Point(300, 3);
+            this.C_Equipement.Name = "C_Equipement";
+            this.C_Equipement.Size = new System.Drawing.Size(121, 20);
+            this.C_Equipement.TabIndex = 2;
             // 
             // listView1
             // 
@@ -551,15 +560,6 @@
             this.label3.Size = new System.Drawing.Size(41, 12);
             this.label3.TabIndex = 0;
             this.label3.Text = "label3";
-            // 
-            // B_refresh
-            // 
-            this.B_refresh.Location = new System.Drawing.Point(3, 2);
-            this.B_refresh.Name = "B_refresh";
-            this.B_refresh.Size = new System.Drawing.Size(23, 23);
-            this.B_refresh.TabIndex = 8;
-            this.B_refresh.Text = "R";
-            this.B_refresh.UseVisualStyleBackColor = true;
             // 
             // MainInterface
             // 
@@ -638,7 +638,7 @@
         private System.Windows.Forms.Button B_SupWayPoint;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox C_Equipement;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.GroupBox groupBox1;
