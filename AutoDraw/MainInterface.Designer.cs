@@ -56,24 +56,25 @@
             this.删除ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.listView1 = new System.Windows.Forms.ListView();
-            this.button1 = new System.Windows.Forms.Button();
-            this.B_Draw = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.B_AppChange = new System.Windows.Forms.Button();
-            this.B_CanChange = new System.Windows.Forms.Button();
             this.D_Station = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.D_ConnectionNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.D_Equipe1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.D_Equipe2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.D_Equipe3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.D_Equipe4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.B_CanChange = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.B_AppChange = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.button1 = new System.Windows.Forms.Button();
+            this.B_Draw = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.B_refresh = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -91,11 +92,11 @@
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -388,6 +389,31 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "防灾设备选择";
             // 
+            // splitContainer3
+            // 
+            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer3.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.splitContainer3.Location = new System.Drawing.Point(3, 17);
+            this.splitContainer3.Name = "splitContainer3";
+            this.splitContainer3.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer3.Panel1
+            // 
+            this.splitContainer3.Panel1.Controls.Add(this.dataGridView1);
+            // 
+            // splitContainer3.Panel2
+            // 
+            this.splitContainer3.Panel2.Controls.Add(this.B_refresh);
+            this.splitContainer3.Panel2.Controls.Add(this.B_CanChange);
+            this.splitContainer3.Panel2.Controls.Add(this.label4);
+            this.splitContainer3.Panel2.Controls.Add(this.textBox1);
+            this.splitContainer3.Panel2.Controls.Add(this.B_AppChange);
+            this.splitContainer3.Panel2.Controls.Add(this.label5);
+            this.splitContainer3.Panel2.Controls.Add(this.comboBox1);
+            this.splitContainer3.Size = new System.Drawing.Size(697, 247);
+            this.splitContainer3.SplitterDistance = 218;
+            this.splitContainer3.TabIndex = 1;
+            // 
             // dataGridView1
             // 
             this.dataGridView1.BackgroundColor = System.Drawing.Color.Aqua;
@@ -406,95 +432,6 @@
             this.dataGridView1.RowTemplate.Height = 23;
             this.dataGridView1.Size = new System.Drawing.Size(697, 218);
             this.dataGridView1.TabIndex = 0;
-            // 
-            // listView1
-            // 
-            this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listView1.Location = new System.Drawing.Point(0, 0);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(703, 202);
-            this.listView1.TabIndex = 0;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(3, 181);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // B_Draw
-            // 
-            this.B_Draw.Location = new System.Drawing.Point(3, 239);
-            this.B_Draw.Name = "B_Draw";
-            this.B_Draw.Size = new System.Drawing.Size(75, 23);
-            this.B_Draw.TabIndex = 0;
-            this.B_Draw.Text = "绘图";
-            this.B_Draw.UseVisualStyleBackColor = true;
-            this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(300, 3);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 20);
-            this.comboBox1.TabIndex = 2;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(231, 9);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 12);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "label3";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(70, 6);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(29, 12);
-            this.label4.TabIndex = 3;
-            this.label4.Text = "里程";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(105, 3);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(121, 21);
-            this.textBox1.TabIndex = 4;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(232, 6);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(53, 12);
-            this.label5.TabIndex = 5;
-            this.label5.Text = "设备类型";
-            // 
-            // B_AppChange
-            // 
-            this.B_AppChange.Location = new System.Drawing.Point(467, 1);
-            this.B_AppChange.Name = "B_AppChange";
-            this.B_AppChange.Size = new System.Drawing.Size(75, 23);
-            this.B_AppChange.TabIndex = 6;
-            this.B_AppChange.Text = "确认";
-            this.B_AppChange.UseVisualStyleBackColor = true;
-            // 
-            // B_CanChange
-            // 
-            this.B_CanChange.Location = new System.Drawing.Point(565, 1);
-            this.B_CanChange.Name = "B_CanChange";
-            this.B_CanChange.Size = new System.Drawing.Size(75, 23);
-            this.B_CanChange.TabIndex = 7;
-            this.B_CanChange.Text = "取消";
-            this.B_CanChange.UseVisualStyleBackColor = true;
             // 
             // D_Station
             // 
@@ -526,29 +463,103 @@
             this.D_Equipe4.HeaderText = "设备4";
             this.D_Equipe4.Name = "D_Equipe4";
             // 
-            // splitContainer3
+            // B_CanChange
             // 
-            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer3.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainer3.Location = new System.Drawing.Point(3, 17);
-            this.splitContainer3.Name = "splitContainer3";
-            this.splitContainer3.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.B_CanChange.Location = new System.Drawing.Point(565, 1);
+            this.B_CanChange.Name = "B_CanChange";
+            this.B_CanChange.Size = new System.Drawing.Size(75, 23);
+            this.B_CanChange.TabIndex = 7;
+            this.B_CanChange.Text = "取消";
+            this.B_CanChange.UseVisualStyleBackColor = true;
             // 
-            // splitContainer3.Panel1
+            // label4
             // 
-            this.splitContainer3.Panel1.Controls.Add(this.dataGridView1);
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(70, 6);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(29, 12);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "里程";
             // 
-            // splitContainer3.Panel2
+            // textBox1
             // 
-            this.splitContainer3.Panel2.Controls.Add(this.B_CanChange);
-            this.splitContainer3.Panel2.Controls.Add(this.label4);
-            this.splitContainer3.Panel2.Controls.Add(this.textBox1);
-            this.splitContainer3.Panel2.Controls.Add(this.B_AppChange);
-            this.splitContainer3.Panel2.Controls.Add(this.label5);
-            this.splitContainer3.Panel2.Controls.Add(this.comboBox1);
-            this.splitContainer3.Size = new System.Drawing.Size(697, 247);
-            this.splitContainer3.SplitterDistance = 218;
-            this.splitContainer3.TabIndex = 1;
+            this.textBox1.Location = new System.Drawing.Point(105, 3);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(121, 21);
+            this.textBox1.TabIndex = 4;
+            // 
+            // B_AppChange
+            // 
+            this.B_AppChange.Location = new System.Drawing.Point(467, 1);
+            this.B_AppChange.Name = "B_AppChange";
+            this.B_AppChange.Size = new System.Drawing.Size(75, 23);
+            this.B_AppChange.TabIndex = 6;
+            this.B_AppChange.Text = "确认";
+            this.B_AppChange.UseVisualStyleBackColor = true;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(232, 6);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(53, 12);
+            this.label5.TabIndex = 5;
+            this.label5.Text = "设备类型";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(300, 3);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 20);
+            this.comboBox1.TabIndex = 2;
+            // 
+            // listView1
+            // 
+            this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView1.Location = new System.Drawing.Point(0, 0);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(703, 202);
+            this.listView1.TabIndex = 0;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(3, 181);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // B_Draw
+            // 
+            this.B_Draw.Location = new System.Drawing.Point(3, 239);
+            this.B_Draw.Name = "B_Draw";
+            this.B_Draw.Size = new System.Drawing.Size(75, 23);
+            this.B_Draw.TabIndex = 0;
+            this.B_Draw.Text = "绘图";
+            this.B_Draw.UseVisualStyleBackColor = true;
+            this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(231, 9);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "label3";
+            // 
+            // B_refresh
+            // 
+            this.B_refresh.Location = new System.Drawing.Point(3, 2);
+            this.B_refresh.Name = "B_refresh";
+            this.B_refresh.Size = new System.Drawing.Size(23, 23);
+            this.B_refresh.TabIndex = 8;
+            this.B_refresh.Text = "R";
+            this.B_refresh.UseVisualStyleBackColor = true;
             // 
             // MainInterface
             // 
@@ -586,12 +597,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
             this.splitContainer3.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -644,5 +655,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn D_Equipe2;
         private System.Windows.Forms.DataGridViewTextBoxColumn D_Equipe3;
         private System.Windows.Forms.DataGridViewTextBoxColumn D_Equipe4;
+        private System.Windows.Forms.Button B_refresh;
     }
 }
