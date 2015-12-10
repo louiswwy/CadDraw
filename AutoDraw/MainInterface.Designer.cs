@@ -57,13 +57,10 @@
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.D_Station = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.D_ConnectionNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.D_Equipe1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.D_Equipe2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.D_Equipe3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.D_Equipe4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             this.B_refresh = new System.Windows.Forms.Button();
             this.B_CanChange = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
@@ -75,9 +72,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
-            this.splitContainer4 = new System.Windows.Forms.SplitContainer();
-            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -99,11 +94,11 @@
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
             this.splitContainer4.Panel1.SuspendLayout();
             this.splitContainer4.Panel2.SuspendLayout();
             this.splitContainer4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -214,6 +209,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.button5);
             this.splitContainer1.Panel1.Controls.Add(this.类型);
             this.splitContainer1.Panel1.Controls.Add(this.button2);
             this.splitContainer1.Panel1.Controls.Add(this.B_SupWayPoint);
@@ -421,18 +417,31 @@
             this.splitContainer3.SplitterDistance = 218;
             this.splitContainer3.TabIndex = 1;
             // 
+            // splitContainer4
+            // 
+            this.splitContainer4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer4.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.splitContainer4.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer4.Name = "splitContainer4";
+            this.splitContainer4.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer4.Panel1
+            // 
+            this.splitContainer4.Panel1.Controls.Add(this.dataGridView1);
+            // 
+            // splitContainer4.Panel2
+            // 
+            this.splitContainer4.Panel2.Controls.Add(this.button4);
+            this.splitContainer4.Panel2.Controls.Add(this.button3);
+            this.splitContainer4.Size = new System.Drawing.Size(697, 218);
+            this.splitContainer4.SplitterDistance = 185;
+            this.splitContainer4.TabIndex = 1;
+            // 
             // dataGridView1
             // 
             this.dataGridView1.BackgroundColor = System.Drawing.Color.Aqua;
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.D_Station,
-            this.D_ConnectionNumber,
-            this.D_Equipe1,
-            this.D_Equipe2,
-            this.D_Equipe3,
-            this.D_Equipe4});
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
@@ -440,35 +449,25 @@
             this.dataGridView1.Size = new System.Drawing.Size(697, 185);
             this.dataGridView1.TabIndex = 0;
             // 
-            // D_Station
+            // button4
             // 
-            this.D_Station.HeaderText = "基站/所亭";
-            this.D_Station.Name = "D_Station";
+            this.button4.Location = new System.Drawing.Point(480, 3);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.TabIndex = 2;
+            this.button4.Text = "取消";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // D_ConnectionNumber
+            // button3
             // 
-            this.D_ConnectionNumber.HeaderText = "设备连接数量";
-            this.D_ConnectionNumber.Name = "D_ConnectionNumber";
-            // 
-            // D_Equipe1
-            // 
-            this.D_Equipe1.HeaderText = "设备1";
-            this.D_Equipe1.Name = "D_Equipe1";
-            // 
-            // D_Equipe2
-            // 
-            this.D_Equipe2.HeaderText = "设备2";
-            this.D_Equipe2.Name = "D_Equipe2";
-            // 
-            // D_Equipe3
-            // 
-            this.D_Equipe3.HeaderText = "设备3";
-            this.D_Equipe3.Name = "D_Equipe3";
-            // 
-            // D_Equipe4
-            // 
-            this.D_Equipe4.HeaderText = "设备4";
-            this.D_Equipe4.Name = "D_Equipe4";
+            this.button3.Location = new System.Drawing.Point(105, 3);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 1;
+            this.button3.Text = "确定";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // B_refresh
             // 
@@ -568,45 +567,15 @@
             this.label3.TabIndex = 0;
             this.label3.Text = "label3";
             // 
-            // button3
+            // button5
             // 
-            this.button3.Location = new System.Drawing.Point(105, 3);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 1;
-            this.button3.Text = "确定";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // splitContainer4
-            // 
-            this.splitContainer4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer4.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainer4.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer4.Name = "splitContainer4";
-            this.splitContainer4.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer4.Panel1
-            // 
-            this.splitContainer4.Panel1.Controls.Add(this.dataGridView1);
-            // 
-            // splitContainer4.Panel2
-            // 
-            this.splitContainer4.Panel2.Controls.Add(this.button4);
-            this.splitContainer4.Panel2.Controls.Add(this.button3);
-            this.splitContainer4.Size = new System.Drawing.Size(697, 218);
-            this.splitContainer4.SplitterDistance = 185;
-            this.splitContainer4.TabIndex = 1;
-            // 
-            // button4
-            // 
-            this.button4.Location = new System.Drawing.Point(480, 3);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(75, 23);
-            this.button4.TabIndex = 2;
-            this.button4.Text = "取消";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.button5.Location = new System.Drawing.Point(13, 281);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(164, 23);
+            this.button5.TabIndex = 12;
+            this.button5.Text = "text XML read";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // MainInterface
             // 
@@ -649,11 +618,11 @@
             this.splitContainer3.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.splitContainer4.Panel1.ResumeLayout(false);
             this.splitContainer4.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
             this.splitContainer4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -700,15 +669,10 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.SplitContainer splitContainer3;
-        private System.Windows.Forms.DataGridViewTextBoxColumn D_Station;
-        private System.Windows.Forms.DataGridViewTextBoxColumn D_ConnectionNumber;
-        private System.Windows.Forms.DataGridViewTextBoxColumn D_Equipe1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn D_Equipe2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn D_Equipe3;
-        private System.Windows.Forms.DataGridViewTextBoxColumn D_Equipe4;
         private System.Windows.Forms.Button B_refresh;
         private System.Windows.Forms.SplitContainer splitContainer4;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button5;
     }
 }

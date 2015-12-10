@@ -852,6 +852,7 @@ namespace AutoDraw
                 
             }
             imgStoragePath = directory + "\\icon"; //icon位置
+            xmlFilePath = directory + "\\setting";
             //创建
             if (!File.Exists(directory + "\\setting\\Setting.xml"))
             {
@@ -920,7 +921,7 @@ namespace AutoDraw
                 //写XML文件
                 if (name != "acadiso.dwt")
                 {
-                    xmlFilePath = "c://defaut.xml";
+                    //xmlFilePath = "c://defaut.xml";
                     if (!File.Exists(xmlFilePath))
                     {
                         createXml(xmlFilePath);
@@ -2043,7 +2044,7 @@ namespace AutoDraw
 
                 }
             }
-            dataGridView1.Columns.Add("里程", "名称");
+            //dataGridView1.Columns.Add("里程", "名称");
             //dataGridView1.Columns.Add("EnglishName", "ChineseName"); 
             dataGridView1.DataSource = tableST.Tables["ST"];
         }
@@ -2063,6 +2064,23 @@ namespace AutoDraw
             {
                 tableST = oldTableSt;
             }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            System.Xml.XmlTextReader reader = new System.Xml.XmlTextReader(xmlFilePath+"\\setting.xml");
+
+            string contents = "";
+            while (reader.Read())
+            {
+                reader.MoveToContent();
+                if (reader.NodeType == System.Xml.XmlNodeType.Element)
+                    contents += "<" + reader.Name + ">\n";
+                if (reader.NodeType == System.Xml.XmlNodeType.Text)
+                    contents += reader.Value + "\n";
+            }
+
+            MessageBox.Show(contents);
         }
 
 
