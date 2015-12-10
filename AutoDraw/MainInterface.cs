@@ -1490,6 +1490,7 @@ namespace AutoDraw
                             InfoStation.Add(sLocation, sName + "," + sType);
                             treeView1.Nodes.Clear();
                             refreshTreeview(true);
+                            fileDataView();  //填充datagridView
                         }
                         else
                         {
@@ -2014,7 +2015,55 @@ namespace AutoDraw
             this.listView1.EndUpdate();  //结束数据处理，UI界面一次性绘制。  
         }
 
+        DataSet tableST;
+        DataSet oldTableSt;
+        System.Data.DataTable stTable;
+        public void fileDataView()
+        {
 
+            if (tableST == null)
+            {
+                tableST = new DataSet("FzProjet"); //创建‘防灾项目’表
+                oldTableSt = new DataSet("backUp");//备份表
+                stTable = tableST.Tables.Add("ST");//创建‘所亭’表
+                System.Data.DataColumn ST = stTable.Columns.Add("里程", typeof(string));// station.Key.ToUpper());
+                stTable.Columns.Add("名称", typeof(string));
+                stTable.PrimaryKey = new System.Data.DataColumn[] { ST };
+            }
+
+            foreach (var station in InfoStation)
+            {
+                if (station.Value.ToString().Contains("所") || station.Value.ToString().Contains("站"))
+                {
+                    if (!stTable.Rows.Contains(station.Key.ToUpper())) //如果datatable中不含有所亭项 
+                    {
+
+                        stTable.Rows.Add(station.Key.ToUpper(), station.Value.ToString());  //添加
+                    }
+
+                }
+            }
+            dataGridView1.Columns.Add("里程", "名称");
+            //dataGridView1.Columns.Add("EnglishName", "ChineseName"); 
+            dataGridView1.DataSource = tableST.Tables["ST"];
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (tableST != null)
+            {
+                tableST.AcceptChanges();
+                oldTableSt = tableST;
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (tableST != null)
+            {
+                tableST = oldTableSt;
+            }
+        }
 
 
         
