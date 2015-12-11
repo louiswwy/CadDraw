@@ -2135,6 +2135,62 @@ namespace AutoDraw
             MessageBox.Show(contents);
         }
 
+        private void B_refresh_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            listView1.MultiSelect = checkBox1.Checked;
+            if (checkBox1.Checked)
+            {
+                listView1.MultiSelect = true;
+                toolStripStatusLabel1.Text = "多选模式，按ctrl键可以多选块图案。";
+            }
+            else
+            {
+                toolStripStatusLabel1.Text = "单选模式。";
+            }
+        }
+
+        List<string> selectListBlock;
+        private void listView1_Click(object sender, EventArgs e)
+        {
+            toolStripStatusLabel1.Text = "选中" + listView1.SelectedItems.Count + "个块";
+
+            selectListBlock = new List<string>();
+            foreach (var item in listView1.SelectedItems)
+            {
+                selectListBlock.Add(textBox1.Text.ToString().Replace(" ", "") + "-" + textBox2.Text.ToString().Replace(" ", "") + "-" + item.ToString());
+            }
+            
+        }
+
+        string selectDataGrid = "";
+
+        private void dataGridView1_Click(object sender, EventArgs e)
+        {
+            int nRow = dataGridView1.CurrentRow.Index; //选中行
+
+            string selectLocation = dataGridView1.Rows[nRow].Cells[0].Value.ToString();
+
+            string selectName = dataGridView1.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[0];
+            string selectType = dataGridView1.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[1];
+
+
+            //每次选中更新字段
+            selectDataGrid = selectLocation + "-" + selectName + selectType;
+            int f = 0;
+
+        }
+
+        private void B_AppChange_Click(object sender, EventArgs e)
+        {
+            XmlFunction xf = new XmlFunction();
+            xf.createConnectionXml(xmlFilePath, selectDataGrid, selectListBlock);
+        }
+
 
         
     }

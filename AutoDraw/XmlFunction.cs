@@ -22,8 +22,8 @@ namespace AutoDraw
             xmlDoc.Load(xmlFile);
 
             if (true)
-            {                                           
-                XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<WayPoints> 
+            {
+                XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
                 XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
                 foreach (var item in infoStation)
                 {
@@ -100,6 +100,47 @@ namespace AutoDraw
                 }
             }
             return elementFound;
+        }
+
+        /// <summary>
+        /// 向xml文件写入设备连接信息
+        /// </summary>
+        /// <param name="xmlFile">文件地址</param>
+        /// <param name="selectGrid">选中所亭项</param>
+        /// <param name="selectBlock">选中的块图案</param>
+        public void createConnectionXml(string xmlFile, string selectGrid, List<string> selectBlocks)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode subroot = root.SelectSingleNode("Connection");//查找<Connection> 
+
+            XmlElement xe1 = xmlDoc.CreateElement("Pair");//创建一个<WayPoint>节点 
+
+            xe1.SetAttribute("location", selectGrid.Split(new char[] { '-' })[0]);//设置该节点location属性 
+            xe1.SetAttribute("name", selectGrid.Split(new char[] { '-' })[1]);//设置该节点name属性 
+
+            foreach (string selectBlock in selectBlocks)
+            {
+                XmlElement subXml1 = xmlDoc.CreateElement("equipement");//创建一个<WayPoint>节点 
+                subXml1.SetAttribute("location", selectBlock.Split(new char[] { '-' })[0]);
+
+                subXml1.SetAttribute("number", selectBlock.Split(new char[] { '-' })[1]);
+
+                subXml1.InnerText = selectBlock.Split(new char[] { '-' })[2];
+
+                xe1.AppendChild(subXml1);
+            }
+
+            subroot.AppendChild(xe1);
+            xmlDoc.Save(xmlFile);  
+            
+        }
+
+        public void loadConnectionXml(string xmlFile) 
+        { 
+
         }
     }
 }

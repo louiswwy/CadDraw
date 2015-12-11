@@ -73,6 +73,9 @@
             this.button1 = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -419,6 +422,9 @@
             // 
             // splitContainer3.Panel2
             // 
+            this.splitContainer3.Panel2.Controls.Add(this.textBox2);
+            this.splitContainer3.Panel2.Controls.Add(this.label6);
+            this.splitContainer3.Panel2.Controls.Add(this.checkBox1);
             this.splitContainer3.Panel2.Controls.Add(this.B_refresh);
             this.splitContainer3.Panel2.Controls.Add(this.B_CanChange);
             this.splitContainer3.Panel2.Controls.Add(this.label4);
@@ -427,7 +433,7 @@
             this.splitContainer3.Panel2.Controls.Add(this.label5);
             this.splitContainer3.Panel2.Controls.Add(this.C_Equipement);
             this.splitContainer3.Size = new System.Drawing.Size(701, 195);
-            this.splitContainer3.SplitterDistance = 166;
+            this.splitContainer3.SplitterDistance = 158;
             this.splitContainer3.TabIndex = 1;
             // 
             // splitContainer4
@@ -462,6 +468,7 @@
             this.dataGridView1.RowTemplate.Height = 23;
             this.dataGridView1.Size = new System.Drawing.Size(693, 209);
             this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.Click += new System.EventHandler(this.dataGridView1_Click);
             // 
             // button4
             // 
@@ -491,10 +498,11 @@
             this.B_refresh.TabIndex = 8;
             this.B_refresh.Text = "R";
             this.B_refresh.UseVisualStyleBackColor = true;
+            this.B_refresh.Click += new System.EventHandler(this.B_refresh_Click);
             // 
             // B_CanChange
             // 
-            this.B_CanChange.Location = new System.Drawing.Point(565, 1);
+            this.B_CanChange.Location = new System.Drawing.Point(607, 2);
             this.B_CanChange.Name = "B_CanChange";
             this.B_CanChange.Size = new System.Drawing.Size(75, 23);
             this.B_CanChange.TabIndex = 7;
@@ -504,32 +512,33 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(70, 6);
+            this.label4.Location = new System.Drawing.Point(86, 7);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(29, 12);
+            this.label4.Size = new System.Drawing.Size(41, 12);
             this.label4.TabIndex = 3;
-            this.label4.Text = "里程";
+            this.label4.Text = "里程：";
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(105, 3);
+            this.textBox1.Location = new System.Drawing.Point(133, 4);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(121, 21);
+            this.textBox1.Size = new System.Drawing.Size(80, 21);
             this.textBox1.TabIndex = 4;
             // 
             // B_AppChange
             // 
-            this.B_AppChange.Location = new System.Drawing.Point(467, 1);
+            this.B_AppChange.Location = new System.Drawing.Point(526, 2);
             this.B_AppChange.Name = "B_AppChange";
             this.B_AppChange.Size = new System.Drawing.Size(75, 23);
             this.B_AppChange.TabIndex = 6;
             this.B_AppChange.Text = "确认";
             this.B_AppChange.UseVisualStyleBackColor = true;
+            this.B_AppChange.Click += new System.EventHandler(this.B_AppChange_Click);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(232, 6);
+            this.label5.Location = new System.Drawing.Point(340, 7);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(53, 12);
             this.label5.TabIndex = 5;
@@ -538,7 +547,7 @@
             // C_Equipement
             // 
             this.C_Equipement.FormattingEnabled = true;
-            this.C_Equipement.Location = new System.Drawing.Point(300, 3);
+            this.C_Equipement.Location = new System.Drawing.Point(399, 4);
             this.C_Equipement.Name = "C_Equipement";
             this.C_Equipement.Size = new System.Drawing.Size(121, 20);
             this.C_Equipement.TabIndex = 2;
@@ -548,9 +557,10 @@
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(699, 164);
+            this.listView1.Size = new System.Drawing.Size(699, 156);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.Click += new System.EventHandler(this.listView1_Click);
             // 
             // button1
             // 
@@ -580,6 +590,33 @@
             this.label3.Size = new System.Drawing.Size(41, 12);
             this.label3.TabIndex = 0;
             this.label3.Text = "label3";
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(32, 6);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(48, 16);
+            this.checkBox1.TabIndex = 9;
+            this.checkBox1.Text = "多选";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(219, 7);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(41, 12);
+            this.label6.TabIndex = 1;
+            this.label6.Text = "个数：";
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(254, 3);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(80, 21);
+            this.textBox2.TabIndex = 1;
             // 
             // MainInterface
             // 
@@ -678,5 +715,8 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label label6;
     }
 }
