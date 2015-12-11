@@ -40,6 +40,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.button5 = new System.Windows.Forms.Button();
             this.类型 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.B_SupWayPoint = new System.Windows.Forms.Button();
@@ -72,7 +73,6 @@
             this.button1 = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.button5 = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -200,7 +200,7 @@
             // 
             // splitContainer1
             // 
-            this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer1.IsSplitterFixed = true;
@@ -229,6 +229,16 @@
             this.splitContainer1.SplitterDistance = 184;
             this.splitContainer1.SplitterWidth = 8;
             this.splitContainer1.TabIndex = 12;
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(13, 281);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(164, 23);
+            this.button5.TabIndex = 12;
+            this.button5.Text = "text XML read";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // 类型
             // 
@@ -364,6 +374,7 @@
             // 
             // splitContainer2
             // 
+            this.splitContainer2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
             this.splitContainer2.Name = "splitContainer2";
@@ -375,34 +386,36 @@
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.listView1);
-            this.splitContainer2.Size = new System.Drawing.Size(703, 473);
-            this.splitContainer2.SplitterDistance = 267;
+            this.splitContainer2.Panel2.Controls.Add(this.splitContainer3);
+            this.splitContainer2.Size = new System.Drawing.Size(705, 475);
+            this.splitContainer2.SplitterDistance = 268;
+            this.splitContainer2.SplitterWidth = 8;
             this.splitContainer2.TabIndex = 0;
             // 
             // groupBox1
             // 
             this.groupBox1.AutoSize = true;
-            this.groupBox1.Controls.Add(this.splitContainer3);
+            this.groupBox1.Controls.Add(this.splitContainer4);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(703, 267);
+            this.groupBox1.Size = new System.Drawing.Size(701, 264);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "防灾设备选择";
             // 
             // splitContainer3
             // 
+            this.splitContainer3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer3.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainer3.Location = new System.Drawing.Point(3, 17);
+            this.splitContainer3.Location = new System.Drawing.Point(0, 0);
             this.splitContainer3.Name = "splitContainer3";
             this.splitContainer3.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // splitContainer3.Panel1
             // 
-            this.splitContainer3.Panel1.Controls.Add(this.splitContainer4);
+            this.splitContainer3.Panel1.Controls.Add(this.listView1);
             // 
             // splitContainer3.Panel2
             // 
@@ -413,15 +426,16 @@
             this.splitContainer3.Panel2.Controls.Add(this.B_AppChange);
             this.splitContainer3.Panel2.Controls.Add(this.label5);
             this.splitContainer3.Panel2.Controls.Add(this.C_Equipement);
-            this.splitContainer3.Size = new System.Drawing.Size(697, 247);
-            this.splitContainer3.SplitterDistance = 218;
+            this.splitContainer3.Size = new System.Drawing.Size(701, 195);
+            this.splitContainer3.SplitterDistance = 166;
             this.splitContainer3.TabIndex = 1;
             // 
             // splitContainer4
             // 
+            this.splitContainer4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer4.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainer4.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer4.Location = new System.Drawing.Point(3, 17);
             this.splitContainer4.Name = "splitContainer4";
             this.splitContainer4.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -433,8 +447,8 @@
             // 
             this.splitContainer4.Panel2.Controls.Add(this.button4);
             this.splitContainer4.Panel2.Controls.Add(this.button3);
-            this.splitContainer4.Size = new System.Drawing.Size(697, 218);
-            this.splitContainer4.SplitterDistance = 185;
+            this.splitContainer4.Size = new System.Drawing.Size(695, 244);
+            this.splitContainer4.SplitterDistance = 211;
             this.splitContainer4.TabIndex = 1;
             // 
             // dataGridView1
@@ -446,7 +460,7 @@
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(697, 185);
+            this.dataGridView1.Size = new System.Drawing.Size(693, 209);
             this.dataGridView1.TabIndex = 0;
             // 
             // button4
@@ -455,7 +469,7 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 2;
-            this.button4.Text = "取消";
+            this.button4.Text = "取消变更";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
@@ -465,7 +479,7 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 1;
-            this.button3.Text = "确定";
+            this.button3.Text = "确认变更定";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -534,7 +548,7 @@
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(703, 202);
+            this.listView1.Size = new System.Drawing.Size(699, 164);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
@@ -566,16 +580,6 @@
             this.label3.Size = new System.Drawing.Size(41, 12);
             this.label3.TabIndex = 0;
             this.label3.Text = "label3";
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(13, 281);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(164, 23);
-            this.button5.TabIndex = 12;
-            this.button5.Text = "text XML read";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // MainInterface
             // 

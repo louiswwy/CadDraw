@@ -729,6 +729,7 @@ namespace AutoDraw
         //string filePath;
         private void MainInterface_Load(object sender, EventArgs e)
         {
+            #region 添加事件
             try
             {
                 //添加eventHandler监控文件状态更改（保存，另存为）
@@ -741,8 +742,9 @@ namespace AutoDraw
             {
                 MessageBox.Show("发生错误!", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-           
+            #endregion
 
+            #region 添加文件
             //toolStripStatusLabel1.Text = getFilePath();
             //combobox添加项
             //TypeWayPoint.ad
@@ -755,16 +757,50 @@ namespace AutoDraw
             else
             {
 
-
                 addFiletoSystem(currentFilePath);
-
                 
                 //filePath = a; ;  //文件位置
                 //xmlFilePath = a + "\\setting";       //xml文件位置
                 //imgStoragePath = a + "\\icon"; //图像文件位置 imgPath
             }
+            #endregion
 
-            
+            #region 读取wayPoint点
+            if (xmlFilePath != null)
+            {
+                XmlFunction xf = new XmlFunction();
+                InfoStation = xf.loadWayPoint(xmlFilePath + "\\setting.xml");
+
+                treeView1.Nodes.Clear(); //清空treeView
+                refreshTreeview(true);   //刷新treeView
+                fileDataView();          //填充datagridView
+            }
+
+            #endregion
+
+
+        }
+
+        /// <summary>
+        /// 读取waypoint信息
+        /// </summary>
+        /// <param name="xmlfilePath">xml文件位置</param>
+        public void loadWayPoint(string xmlfilePath)
+        {
+            //初始化一个xml实例
+            XmlDocument xml = new XmlDocument();
+            //导入指定xml文件
+            xml.Load(xmlfilePath);
+
+            //指定一个节点
+            XmlNode root = xml.SelectSingleNode("WayPoint");
+
+            if (root.HasChildNodes)
+            {
+                //read wayPoint 信息
+            }
+
+
         }
 
         /// <summary>
@@ -828,7 +864,7 @@ namespace AutoDraw
         }
 
         /// <summary>
-        /// 
+        /// 设置变量、创建文件
         /// </summary>
         /// <param name="path"></param>
         private void addFiletoSystem(string path)
@@ -851,9 +887,9 @@ namespace AutoDraw
                 Directory.CreateDirectory(directory + "\\icon");
                 
             }
-            imgStoragePath = directory + "\\icon"; //icon位置
-            xmlFilePath = directory + "\\setting";
-            //创建
+            imgStoragePath = directory + "icon"; //icon位置
+            xmlFilePath = directory + "setting";
+            //创建配置文件
             if (!File.Exists(directory + "\\setting\\Setting.xml"))
             {
                 //File.Create(path + "\\setting\\Setting.xml");
@@ -1455,6 +1491,7 @@ namespace AutoDraw
 
             if (!filePath.ToLower().Contains("template"))
             {
+                //修改功能关闭时
                 if (modifData == false)
                 {
                     #region 添加字典信息
@@ -1504,8 +1541,14 @@ namespace AutoDraw
                     }
 
                     #endregion
+
+                    #region wayPoint写入xml
+                    XmlFunction xF = new XmlFunction();
+
+                    xF.addWayPointNode(xmlFilePath + "\\setting.xml", InfoStation);
+                    #endregion
                 }
-                else //变更dictionary中数据
+                else //修改功能开启时，变更dictionary中数据
                 {
                     #region 修改字典信息
 
@@ -1615,16 +1658,19 @@ namespace AutoDraw
 
         public void createXml(string CreatXmlFilePath)
         {
+            string filepath = getFilePath();
+            string[] strings = filepath.Split(new char[] { '\\' });
+            string PName = strings[strings.Length - 1];
             XmlDocument xmlDoc = new XmlDocument();
             //创建类型声明节点  
             XmlNode node = xmlDoc.CreateXmlDeclaration("1.0", "gb2312", "");
             xmlDoc.AppendChild(node);
             //创建根节点  
-            XmlNode root = xmlDoc.CreateElement("User");
+            XmlNode root = xmlDoc.CreateElement("Projet");
             xmlDoc.AppendChild(root);
-            CreateNode(xmlDoc, root, "name", "xuwei");
-            CreateNode(xmlDoc, root, "sex", "male");
-            CreateNode(xmlDoc, root, "age", "25");
+            CreateNode(xmlDoc, root, "ProjetName", PName);
+            CreateNode(xmlDoc, root, "WayPoints", "");
+            CreateNode(xmlDoc, root, "Connection", "");
             try
             {
                 xmlDoc.Save(CreatXmlFilePath);
@@ -2047,6 +2093,11 @@ namespace AutoDraw
             //dataGridView1.Columns.Add("里程", "名称");
             //dataGridView1.Columns.Add("EnglishName", "ChineseName"); 
             dataGridView1.DataSource = tableST.Tables["ST"];
+            dataGridView1.Columns.Add("设备1","equipe1");
+            dataGridView1.Columns.Add("设备2", "equipe2");
+            dataGridView1.Columns.Add("设备3", "equipe3");
+            dataGridView1.Columns.Add("设备4", "equipe4");
+            dataGridView1.Columns.Add("设备5", "equipe5");
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -2068,6 +2119,7 @@ namespace AutoDraw
 
         private void button5_Click(object sender, EventArgs e)
         {
+            xmlFilePath="C:\\Users\\wenyi\\Desktop\\新建文件夹 (2)\\setting";
             System.Xml.XmlTextReader reader = new System.Xml.XmlTextReader(xmlFilePath+"\\setting.xml");
 
             string contents = "";
