@@ -51,16 +51,20 @@ namespace AutoDraw
             {
                 xf = new XmlFunction();
                 xf.createLineType(xmlfile, DicNandT); //只在xml文件中没有lineName节点时写入
+
+                //只在运行过程中变更线类型表时触发,此处取消
+                dataTimeTag = DateTime.Now.ToLongTimeString();        //记录时间
+                //var args = new TimeMarkUpdateEventArgs(DicNandT);   //
+                //TimeMarkUpdated(this, args);                        //
             }
             catch (System.Exception ee)
             {
 
                 MessageBox.Show("错误：" + ee.ToString());
+                return null;
             }
 
-            dataTimeTag = DateTime.Now.ToLongTimeString();
-            var args = new TimeMarkUpdateEventArgs(dataTimeTag);
-            TimeMarkUpdated(this, args);
+
             return DicNandT;
 
         }
@@ -185,9 +189,8 @@ namespace AutoDraw
 
             //
             dataTimeTag = DateTime.Now.ToLongTimeString();
-            var args = new TimeMarkUpdateEventArgs(dataTimeTag);
-            TimeMarkUpdated(this, args);
-            this.Dispose();
+            //var args = new TimeMarkUpdateEventArgs(newDataSet);
+            //TimeMarkUpdated(this, args);
             //xf.updataLineType(XmlFilePath,)
             /*bool done=false;
 
@@ -239,6 +242,21 @@ namespace AutoDraw
 
                 
         }
+
+        public class newLineList
+        {
+            private Dictionary<string, string> _List;
+
+            public Dictionary<string, string> List
+            {
+                get
+                {
+                    return this._List;
+                }
+
+            }
+        }
+
         int i = 0;
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -259,12 +277,12 @@ namespace AutoDraw
 
         public class TimeMarkUpdateEventArgs : System.EventArgs
         {
-            private string timeMark;
-            public TimeMarkUpdateEventArgs(string MarkTime)
+            private Dictionary<string, string> passDictionary;
+            public TimeMarkUpdateEventArgs(Dictionary<string, string> PassValue)
             {
-                this.timeMark = MarkTime;
+                this.passDictionary = PassValue;
             }
-            public string markTheTime { get { return timeMark; } }
+            public Dictionary<string, string> markTheTime { get { return passDictionary; } }
         }
 
 

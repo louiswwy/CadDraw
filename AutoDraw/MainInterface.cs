@@ -744,6 +744,8 @@ namespace AutoDraw
 
                 //添加commandEnded事件,当每个命令完成后触发
                 Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.CommandEnded += new CommandEventHandler(doc_CommandEnded);
+
+                
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ee)
             {
@@ -844,16 +846,24 @@ namespace AutoDraw
                 if (filePath == "" || filePath == null)
                 {
                     filePath = newFilePath;
-                    addFiletoSystem(filePath); //检查是否有相应文件夹
+                    addFiletoSystem(filePath); //检查并设置xml、icon文件夹
+
+                    Form_LineType fLT = new Form_LineType(newFilePath + "\\setting.xml");
+                    fLT.TimeMarkUpdated += new Form_LineType.TimeMarkUpdateHandler(getTimeMark);
+                    /*if (Local_lastLoadedLineTime == "" && Local_lastLoadedLineTime == fLT.dataTimeTag) //如果还没有读取linelist，切没有打开linetype界面
+                    {
+                        lineList = fLT.defautLineType(xmlFilePath);//调用生成linetype界面的defautLineType功能更新时间戳
+                        Local_lastLoadedLineTime = fLT.dataTimeTag; //统一时间一致
+                    }*/
                 }
                 else //当文件运行过程中已经保存过一次 to be continu
                 {
                     //文件打开过程中更换库位置时
 
                     //调用库位置变更功能
-                    moveDictionary(newFilePath);
+                    //moveDictionary(newFilePath);
                     //设置新库位置
-                    filePath = newFilePath;
+                    //filePath = newFilePath;
 
                 }
                 if (filePath != newFilePath)
@@ -2336,7 +2346,7 @@ namespace AutoDraw
 
         public void getTimeMark(object sender, AutoDraw.Form_LineType.TimeMarkUpdateEventArgs e)
         {
-            remotTimeMark = e.markTheTime.ToString();
+            lineList = e.markTheTime;
             
         }
         string Local_lastLoadedLineTime = "";
@@ -2351,24 +2361,27 @@ namespace AutoDraw
             else
             {
                 //添加事件
-                fLT.TimeMarkUpdated += new Form_LineType.TimeMarkUpdateHandler(getTimeMark);
+               /* fLT.TimeMarkUpdated += new Form_LineType.TimeMarkUpdateHandler(getTimeMark);
                 if (Local_lastLoadedLineTime == "" && Local_lastLoadedLineTime == fLT.dataTimeTag) //如果还没有读取linelist，切没有打开linetype界面
                 {
                     lineList = fLT.defautLineType(xmlFilePath);//调用生成linetype界面的defautLineType功能更新时间戳
                     Local_lastLoadedLineTime = fLT.dataTimeTag; //统一时间一致
-
-                    listLine = new List<string>();
+                */
+                    //listLine = new List<string>();
+                fLT.newDicNandT
+                XmlFunction xF = new XmlFunction();
+                lineList = xF.loadLineType(xmlFilePath + "\\setting.xml"); //每次都要查询，耗时很大
                     foreach (var line in lineList)
                     {
                         listLine.Add(line.Key.ToString());
                         C_Line.Items.Add(line.Key.ToString()); //填充combobox
                     }
-                }
-                else if (Local_lastLoadedLineTime != fLT.dataTimeTag) //如果上一次更新listtype后更新过线缆类型
+                //}
+                /*else if (Local_lastLoadedLineTime != fLT.dataTimeTag) //如果上一次更新listtype后更新过线缆类型
                 {
                     XmlFunction xf = new XmlFunction();
                     lineList = xf.loadLineType(xmlFilePath);
-                }
+                }*/
 
             }
 
@@ -2384,8 +2397,8 @@ namespace AutoDraw
             if (C_Line.Items.Count == 0)
             {
                 XmlFunction xF = new XmlFunction();
-                if (remotTimeMark == "")
-                //if (xF.loadLineType(xmlFilePath + "\\setting.xml") != null) 
+
+                if (xF.loadLineType(xmlFilePath + "\\setting.xml") != null) 
                 {
                     lineList = xF.loadLineType(xmlFilePath + "\\setting.xml");
                 }
