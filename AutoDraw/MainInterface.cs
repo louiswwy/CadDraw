@@ -729,6 +729,13 @@ namespace AutoDraw
         //string filePath;
         private void MainInterface_Load(object sender, EventArgs e)
         {
+
+            /*listLine = new List<string>();
+            foreach (var line in lineList)
+            {
+                listLine.Add(line.Key.ToString());
+                C_Line.Items.Add(line.Key.ToString()); //填充combobox
+            }*/
             #region 添加事件
             try
             {
@@ -1002,11 +1009,11 @@ namespace AutoDraw
                             fillImageList(imgStoragePath, defSize);
                             fileListView(imgStoragePath);
 
-                            C_Equipement.Items.Clear(); //清除combobox项
+                            C_LineType.Items.Clear(); //清除combobox项
                             DirectoryInfo Dir = new DirectoryInfo(imgStoragePath);
                             foreach (FileInfo f in Dir.GetFiles("*.bmp")) //查找文件
                             {
-                                C_Equipement.Items.Add(f.Name.ToString().Split(new char[] { '_' })[0]); //添加项
+                                C_LineType.Items.Add(f.Name.ToString().Split(new char[] { '_' })[0]); //添加项
                             }
 
                             
@@ -2093,11 +2100,11 @@ namespace AutoDraw
             //dataGridView1.Columns.Add("里程", "名称");
             //dataGridView1.Columns.Add("EnglishName", "ChineseName"); 
             dataGridView1.DataSource = tableST.Tables["ST"];
-            dataGridView1.Columns.Add("设备1","equipe1");
+            /*dataGridView1.Columns.Add("设备1","equipe1");
             dataGridView1.Columns.Add("设备2", "equipe2");
             dataGridView1.Columns.Add("设备3", "equipe3");
             dataGridView1.Columns.Add("设备4", "equipe4");
-            dataGridView1.Columns.Add("设备5", "equipe5");
+            dataGridView1.Columns.Add("设备5", "equipe5");*/
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -2154,41 +2161,251 @@ namespace AutoDraw
             }
         }
 
+        /// <summary>
+        /// 在右侧treeview中添加block信息子节点
+        /// </summary>
         List<string> selectListBlock;
         private void listView1_Click(object sender, EventArgs e)
         {
-            toolStripStatusLabel1.Text = "选中" + listView1.SelectedItems.Count + "个块";
-
-            selectListBlock = new List<string>();
-            foreach (var item in listView1.SelectedItems)
+            if (selectedWayPoint.Nodes.Count > 0)
             {
-                selectListBlock.Add(textBox1.Text.ToString().Replace(" ", "") + "-" + textBox2.Text.ToString().Replace(" ", "") + "-" + item.ToString());
+                toolStripStatusLabel1.Text = "选中" + listView1.SelectedItems.Count + "个块";
+
+                selectListBlock = new List<string>();
+
+                TreeNode rootNode = selectedWayPoint.TopNode; //root Node
+
+                foreach (ListViewItem item in listView1.SelectedItems)
+                {
+                    if (textBox1.Text.ToString() != "" && textBox2.Text.ToString() != "")
+                    {
+                        selectListBlock.Add(textBox1.Text.ToString().Replace(" ", "") + "-" + textBox2.Text.ToString().Replace(" ", "") + "-" + item.Text.ToString());
+
+
+                        TreeNode equipeNode = new TreeNode(); //设备接点
+                        equipeNode.Text = "设备: " + item.Text.ToString().Replace(" ", "");
+                        rootNode.Nodes.Add(equipeNode);
+
+                        TreeNode childNode1 = new TreeNode();
+                        childNode1.Text = "里程: " + textBox1.Text.ToUpper().Replace(" ", "");
+                        equipeNode.Nodes.Add(childNode1);
+
+                        TreeNode childNode2 = new TreeNode();
+                        childNode2.Text = "线缆: " + C_LineType.SelectedText.ToString().Replace(" ", "");
+                        equipeNode.Nodes.Add(childNode2);
+
+                        TreeNode childNode3 = new TreeNode();
+                        childNode3.Text = "数量: " + textBox2.Text.ToString().Replace(" ", "");
+                        equipeNode.Nodes.Add(childNode3);
+                    }
+                    else
+                    {
+                        MessageBox.Show("右侧面板数据不能为空。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+      
+                } 
+            }
+            else
+            {
+                MessageBox.Show("没有选中所亭。");
             }
             
         }
 
         string selectDataGrid = "";
 
+        /// <summary>
+        /// 每在datagridview中选中一个非空项，就在右侧treeview中添加一个node。一次只显示一个node
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dataGridView1_Click(object sender, EventArgs e)
         {
-            int nRow = dataGridView1.CurrentRow.Index; //选中行
+            if (dataGridView1.CurrentRow != null) //如果选中项不为空
+            {
+                int nRow = dataGridView1.CurrentRow.Index; //选中行
 
-            string selectLocation = dataGridView1.Rows[nRow].Cells[0].Value.ToString();
+                string selectLocation = dataGridView1.Rows[nRow].Cells[0].Value.ToString();
 
-            string selectName = dataGridView1.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[0];
-            string selectType = dataGridView1.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[1];
+                string selectName = dataGridView1.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[0];
+                string selectType = dataGridView1.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[1];
 
 
-            //每次选中更新字段
-            selectDataGrid = selectLocation + "-" + selectName + selectType;
-            int f = 0;
+                //每次选中更新字段
+                selectDataGrid = selectLocation + "-" + selectName + selectType;
 
+                //填充selectedWayPoint表，一次只能显示一个
+
+                //清空treeview
+                selectedWayPoint.Nodes.Clear();
+                //添加项到连接表
+                TreeNode firstNode = new TreeNode();
+                firstNode.Text = selectDataGrid;
+                selectedWayPoint.Nodes.Add(firstNode);
+
+
+            }
+
+
+        }
+
+        /// <summary>
+        /// 检查选中项是否已经存在于treeview中
+        /// </summary>
+        /// <param name="checkString"></param>
+        /// <returns></returns>
+        public bool checkTreeView(string checkString)
+        {
+            bool isDuplicate = false;
+
+            foreach (TreeNode node in selectedWayPoint.Nodes)
+            {
+                if (node.Level == 0)
+                {
+                    if (node.Text.ToUpper() == checkString)
+                    {
+                        isDuplicate = true;
+                        break;
+                    }
+                }
+            }
+
+            return isDuplicate;
         }
 
         private void B_AppChange_Click(object sender, EventArgs e)
         {
-            XmlFunction xf = new XmlFunction();
-            xf.createConnectionXml(xmlFilePath, selectDataGrid, selectListBlock);
+
+
+            /*XmlFunction xf = new XmlFunction();
+            
+            List<string> equipeNode = new List<string>();
+
+            foreach (TreeNode node in selectedWayPoint.Nodes)
+            {
+                if (node.Level == 0)
+                {
+                    string SuoTing = node.Name.ToString().ToUpper().Replace(" ", "");
+
+                    string equipeInfor = "";
+                    foreach(TreeNode childNode in node.Nodes)
+                    {
+                        equipeInfor += childNode.Name.ToString() + ","; //里程，名称，数量
+                        
+                    }
+                    equipeNode.Add(equipeInfor);
+                }
+            }
+            xf.createConnectionXml(xmlFilePath, selectDataGrid, equipeNode);*/
+        }
+
+        /// <summary>
+        /// 清空selectedWayPoint treeview
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void B_CanChange_Click(object sender, EventArgs e)
+        {
+            selectedWayPoint.Nodes.Clear();
+        }
+
+        private void 可选线缆类型ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (xmlFilePath != null || xmlFilePath != "")
+            {
+                Form_LineType LT = new Form_LineType(xmlFilePath + "\\setting.xml");
+                LT.ShowDialog();
+            }
+        }
+
+        private void selectedWayPoint_Click(object sender, EventArgs e)
+        {
+            if (selectedWayPoint.SelectedNode != null)
+            {
+                if (selectedWayPoint.SelectedNode.Level > 0) //l选中项非第一级node事
+                {
+                    TreeNode parentNode = selectedWayPoint.SelectedNode.Parent;
+
+                    TreeNode a = parentNode.NextNode;
+                    TreeNode b = a.NextNode;
+                    TreeNode c = b.NextNode;
+                    TreeNode d = c.NextNode;
+                }
+            }
+        }
+
+        public void getTimeMark(object sender, AutoDraw.Form_LineType.TimeMarkUpdateEventArgs e)
+        {
+            remotTimeMark = e.markTheTime.ToString();
+            
+        }
+        string Local_lastLoadedLineTime = "";
+        string remotTimeMark = "";
+        Dictionary<string, string> lineList;
+        List<string> listLine;
+        private void C_Line_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Form_LineType fLT = new Form_LineType(xmlFilePath);
+
+            if (C_Line.SelectedText == "") { return; }
+            else
+            {
+                //添加事件
+                fLT.TimeMarkUpdated += new Form_LineType.TimeMarkUpdateHandler(getTimeMark);
+                if (Local_lastLoadedLineTime == "" && Local_lastLoadedLineTime == fLT.dataTimeTag) //如果还没有读取linelist，切没有打开linetype界面
+                {
+                    lineList = fLT.defautLineType(xmlFilePath);//调用生成linetype界面的defautLineType功能更新时间戳
+                    Local_lastLoadedLineTime = fLT.dataTimeTag; //统一时间一致
+
+                    listLine = new List<string>();
+                    foreach (var line in lineList)
+                    {
+                        listLine.Add(line.Key.ToString());
+                        C_Line.Items.Add(line.Key.ToString()); //填充combobox
+                    }
+                }
+                else if (Local_lastLoadedLineTime != fLT.dataTimeTag) //如果上一次更新listtype后更新过线缆类型
+                {
+                    XmlFunction xf = new XmlFunction();
+                    lineList = xf.loadLineType(xmlFilePath);
+                }
+
+            }
+
+        }
+
+        /// <summary>
+        /// 第一次点击用来填充列表
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void C_Line_Click(object sender, EventArgs e)
+        {
+            if (C_Line.Items.Count == 0)
+            {
+                XmlFunction xF = new XmlFunction();
+                if (remotTimeMark == "")
+                //if (xF.loadLineType(xmlFilePath + "\\setting.xml") != null) 
+                {
+                    lineList = xF.loadLineType(xmlFilePath + "\\setting.xml");
+                }
+                else
+                {
+                    Form_LineType fLT = new Form_LineType(xmlFilePath + "\\setting.xml");
+                    lineList = fLT.defautLineType(xmlFilePath + "\\setting.xml");//调用生成linetype界面的defautLineType功能更新时间戳
+                    Local_lastLoadedLineTime = fLT.dataTimeTag; //统一时间一致
+                }
+
+
+                listLine = new List<string>();
+                foreach (var line in lineList)
+                {
+                    listLine.Add(line.Key.ToString());
+                    C_Line.Items.Add(line.Key.ToString()); //填充combobox
+                }
+
+                C_Line.Click -= new EventHandler(C_Line_Click);
+            }
         }
 
 

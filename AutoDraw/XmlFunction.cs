@@ -142,5 +142,130 @@ namespace AutoDraw
         { 
 
         }
+
+
+        #region 线缆部分
+        /// <summary>
+        /// 写入线缆类型
+        /// </summary>
+        /// <param name="xmlFile"></param>
+        public void createLineType(string xmlFile, Dictionary<string, string> NameAndType)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+
+
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode xe1 = root.SelectSingleNode("LineName");
+            if (xe1 == null)
+            {
+                xe1 = xmlDoc.CreateElement("LineName");//创建一个<LineName>节点 
+                root.AppendChild(xe1);
+            }
+
+               
+
+            foreach (var item in NameAndType)
+            {
+                if (!duplicateXML(xe1.ChildNodes, item.Key.ToString()))
+                {
+                    string text = item.Value.ToString();
+                    string name = text.Split(new char[] { ',' })[0]; //type
+                    string sx = text.Split(new char[] { ',' })[1];  //short
+                    string num = text.Split(new char[] { ',' })[2]; //num1
+                    string numX = text.Split(new char[] { ',' })[3]; //numX
+
+                    XmlElement childNode = xmlDoc.CreateElement("Line");//创建一个<Line>节点  
+                    childNode.SetAttribute("Type", name);//设置该节点 线缆类型 名字属性 
+                    childNode.SetAttribute("Short", sx);//设置该节点 缩写 属性 
+                    childNode.SetAttribute("num1", num);//设置该节点 第一个数量 属性 
+                    childNode.SetAttribute("num2", numX);//设置该节点 芯数 属性 
+                    childNode.InnerText = item.Key.ToString();
+                    xe1.AppendChild(childNode);
+                }
+            }
+            xmlDoc.Save(xmlFile);
+        }
+
+        public bool duplicateXML(XmlNodeList xmlList, string toCheck)
+        {
+            bool isDupli = false;
+            foreach (XmlElement node in xmlList)
+            {
+                if (node.InnerText == toCheck)
+                {
+                    isDupli = true;
+                    break;
+                }
+            }
+            return isDupli;
+        }
+        public void updataLineType(string xmlFile, Dictionary<string, string> NameAndType)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+
+
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+
+
+            XmlNode xe1 = root.SelectSingleNode("LineName");//创建一个<LineName>节点
+
+            if (xe1 != null)
+            {
+                xe1.RemoveAll(); //删除现有项
+
+                xmlDoc.Save(xmlFile);
+                createLineType(xmlFile, NameAndType);
+
+            }
+
+        }
+
+
+        public Dictionary<string, string> loadLineType(string xmlFile)
+        {
+            Dictionary<string, string> retuneValue = new Dictionary<string, string>();
+            if (xmlFile != "")
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(xmlFile);
+
+
+                XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+
+                //foreach (string item in NameAndType)
+
+                XmlNode xe1 = root.SelectSingleNode("LineName");//创建一个<LineName>节点
+
+                if (xe1 != null)
+                {
+                    XmlNodeList nodeList = xe1.ChildNodes;//获取FatherNode节点的所有子节点   
+
+                    if (nodeList != null)
+                    {
+                        foreach (var childNode in nodeList)
+                        {
+                            XmlElement childElement = (XmlElement)childNode;
+                            string type = childElement.GetAttribute("Type");
+                            string Short = childElement.GetAttribute("Short");
+                            string num1 = childElement.GetAttribute("num1");
+                            string num2 = childElement.GetAttribute("num2");
+                            string fullName = childElement.InnerText;
+
+                            retuneValue.Add(fullName, type + "," + Short + "," + num1 + "," + num2);
+                        }
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            return retuneValue;
+
+        }
+
+        #endregion
     }
 }

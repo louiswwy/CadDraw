@@ -60,6 +60,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Form_LineType.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_LineType.Designer.cs">
+      <DependentUpon>Form_LineType.cs</DependentUpon>
+    </Compile>
     <Compile Include="XmlFunction.cs" />
     <Compile Include="MainInterface.cs">
       <SubType>Form</SubType>
@@ -83,6 +89,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Form_LineType.resx">
+      <DependentUpon>Form_LineType.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainInterface.resx">
       <DependentUpon>MainInterface.cs</DependentUpon>
     </EmbeddedResource>
