@@ -243,19 +243,7 @@ namespace AutoDraw
                 
         }
 
-        public class newLineList
-        {
-            private Dictionary<string, string> _List;
 
-            public Dictionary<string, string> List
-            {
-                get
-                {
-                    return this._List;
-                }
-
-            }
-        }
 
         int i = 0;
         private void timer1_Tick(object sender, EventArgs e)

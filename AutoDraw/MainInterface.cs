@@ -2368,7 +2368,6 @@ namespace AutoDraw
                     Local_lastLoadedLineTime = fLT.dataTimeTag; //统一时间一致
                 */
                     //listLine = new List<string>();
-                fLT.newDicNandT
                 XmlFunction xF = new XmlFunction();
                 lineList = xF.loadLineType(xmlFilePath + "\\setting.xml"); //每次都要查询，耗时很大
                     foreach (var line in lineList)
