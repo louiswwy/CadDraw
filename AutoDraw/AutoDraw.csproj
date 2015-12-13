@@ -66,6 +66,7 @@
     <Compile Include="Form_LineType.Designer.cs">
       <DependentUpon>Form_LineType.cs</DependentUpon>
     </Compile>
+    <Compile Include="PFunction.cs" />
     <Compile Include="XmlFunction.cs" />
     <Compile Include="MainInterface.cs">
       <SubType>Form</SubType>

@@ -41,7 +41,6 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.button5 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
             this.类型 = new System.Windows.Forms.Label();
@@ -76,12 +75,13 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.C_LineType = new System.Windows.Forms.ComboBox();
-            this.B_AppChange = new System.Windows.Forms.Button();
+            this.C_equipeType = new System.Windows.Forms.ComboBox();
+            this.B_AddEquipe = new System.Windows.Forms.Button();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.label7 = new System.Windows.Forms.Label();
             this.listView1 = new System.Windows.Forms.ListView();
             this.label3 = new System.Windows.Forms.Label();
+            this.B_writeXML = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -229,7 +229,6 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.button5);
             this.splitContainer1.Panel1.Controls.Add(this.button1);
             this.splitContainer1.Panel1.Controls.Add(this.B_Draw);
             this.splitContainer1.Panel1.Controls.Add(this.类型);
@@ -251,16 +250,6 @@
             this.splitContainer1.SplitterDistance = 184;
             this.splitContainer1.SplitterWidth = 8;
             this.splitContainer1.TabIndex = 12;
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(13, 281);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(164, 23);
-            this.button5.TabIndex = 12;
-            this.button5.Text = "text XML read";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button1
             // 
@@ -428,7 +417,7 @@
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer5);
             this.splitContainer2.Size = new System.Drawing.Size(525, 533);
-            this.splitContainer2.SplitterDistance = 300;
+            this.splitContainer2.SplitterDistance = 317;
             this.splitContainer2.SplitterWidth = 8;
             this.splitContainer2.TabIndex = 0;
             // 
@@ -439,7 +428,7 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(521, 296);
+            this.groupBox1.Size = new System.Drawing.Size(521, 313);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "防灾设备选择";
@@ -461,8 +450,8 @@
             // 
             this.splitContainer4.Panel2.Controls.Add(this.button4);
             this.splitContainer4.Panel2.Controls.Add(this.button3);
-            this.splitContainer4.Size = new System.Drawing.Size(515, 276);
-            this.splitContainer4.SplitterDistance = 243;
+            this.splitContainer4.Size = new System.Drawing.Size(515, 293);
+            this.splitContainer4.SplitterDistance = 260;
             this.splitContainer4.TabIndex = 1;
             // 
             // dataGridView1
@@ -474,7 +463,7 @@
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(513, 241);
+            this.dataGridView1.Size = new System.Drawing.Size(513, 258);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.Click += new System.EventHandler(this.dataGridView1_Click);
             // 
@@ -511,6 +500,7 @@
             // 
             // splitContainer5.Panel2
             // 
+            this.splitContainer5.Panel2.Controls.Add(this.B_writeXML);
             this.splitContainer5.Panel2.Controls.Add(this.C_Line);
             this.splitContainer5.Panel2.Controls.Add(this.label8);
             this.splitContainer5.Panel2.Controls.Add(this.B_CanChange);
@@ -521,9 +511,9 @@
             this.splitContainer5.Panel2.Controls.Add(this.textBox1);
             this.splitContainer5.Panel2.Controls.Add(this.label6);
             this.splitContainer5.Panel2.Controls.Add(this.label4);
-            this.splitContainer5.Panel2.Controls.Add(this.C_LineType);
-            this.splitContainer5.Panel2.Controls.Add(this.B_AppChange);
-            this.splitContainer5.Size = new System.Drawing.Size(521, 221);
+            this.splitContainer5.Panel2.Controls.Add(this.C_equipeType);
+            this.splitContainer5.Panel2.Controls.Add(this.B_AddEquipe);
+            this.splitContainer5.Size = new System.Drawing.Size(521, 204);
             this.splitContainer5.SplitterDistance = 345;
             this.splitContainer5.TabIndex = 2;
             // 
@@ -532,14 +522,14 @@
             this.selectedWayPoint.Dock = System.Windows.Forms.DockStyle.Fill;
             this.selectedWayPoint.Location = new System.Drawing.Point(0, 0);
             this.selectedWayPoint.Name = "selectedWayPoint";
-            this.selectedWayPoint.Size = new System.Drawing.Size(345, 221);
+            this.selectedWayPoint.Size = new System.Drawing.Size(345, 204);
             this.selectedWayPoint.TabIndex = 0;
             this.selectedWayPoint.Click += new System.EventHandler(this.selectedWayPoint_Click);
             // 
             // C_Line
             // 
             this.C_Line.FormattingEnabled = true;
-            this.C_Line.Location = new System.Drawing.Point(62, 136);
+            this.C_Line.Location = new System.Drawing.Point(63, 115);
             this.C_Line.Name = "C_Line";
             this.C_Line.Size = new System.Drawing.Size(106, 20);
             this.C_Line.TabIndex = 11;
@@ -549,7 +539,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 139);
+            this.label8.Location = new System.Drawing.Point(4, 118);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(53, 12);
             this.label8.TabIndex = 10;
@@ -557,7 +547,7 @@
             // 
             // B_CanChange
             // 
-            this.B_CanChange.Location = new System.Drawing.Point(93, 162);
+            this.B_CanChange.Location = new System.Drawing.Point(94, 141);
             this.B_CanChange.Name = "B_CanChange";
             this.B_CanChange.Size = new System.Drawing.Size(75, 23);
             this.B_CanChange.TabIndex = 7;
@@ -568,17 +558,18 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(32, 34);
+            this.checkBox1.Location = new System.Drawing.Point(33, 13);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(48, 16);
             this.checkBox1.TabIndex = 9;
             this.checkBox1.Text = "多选";
             this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.Visible = false;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // B_refresh
             // 
-            this.B_refresh.Location = new System.Drawing.Point(3, 30);
+            this.B_refresh.Location = new System.Drawing.Point(4, 9);
             this.B_refresh.Name = "B_refresh";
             this.B_refresh.Size = new System.Drawing.Size(23, 23);
             this.B_refresh.TabIndex = 8;
@@ -588,7 +579,7 @@
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(62, 83);
+            this.textBox2.Location = new System.Drawing.Point(63, 62);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(106, 21);
             this.textBox2.TabIndex = 1;
@@ -596,7 +587,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(3, 113);
+            this.label5.Location = new System.Drawing.Point(4, 92);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(53, 12);
             this.label5.TabIndex = 5;
@@ -604,7 +595,7 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(62, 56);
+            this.textBox1.Location = new System.Drawing.Point(63, 35);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(106, 21);
             this.textBox1.TabIndex = 4;
@@ -612,7 +603,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(15, 86);
+            this.label6.Location = new System.Drawing.Point(16, 65);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(41, 12);
             this.label6.TabIndex = 1;
@@ -621,29 +612,30 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(15, 59);
+            this.label4.Location = new System.Drawing.Point(16, 38);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(41, 12);
             this.label4.TabIndex = 3;
             this.label4.Text = "里程：";
             // 
-            // C_LineType
+            // C_equipeType
             // 
-            this.C_LineType.FormattingEnabled = true;
-            this.C_LineType.Location = new System.Drawing.Point(62, 110);
-            this.C_LineType.Name = "C_LineType";
-            this.C_LineType.Size = new System.Drawing.Size(106, 20);
-            this.C_LineType.TabIndex = 2;
+            this.C_equipeType.FormattingEnabled = true;
+            this.C_equipeType.Location = new System.Drawing.Point(63, 89);
+            this.C_equipeType.Name = "C_equipeType";
+            this.C_equipeType.Size = new System.Drawing.Size(106, 20);
+            this.C_equipeType.TabIndex = 2;
+            this.C_equipeType.SelectedIndexChanged += new System.EventHandler(this.C_equipeType_SelectedIndexChanged);
             // 
-            // B_AppChange
+            // B_AddEquipe
             // 
-            this.B_AppChange.Location = new System.Drawing.Point(12, 162);
-            this.B_AppChange.Name = "B_AppChange";
-            this.B_AppChange.Size = new System.Drawing.Size(75, 23);
-            this.B_AppChange.TabIndex = 6;
-            this.B_AppChange.Text = "确认";
-            this.B_AppChange.UseVisualStyleBackColor = true;
-            this.B_AppChange.Click += new System.EventHandler(this.B_AppChange_Click);
+            this.B_AddEquipe.Location = new System.Drawing.Point(13, 141);
+            this.B_AddEquipe.Name = "B_AddEquipe";
+            this.B_AddEquipe.Size = new System.Drawing.Size(75, 23);
+            this.B_AddEquipe.TabIndex = 6;
+            this.B_AddEquipe.Text = "添加";
+            this.B_AddEquipe.UseVisualStyleBackColor = true;
+            this.B_AddEquipe.Click += new System.EventHandler(this.B_AddEquipe_Click);
             // 
             // splitContainer6
             // 
@@ -687,6 +679,16 @@
             this.label3.Size = new System.Drawing.Size(41, 12);
             this.label3.TabIndex = 0;
             this.label3.Text = "label3";
+            // 
+            // B_writeXML
+            // 
+            this.B_writeXML.Location = new System.Drawing.Point(13, 170);
+            this.B_writeXML.Name = "B_writeXML";
+            this.B_writeXML.Size = new System.Drawing.Size(155, 23);
+            this.B_writeXML.TabIndex = 12;
+            this.B_writeXML.Text = "写入";
+            this.B_writeXML.UseVisualStyleBackColor = true;
+            this.B_writeXML.Click += new System.EventHandler(this.B_writeXML_Click);
             // 
             // MainInterface
             // 
@@ -773,13 +775,13 @@
         private System.Windows.Forms.Button B_SupWayPoint;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.ComboBox C_LineType;
+        private System.Windows.Forms.ComboBox C_equipeType;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Button B_CanChange;
-        private System.Windows.Forms.Button B_AppChange;
+        private System.Windows.Forms.Button B_AddEquipe;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label4;
@@ -787,7 +789,6 @@
         private System.Windows.Forms.SplitContainer splitContainer4;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button5;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label6;
@@ -798,5 +799,6 @@
         private System.Windows.Forms.ComboBox C_Line;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button B_writeXML;
     }
 }
