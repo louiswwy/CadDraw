@@ -130,12 +130,13 @@ namespace AutoDraw
             BlockTableRecord acBlkTblRec = new BlockTableRecord();
             acBlkTbl.UpgradeOpen();
             acBlkTbl.Add(acBlkTblRec);
-            acBlkTblRec.Name = "铁轨_Length_208";
+            acBlkTblRec.Name = "铁轨_Length_248";
 
             //块属性
             double textHeight = 3;
             //AttributeDefinition ProjectNameShortAtt = new AttributeDefinition(new Point3d(insertPoint.X, insertPoint.Y - 7 / 2, 0), RailWayDirection, "上/下行", "输入线路名简称", ObjectId.Null);
 
+            //块属性
             AttributeDefinition ProjectNameShortAtt = new AttributeDefinition();
             ProjectNameShortAtt.TextString = "XXX上行/下行线";
             ProjectNameShortAtt.Tag = "上行/下行线";
@@ -152,6 +153,7 @@ namespace AutoDraw
             trans.AddNewlyCreatedDBObject(ProjectNameShortAtt, true);
             //ProjectNameShortAtt.AlignmentPoint = new Point3d(1, 1, 0);
 
+            //
             Polyline BigRectangle = new Polyline(4);
             BigRectangle.AddVertexAt(0, new Point2d(insertPoint.X + 15, insertPoint.Y), 0, 0.1, 0.1);
             BigRectangle.AddVertexAt(1, new Point2d(insertPoint.X + 15 + 228, insertPoint.Y), 0, 0.1, 0.1);

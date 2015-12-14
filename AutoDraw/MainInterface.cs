@@ -1519,8 +1519,18 @@ namespace AutoDraw
                     #region 添加字典信息
                     if (TypeWayPoint.SelectedItem != null)
                     {
-                        if (TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.ToString() != "")
+                        if (TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.Text.ToString().Replace(" ","") != "")
                         {
+                            PFunction pF=new PFunction();
+                            if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$"))
+                            {
+                                return;
+                            }
+                            //if (!pF.isExMatch(T_SLocation.Text.ToString().Replace(" ", ""), @"^([A-Z]*)(\d*)([A-Z]*)(\d*).(\d{0,4})$"))   (\d+)+(\d{0,4})
+                            if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                            {
+                                return;
+                            }
                             string sLocation = "";
                             string sName = T_SName.Text.ToString();
                             string sType = TypeWayPoint.SelectedItem.ToString();
@@ -2196,37 +2206,42 @@ namespace AutoDraw
                 string selectType = dataGridView1.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[1];
 
 
-                //每次选中更新字段
-                selectDataGrid = selectLocation + "-" + selectName + selectType;
-
-                //填充selectedWayPoint表，一次只能显示一个
-
-                //清空treeview
-                //selectedWayPoint.Nodes.Clear();
-                //添加项到连接表
-                bool inTheList = false;
-                TreeNode NodeIndex = new TreeNode();
-                foreach (TreeNode node in selectedWayPoint.Nodes)
+                if (selectType != "车站")
                 {
-                    if (node.Level == 0)
+                    //每次选中更新字段
+                    selectDataGrid = selectLocation + "-" + selectName + selectType;
+
+                    //填充selectedWayPoint表，一次只能显示一个
+
+                    //清空treeview
+                    //selectedWayPoint.Nodes.Clear();
+                    //添加项到连接表
+                    bool inTheList = false;
+                    TreeNode NodeIndex = new TreeNode();
+
+                    //便利列表，检查是否datagridView中选中项是否已经存在于treeview中
+                    foreach (TreeNode node in selectedWayPoint.Nodes)
                     {
-                        if (node.Text == selectDataGrid)
+                        if (node.Level == 0)
                         {
-                            inTheList = true;
-                            NodeIndex = node;
-                            break;
+                            if (node.Text == selectDataGrid)
+                            {
+                                inTheList = true; //存在于treeview中
+                                NodeIndex = node;
+                                break;
+                            }
                         }
                     }
-                }
-                if (!inTheList)
-                {
-                    TreeNode firstNode = new TreeNode();
-                    firstNode.Text = selectDataGrid;
-                    selectedWayPoint.Nodes.Add(firstNode);
-                }
-                else
-                {
-                    selectedWayPoint.SelectedNode = NodeIndex;
+                    if (!inTheList) //如果不存在
+                    {
+                        TreeNode firstNode = new TreeNode();
+                        firstNode.Text = selectDataGrid;
+                        selectedWayPoint.Nodes.Add(firstNode); //添加
+                    }
+                    else
+                    {
+                        selectedWayPoint.SelectedNode = NodeIndex; //如果选中项的项存在于treeView中，则treeView选中对应项
+                    }
                 }
 
 
