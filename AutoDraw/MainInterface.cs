@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Data;
 using System.Text;
 using System;
+using System.Linq;
 
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -729,23 +730,11 @@ namespace AutoDraw
         //string filePath;
         private void MainInterface_Load(object sender, EventArgs e)
         {
-
-            /*listLine = new List<string>();
-            foreach (var line in lineList)
-            {
-                listLine.Add(line.Key.ToString());
-                C_Line.Items.Add(line.Key.ToString()); //填充combobox
-            }*/
             #region 添加事件
             try
             {
-                //添加eventHandler监控文件状态更改（保存，另存为）
-                //Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.DocumentLockModeChanged += new DocumentLockModeChangedEventHandler(callback_DocumentManager_DocumentLockModeChanged);
-
                 //添加commandEnded事件,当每个命令完成后触发
-                Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.CommandEnded += new CommandEventHandler(doc_CommandEnded);
-
-                
+                Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.CommandEnded += new CommandEventHandler(doc_CommandEnded);                
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ee)
             {
@@ -754,10 +743,6 @@ namespace AutoDraw
             #endregion
 
             #region 添加文件
-            //toolStripStatusLabel1.Text = getFilePath();
-            //combobox添加项
-            //TypeWayPoint.ad
-
             string currentFilePath= getFilePath();
             if (currentFilePath.ToLower().Contains("template"))
             {
@@ -765,16 +750,11 @@ namespace AutoDraw
             }
             else
             {
-
                 addFiletoSystem(currentFilePath);
-                
-                //filePath = a; ;  //文件位置
-                //xmlFilePath = a + "\\setting";       //xml文件位置
-                //imgStoragePath = a + "\\icon"; //图像文件位置 imgPath
             }
             #endregion
 
-            #region 读取wayPoint点
+            #region 从xml文件中读取wayPoint点
             if (xmlFilePath != null)
             {
                 XmlFunction xf = new XmlFunction();
@@ -787,8 +767,30 @@ namespace AutoDraw
 
             #endregion
 
+            #region 检查块
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    toolStripStatusLabel1.Text = "检查块";
+                    DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
 
+                    drawFunction dF = new drawFunction();
+                    dF.CheckBlock();
+
+                    trans.Commit();
+                    m_DocumentLock.Dispose();
+                }
+                catch (Autodesk.AutoCAD.Runtime.Exception ee)
+                {
+                    Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("Message: " + ee.Message.ToString() + System.Environment.NewLine + "Source: " + ee.Source.ToString() + System.Environment.NewLine + "TargetSite: " + ee.TargetSite.ToString() + System.Environment.NewLine + "StackTrace: " + ee.StackTrace.ToString());
+                }
+            }
+            #endregion
         }
+
+
 
         /// <summary>
         /// 读取waypoint信息
@@ -825,7 +827,7 @@ namespace AutoDraw
                 toolStripStatusLabel1.Text = getFilePath();
             }
         }
-        
+
         /// <summary>
         /// 当保存完文件以后触发
         /// </summary>
@@ -840,45 +842,48 @@ namespace AutoDraw
                 toolStripStatusLabel1.Text = newFilePath;
 
                 //获取文件位置
-
-
                 //当程序第一次运行
-                if (filePath == "" || filePath == null)
-                {
-                    filePath = newFilePath;
-                    addFiletoSystem(filePath); //检查并设置xml、icon文件夹
+                //if (filePath == "" || filePath == null)
+                //{
+                filePath = newFilePath;
+                addFiletoSystem(filePath); //检查并设置xml、icon文件夹
 
-                    Form_LineType fLT = new Form_LineType(newFilePath + "\\setting.xml");
-                    fLT.TimeMarkUpdated += new Form_LineType.TimeMarkUpdateHandler(getTimeMark);
-                    /*if (Local_lastLoadedLineTime == "" && Local_lastLoadedLineTime == fLT.dataTimeTag) //如果还没有读取linelist，切没有打开linetype界面
-                    {
-                        lineList = fLT.defautLineType(xmlFilePath);//调用生成linetype界面的defautLineType功能更新时间戳
-                        Local_lastLoadedLineTime = fLT.dataTimeTag; //统一时间一致
-                    }*/
-                }
-                else //当文件运行过程中已经保存过一次 to be continu
-                {
-                    //文件打开过程中更换库位置时
+                /****废弃******/
+                Form_LineType fLT = new Form_LineType(newFilePath + "\\setting.xml");
+                fLT.TimeMarkUpdated += new Form_LineType.TimeMarkUpdateHandler(getTimeMark);
+                /****废弃******/
 
-                    //调用库位置变更功能
-                    //moveDictionary(newFilePath);
-                    //设置新库位置
-                    //filePath = newFilePath;
-
-                }
-                if (filePath != newFilePath)
-                {
-                    //文件位置
-                    
-                }
                 
-                Document doc = sender as Document;
-                if (!doc.Editor.IsQuiescent) return;
-                else { MessageBox.Show("doc IsQuiescent?"); }
 
-                //DoSomeWork();
+                /*if (Local_lastLoadedLineTime == "" && Local_lastLoadedLineTime == fLT.dataTimeTag) //如果还没有读取linelist，切没有打开linetype界面
+                {
+                    lineList = fLT.defautLineType(xmlFilePath);//调用生成linetype界面的defautLineType功能更新时间戳
+                    Local_lastLoadedLineTime = fLT.dataTimeTag; //统一时间一致
+                }*/
+                //}
+                //else //当文件运行过程中已经保存过一次 to be continu
+                //{
+                //文件打开过程中更换库位置时
+
+                //调用库位置变更功能
+                //moveDictionary(newFilePath);
+                //设置新库位置
+                //filePath = newFilePath;
+
             }
+            if (filePath != newFilePath)
+            {
+                //文件位置
+
+            }
+
+            Document doc = sender as Document;
+            if (!doc.Editor.IsQuiescent) return;
+            else { MessageBox.Show("doc IsQuiescent?"); }
+
+            //DoSomeWork();
         }
+        
 
         /// <summary>
         /// 设置变量、创建文件
@@ -1019,11 +1024,11 @@ namespace AutoDraw
                             fillImageList(imgStoragePath, defSize);
                             fileListView(imgStoragePath);
 
-                            C_LineType.Items.Clear(); //清除combobox项
+                            C_equipeType.Items.Clear(); //清除combobox项
                             DirectoryInfo Dir = new DirectoryInfo(imgStoragePath);
                             foreach (FileInfo f in Dir.GetFiles("*.bmp")) //查找文件
                             {
-                                C_LineType.Items.Add(f.Name.ToString().Split(new char[] { '_' })[0]); //添加项
+                                C_equipeType.Items.Add(f.Name.ToString().Split(new char[] { '_' })[0]); //添加项
                             }
 
                             
@@ -1377,7 +1382,7 @@ namespace AutoDraw
         //再次尝试
         private void button1_Click(object sender, EventArgs e)
         {
-             Database db = HostApplicationServices.WorkingDatabase;
+             /*Database db = HostApplicationServices.WorkingDatabase;
             ObjectId spaceId = db.CurrentSpaceId;//当前空间（模型空间或图纸空间）的Id
             Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
             using (Transaction trans = db.TransactionManager.StartTransaction())
@@ -1494,7 +1499,7 @@ namespace AutoDraw
                     MessageBox.Show("错误;  " + ee.ToString());
                     //preview = btr.PreviewIcon; // 适用于AutoCAD 2009及以上版本
                 }
-            }
+            }*/
 
         }
 
@@ -1512,58 +1517,67 @@ namespace AutoDraw
                 if (modifData == false)
                 {
                     #region 添加字典信息
-                    if (TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.ToString() != "")
+                    if (TypeWayPoint.SelectedItem != null)
                     {
-                        string sLocation = "";
-                        string sName = T_SName.Text.ToString();
-                        string sType = TypeWayPoint.SelectedItem.ToString();
-
-                        if (sType == "桥梁")
+                        if (TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.ToString() != "")
                         {
-                            string locationPart2 = "";
-                            foreach (var component in splitContainer1.Panel1.Controls)
-                            {
-                                TextBox temp = component as TextBox;
+                            string sLocation = "";
+                            string sName = T_SName.Text.ToString();
+                            string sType = TypeWayPoint.SelectedItem.ToString();
 
-                                if (temp != null)
+                            if (sType == "桥梁")
+                            {
+                                string locationPart2 = "";
+                                foreach (var component in splitContainer1.Panel1.Controls)
                                 {
-                                    if (temp.Name == "tempText")
+                                    TextBox temp = component as TextBox;
+
+                                    if (temp != null)
                                     {
-                                        locationPart2 = temp.Text.ToString();
+                                        if (temp.Name == "tempText")
+                                        {
+                                            locationPart2 = temp.Text.ToString();
+                                        }
                                     }
                                 }
+                                sLocation = T_SLocation.Text.ToString().ToUpper() + "-" + locationPart2;
                             }
-                            sLocation = T_SLocation.Text.ToString().ToUpper() + "-" + locationPart2;
+                            else
+                            {
+                                sLocation = T_SLocation.Text.ToString().ToUpper();
+                            }
+                            //添加字典项
+                            if (!InfoStation.ContainsKey(sLocation))
+                            {
+                                InfoStation.Add(sLocation, sName + "," + sType);
+                                treeView1.Nodes.Clear();
+                                refreshTreeview(true);
+                                fileDataView();  //填充datagridView 
+
+                                #region wayPoint写入xml
+                                if (InfoStation.Count > 0)
+                                {
+                                    XmlFunction xF = new XmlFunction();
+
+                                    xF.addWayPointNode(xmlFilePath + "\\setting.xml", InfoStation);
+                                }
+                                #endregion
+                            }
+                            else
+                            {
+                                MessageBox.Show("已定义该站.");
+                            }
                         }
+
                         else
                         {
-                            sLocation = T_SLocation.Text.ToString().ToUpper();
-                        }
-                        //添加字典项
-                        if (!InfoStation.ContainsKey(sLocation))
-                        {
-                            InfoStation.Add(sLocation, sName + "," + sType);
-                            treeView1.Nodes.Clear();
-                            refreshTreeview(true);
-                            fileDataView();  //填充datagridView
-                        }
-                        else
-                        {
-                            MessageBox.Show("已定义该站.");
+                            MessageBox.Show("请录入所有信息.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
-                    else
-                    {
-                        MessageBox.Show("请录入所有信息.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-
                     #endregion
 
-                    #region wayPoint写入xml
-                    XmlFunction xF = new XmlFunction();
 
-                    xF.addWayPointNode(xmlFilePath + "\\setting.xml", InfoStation);
-                    #endregion
+                    
                 }
                 else //修改功能开启时，变更dictionary中数据
                 {
@@ -2107,6 +2121,7 @@ namespace AutoDraw
 
                 }
             }
+            stTable.AcceptChanges();
             //dataGridView1.Columns.Add("里程", "名称");
             //dataGridView1.Columns.Add("EnglishName", "ChineseName"); 
             dataGridView1.DataSource = tableST.Tables["ST"];
@@ -2128,29 +2143,10 @@ namespace AutoDraw
 
         private void button4_Click(object sender, EventArgs e)
         {
-            if (tableST != null)
-            {
-                tableST = oldTableSt;
-            }
+            tableST.RejectChanges();
         }
 
-        private void button5_Click(object sender, EventArgs e)
-        {
-            xmlFilePath="C:\\Users\\wenyi\\Desktop\\新建文件夹 (2)\\setting";
-            System.Xml.XmlTextReader reader = new System.Xml.XmlTextReader(xmlFilePath+"\\setting.xml");
 
-            string contents = "";
-            while (reader.Read())
-            {
-                reader.MoveToContent();
-                if (reader.NodeType == System.Xml.XmlNodeType.Element)
-                    contents += "<" + reader.Name + ">\n";
-                if (reader.NodeType == System.Xml.XmlNodeType.Text)
-                    contents += reader.Value + "\n";
-            }
-
-            MessageBox.Show(contents);
-        }
 
         private void B_refresh_Click(object sender, EventArgs e)
         {
@@ -2177,48 +2173,7 @@ namespace AutoDraw
         List<string> selectListBlock;
         private void listView1_Click(object sender, EventArgs e)
         {
-            if (selectedWayPoint.Nodes.Count > 0)
-            {
-                toolStripStatusLabel1.Text = "选中" + listView1.SelectedItems.Count + "个块";
-
-                selectListBlock = new List<string>();
-
-                TreeNode rootNode = selectedWayPoint.TopNode; //root Node
-
-                foreach (ListViewItem item in listView1.SelectedItems)
-                {
-                    if (textBox1.Text.ToString() != "" && textBox2.Text.ToString() != "")
-                    {
-                        selectListBlock.Add(textBox1.Text.ToString().Replace(" ", "") + "-" + textBox2.Text.ToString().Replace(" ", "") + "-" + item.Text.ToString());
-
-
-                        TreeNode equipeNode = new TreeNode(); //设备接点
-                        equipeNode.Text = "设备: " + item.Text.ToString().Replace(" ", "");
-                        rootNode.Nodes.Add(equipeNode);
-
-                        TreeNode childNode1 = new TreeNode();
-                        childNode1.Text = "里程: " + textBox1.Text.ToUpper().Replace(" ", "");
-                        equipeNode.Nodes.Add(childNode1);
-
-                        TreeNode childNode2 = new TreeNode();
-                        childNode2.Text = "线缆: " + C_LineType.SelectedText.ToString().Replace(" ", "");
-                        equipeNode.Nodes.Add(childNode2);
-
-                        TreeNode childNode3 = new TreeNode();
-                        childNode3.Text = "数量: " + textBox2.Text.ToString().Replace(" ", "");
-                        equipeNode.Nodes.Add(childNode3);
-                    }
-                    else
-                    {
-                        MessageBox.Show("右侧面板数据不能为空。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-      
-                } 
-            }
-            else
-            {
-                MessageBox.Show("没有选中所亭。");
-            }
+            
             
         }
 
@@ -2247,11 +2202,32 @@ namespace AutoDraw
                 //填充selectedWayPoint表，一次只能显示一个
 
                 //清空treeview
-                selectedWayPoint.Nodes.Clear();
+                //selectedWayPoint.Nodes.Clear();
                 //添加项到连接表
-                TreeNode firstNode = new TreeNode();
-                firstNode.Text = selectDataGrid;
-                selectedWayPoint.Nodes.Add(firstNode);
+                bool inTheList = false;
+                TreeNode NodeIndex = new TreeNode();
+                foreach (TreeNode node in selectedWayPoint.Nodes)
+                {
+                    if (node.Level == 0)
+                    {
+                        if (node.Text == selectDataGrid)
+                        {
+                            inTheList = true;
+                            NodeIndex = node;
+                            break;
+                        }
+                    }
+                }
+                if (!inTheList)
+                {
+                    TreeNode firstNode = new TreeNode();
+                    firstNode.Text = selectDataGrid;
+                    selectedWayPoint.Nodes.Add(firstNode);
+                }
+                else
+                {
+                    selectedWayPoint.SelectedNode = NodeIndex;
+                }
 
 
             }
@@ -2283,9 +2259,99 @@ namespace AutoDraw
             return isDuplicate;
         }
 
-        private void B_AppChange_Click(object sender, EventArgs e)
+        private void B_AddEquipe_Click(object sender, EventArgs e)
         {
 
+            if (selectedWayPoint.SelectedNode!=null)
+            {
+                //toolStripStatusLabel1.Text = "选中" + listView1.SelectedItems.Count + "个块";
+
+                selectListBlock = new List<string>();
+
+                //label7.Text = selectedWayPoint.Nodes.ToString();
+                TreeNode rootNode=new TreeNode();
+                rootNode = selectedWayPoint.SelectedNode.Parent;
+                if (rootNode == null)
+                {
+                    rootNode = selectedWayPoint.SelectedNode;
+                }
+
+                TreeNode Node = new TreeNode();
+                List<TreeNode> listNode = new List<TreeNode>();
+                foreach (TreeNode node in selectedWayPoint.Nodes)
+                {
+                    
+                    if (node.FullPath.Contains(rootNode.Name.ToString())) //如果fullpath中有
+                    {
+                        Node = node;
+                        
+
+                    }
+                }
+
+                foreach (TreeNode child in Node.Nodes)
+                {
+                    listNode.Add(child); //查找所亭节点下的所有node
+                }
+
+                //当不为空时
+                if (textBox1.Text.ToString() != "" && textBox2.Text.ToString() != "" && C_equipeType.SelectedItem.ToString() != "" && C_Line.SelectedItem.ToString() != "" && C_equipeType.SelectedItem.ToString() != null && C_Line.SelectedItem.ToString() != null)
+                {
+                    //检查是否已经在表里
+                    bool duplicate = false;
+                    foreach (TreeNode node in listNode)
+                    {
+                        if (node.FullPath.Contains(textBox1.Text.ToUpper().Replace(" ", "") + "-" + C_equipeType.SelectedItem.ToString().Replace(" ", "")))
+                        {
+                            duplicate = true;
+                            break;
+                        }
+                    }
+                    selectListBlock.Add(textBox1.Text.ToUpper().Replace(" ", "") + "-" + textBox2.Text.ToString().Replace(" ", "") + "-" + C_equipeType.SelectedText.ToString());
+
+                    if (!duplicate)
+                    {
+                        TreeNode equipeNode = new TreeNode(); //设备接点
+                        equipeNode.Text = "设备: " + textBox1.Text.ToUpper().Replace(" ", "") + "-" + C_equipeType.SelectedItem.ToString().Replace(" ", "");
+                        rootNode.Nodes.Add(equipeNode);
+
+
+                        TreeNode childNode1 = new TreeNode();
+                        childNode1.Text = "里程: " + textBox1.Text.ToUpper().Replace(" ", "");
+                        equipeNode.Nodes.Add(childNode1);
+
+                        TreeNode childNode2 = new TreeNode();
+                        childNode2.Text = "线缆: " + C_Line.SelectedItem.ToString().Replace(" ", "");
+                        equipeNode.Nodes.Add(childNode2);
+
+                        TreeNode childNode3 = new TreeNode();
+                        childNode3.Text = "数量: " + textBox2.Text.ToString().Replace(" ", "");
+                        equipeNode.Nodes.Add(childNode3);
+
+                        //清空
+                        textBox1.Text = "";
+                        textBox2.Text = "";
+                        //C_equipeType.SelectedText = "";
+                        //C_Line.SelectedText = "";
+                    }
+                    else
+                    {
+                        //清空
+                        textBox1.Text = "";
+                        textBox2.Text = "";
+                    }
+
+                }
+                else
+                {
+                    MessageBox.Show("右侧面板数据不能为空。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+            }
+            else
+            {
+                MessageBox.Show("没有选中所亭。");
+            }
 
             /*XmlFunction xf = new XmlFunction();
             
@@ -2334,12 +2400,15 @@ namespace AutoDraw
             {
                 if (selectedWayPoint.SelectedNode.Level > 0) //l选中项非第一级node事
                 {
-                    TreeNode parentNode = selectedWayPoint.SelectedNode.Parent;
+                    //TreeNode parentNode = selectedWayPoint.SelectedNode.Parent;
 
-                    TreeNode a = parentNode.NextNode;
-                    TreeNode b = a.NextNode;
-                    TreeNode c = b.NextNode;
-                    TreeNode d = c.NextNode;
+                    //TreeNode parentNode = selectedWayPoint.SelectedNode.Parent;
+
+                    //label7.Text = parentNode.Name;
+                }
+                else if (selectedWayPoint.SelectedNode.Level == 0)
+                {
+                    //label7.Text = selectedWayPoint.SelectedNode.Name;
                 }
             }
         }
@@ -2420,8 +2489,213 @@ namespace AutoDraw
             }
         }
 
+        private void C_equipeType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (C_equipeType.SelectedText == "地震传感器" || C_equipeType.SelectedText == "信号中继站" || C_equipeType.SelectedText == "监控单元" || C_equipeType.SelectedText == "防灾控制箱")
+            {
+                int nRow = dataGridView1.CurrentRow.Index; //选中行
 
-        
+                string selectLocation = dataGridView1.Rows[nRow].Cells[0].Value.ToString();
+
+                textBox1.Text = selectLocation;
+            }
+        }
+
+        private void B_writeXML_Click(object sender, EventArgs e)
+        {
+            XmlFunction xF = new XmlFunction();
+            PFunction pF = new PFunction();
+            foreach (TreeNode rootNode in selectedWayPoint.Nodes)
+            {
+                string STInfo = rootNode.Text.ToString();
+                List<string> ListEquipe = new List<string>();
+                foreach (TreeNode ChildNode in rootNode.Nodes)
+                {
+                    string name = ChildNode.Text.ToString().Split(new char[] { '-' })[1];
+                    //name = name.Split(new char[] { ':' })[1];
+                    string location = "";
+                    string line = "";
+                    string num = "";
+                    foreach (TreeNode AttributeNode in ChildNode.Nodes)
+                    {
+                        
+
+                        if (AttributeNode.Text.Contains("+"))
+                        {
+                            location = AttributeNode.Text.ToString().Split(new char[] { ':' })[1];
+                            continue;
+                        }
+                        else if (AttributeNode.Text.Contains("数量"))
+                        {
+                            num = AttributeNode.Text.ToString().Split(new char[] { ':' })[1];
+                            continue;
+                        }
+                        else
+                        {
+                            line = AttributeNode.Text.ToString().Split(new char[] { ':' })[1];
+                            continue;
+                        }
+
+                    }
+                    ListEquipe.Add(location + "-" + num + "-" + line + "-" + name);
+
+                }
+                xF.createConnectionXml(xmlFilePath + "\\setting.xml", STInfo, ListEquipe);
+            }
+            //xF.createConnectionXml()
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (InfoStation.Count > 0)
+            {
+                Dictionary<double, string> sortedDic;
+                //里程换算成数字 ，排序. 含所有的waypoint
+                sortedDic = LocationToInt(InfoStation); 
+
+                Dictionary<double, string> dicWithoutStation = dicWithOutType(sortedDic, "车站");
+
+                //生成除了车站外的所有路点
+                //添加List<string>作为索引
+                int count = 0;
+                List<double> dicIndex = new List<double>();
+                //生成sortedDic表的索引
+                foreach (var item in sortedDic)
+                {
+                    //KeyValuePair
+                    dicIndex.Add(item.Key);
+                    count++;
+                }
+                foreach(var item in dicWithoutStation)
+                {
+                    //每一项的index
+                    int itemIndex = dicIndex.IndexOf(item.Key);
+
+                    string leftStation = "";
+                    string rightStation = "";
+                    //如果所亭的两端都有站
+                    if (itemIndex > 0 && itemIndex < sortedDic.Count - 1)
+                    {
+                        leftStation = sortedDic[dicIndex[itemIndex - 1]];
+                        rightStation = sortedDic[dicIndex[itemIndex + 1]];
+                    }
+                    //所亭在站点列表中排第一
+                    else if(itemIndex == 0)
+                    {
+                        rightStation = sortedDic[dicIndex[itemIndex + 1]];
+                    }
+                    //所亭在站点列表中排最后
+                    else if (itemIndex < sortedDic.Count - 1)
+                    {
+                        leftStation = sortedDic[dicIndex[itemIndex - 1]];
+                    }
+
+                    //绘制车站圆形图块
+
+                }
+            }
+        }
+
+        public void drawStationMark()
+        {
+
+        }
+
+        public Dictionary<double, string> dicWithOutType(Dictionary<double, string> dic,string type)
+        {
+            Dictionary<double, string> dicWithoutType = new Dictionary<double, string>();
+            //Dictionary<double, string> dicWithoutType1 = new Dictionary<double, string>();
+            int count = 0;
+            foreach(var item in dic)
+            {
+                if (!item.Value.ToString().Contains(type))
+                {
+                    dicWithoutType.Add(item.Key, item.Value);
+                }
+            }
+            //由于兼容性问题，放弃linq方式，
+            /*var withoutType= (from objDic in dic
+                             where !objDic.Value.ToString().Contains(type)
+                              select objDic);
+            foreach (KeyValuePair<double, string> kvp in withoutType)
+            {
+                dicWithoutType1.Add(kvp.Key, kvp.Value);
+            }*/
+            return dicWithoutType;
+        }
+        /// <summary>
+        /// 里程格式的字符串换算为数字，并返回排序后的列表
+        /// </summary>
+        /// <param name="origDic"></param>
+        /// <returns></returns>
+        public Dictionary<double, string> LocationToInt(Dictionary<string,string> origDic)
+        {
+
+            Dictionary<double, string> distanceWP = new Dictionary<double, string>();
+            foreach (var wayPoint in origDic)
+            {
+                string kmMD = wayPoint.Key.ToString().Split(new char[] { '+' })[0];
+                string kmD = IsNumberInString(kmMD);
+                string mD = wayPoint.Key.ToString().Split(new char[] { '+' })[1];
+
+                double distance = Int32.Parse(kmD) * 1000 + Int32.Parse(mD);
+                distanceWP.Add(distance, wayPoint.Value);
+            }
+            Dictionary<double, string> Sortdic = DictonarySort(distanceWP);
+            return Sortdic;
+        }
+
+        /// <summary>
+        /// .net3.5引入linq以后的字典排序
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        private Dictionary<double, string> DictonarySort(Dictionary<double , string > dic)
+        {
+            Dictionary<double, string> Sortdic = new Dictionary<double, string>();
+            var dicSort =
+                (from objDic in dic
+                 orderby objDic.Key ascending
+                 select objDic);
+            foreach (KeyValuePair<double, string> kvp in dicSort)
+            {
+                Sortdic.Add(kvp.Key, kvp.Value);
+            }
+            return Sortdic;
+        }
+
+        public string IsNumberInString(string str)
+        {
+            string returnStr = string.Empty;
+            for (int i = 0; i < str.Length; i++)
+            {
+
+                if (Char.IsNumber(str, i) == true)
+                {
+                    returnStr += str.Substring(i, 1);
+                }
+                else
+                {
+                    if (str.Substring(i, 1) == "A" || str.Substring(i, 1) == " ")
+                    {
+                        returnStr += str.Substring(i, 1);
+                    }
+                }
+
+            }
+            return returnStr;
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button6_Click_1(object sender, EventArgs e)
+        {
+            drawFunction dF = new drawFunction();
+            dF.CheckBlock();
+        }
     }
 }
  

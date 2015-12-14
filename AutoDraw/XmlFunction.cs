@@ -102,6 +102,8 @@ namespace AutoDraw
             return elementFound;
         }
 
+
+        #region 连接情况信息
         /// <summary>
         /// 向xml文件写入设备连接信息
         /// </summary>
@@ -114,8 +116,13 @@ namespace AutoDraw
             xmlDoc.Load(xmlFile);
 
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
-            XmlNode subroot = root.SelectSingleNode("Connection");//查找<Connection> 
+            XmlNode subroot = root.SelectSingleNode("Connections");//查找<Connection> 
 
+            if (subroot == null)
+            {
+                subroot = xmlDoc.CreateElement("Connections"); //添加
+                root.AppendChild(subroot);
+            }
             XmlElement xe1 = xmlDoc.CreateElement("Pair");//创建一个<WayPoint>节点 
 
             xe1.SetAttribute("location", selectGrid.Split(new char[] { '-' })[0]);//设置该节点location属性 
@@ -128,7 +135,9 @@ namespace AutoDraw
 
                 subXml1.SetAttribute("number", selectBlock.Split(new char[] { '-' })[1]);
 
-                subXml1.InnerText = selectBlock.Split(new char[] { '-' })[2];
+                subXml1.SetAttribute("line", selectBlock.Split(new char[] { '-' })[2]);
+
+                subXml1.InnerText = selectBlock.Split(new char[] { '-' })[3];
 
                 xe1.AppendChild(subXml1);
             }
@@ -143,6 +152,7 @@ namespace AutoDraw
 
         }
 
+#endregion
 
         #region 线缆部分
         /// <summary>
@@ -266,6 +276,19 @@ namespace AutoDraw
 
         }
 
+        #endregion
+
+        #region 连接情况
+
+        /*public void createXmlConnection(string xmlFile)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+
+
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode xe1 = root.SelectSingleNode("Connection");//查找<Connection> 
+        }*/
         #endregion
     }
 }

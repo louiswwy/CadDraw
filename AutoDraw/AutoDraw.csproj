@@ -51,7 +51,7 @@
     </Reference>
     <Reference Include="DotNetARX, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\OneDrive\DotNetARX.dll</HintPath>
+      <HintPath>..\..\..\OneDrive\DotNetARX.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -60,12 +60,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="drawFunction.cs" />
     <Compile Include="Form_LineType.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form_LineType.Designer.cs">
       <DependentUpon>Form_LineType.cs</DependentUpon>
     </Compile>
+    <Compile Include="PFunction.cs" />
     <Compile Include="XmlFunction.cs" />
     <Compile Include="MainInterface.cs">
       <SubType>Form</SubType>
