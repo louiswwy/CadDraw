@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="gb2312"?>
+<xs:schema id="XmlSPro"
+    targetNamespace="http://tempuri.org/XmlSPro.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/XmlSPro.xsd"
+    xmlns:mstns="http://tempuri.org/XmlSPro.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+	<xs:element name ="ZTZX">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Project">
+					
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ProjectName"></xs:element>
+							<xs:element name ="WayPoint"  >
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="wayPointName" type="xs:string"></xs:element>
+										<xs:element name="wayPointType" type="xs:string"></xs:element>
+										<xs:element name="wayPointLocation" type="xs:string"></xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="connection">
+								
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+	<xs:attribute name="ProjectTime" type="xs:date" />
+	
+	<!--<xs:element name="typeWayPoint" type="wayPointType">
+		<xs:complexType name="wayPointType">
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="车站"/>
+				<xs:enumeration value="AT所"/>
+				<xs:enumeration value="基站"/>
+				<xs:enumeration value="分区所"/>
+				<xs:enumeration value="所亭"/>
+			</xs:restriction>
+		</xs:complexType>
+	
+</xs:element>
+
+	<xs:attribute  name="ProjectInfo" type="PInfo"/>
+	<xs:complexType name="PInfo">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Data" type="xs:date" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>-->
+	
+	<xs:element name="Book">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="isbn" use="required"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
