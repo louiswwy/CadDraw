@@ -35,40 +35,22 @@ namespace AutoDraw
 
         private void B_Draw_Click(object sender, EventArgs e)
         {
-            Database db = HostApplicationServices.WorkingDatabase;
-            using (Transaction trans = db.TransactionManager.StartTransaction())
-            {
 
+            DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
 
+            //创建字体
+            ObjectId fontStyleId = createFont();
+            //检查图块
+            checkBlock(true, fontStyleId); //检查图块
 
-                try
-                {
-                    DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
+            Point2d insertSignlePoint = new Point2d(0, 0);
+            drawSinglePicture(insertSignlePoint, fontStyleId);//db, trans, 
 
+            m_DocumentLock.Dispose();
 
-                    //创建字体
-                    ObjectId fontStyleId = createFont(db, trans);
-                    //检查图块
-                    checkBlock(true, fontStyleId); //检查图块
-
-                    Point2d insertSignlePoint = new Point2d(0, 0);
-                    drawSinglePicture(db, trans, insertSignlePoint, fontStyleId);
-
-                    //trans.Commit();
-
-                    m_DocumentLock.Dispose();
-
-                }
-                catch (System.Exception ee)
-                {
-
-                    MessageBox.Show("出现错误！" + System.Environment.NewLine + "\t错误信息:" + ee.ToString(), "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    trans.Abort();
-                }
-            }
         }
 
-        public void drawSinglePicture(Database db,Transaction trans, Point2d insertSignlePoint,ObjectId fontStyleId)
+        public void drawSinglePicture(Point2d insertSignlePoint,ObjectId fontStyleId)
         {
             Point2d outerStartPoint = insertSignlePoint;
             Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
@@ -76,78 +58,95 @@ namespace AutoDraw
             Point2d innerStartPoint = new Point2d(outerStartPoint.X + 25, outerStartPoint.Y + 5);
             Point2d innerEndPoint = new Point2d(outerEndPoint.X - 5, outerEndPoint.Y - 5);
             Database db1 = HostApplicationServices.WorkingDatabase;
-            using (Transaction trans1 = db.TransactionManager.StartTransaction())
+            using (Transaction trans1 = db1.TransactionManager.StartTransaction())
             {
                 //单个图框的范围
 
-                #region 绘制图框
-                Polyline rectangleOuterLayer = new Polyline();
-                Polyline rectangleInnerLayer = new Polyline();
-                rectangleOuterLayer.CreateNewRectangle(outerStartPoint, outerEndPoint);
-                rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
-                #endregion
+                try {
+                    #region 绘制图框
+                    Polyline rectangleOuterLayer = new Polyline();
+                    Polyline rectangleInnerLayer = new Polyline();
+                    rectangleOuterLayer.CreateNewRectangle(outerStartPoint, outerEndPoint);
+                    rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
+                    #endregion
 
-                #region 图表
-                //绘制工程数量表 innerStartPoint
-                Point2d tableInsertPoint = new Point2d(innerStartPoint.X, innerEndPoint.Y);
-                Entity[] NumbEngineTable = createNumberTable("工程数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y), fontStyleId);
-                //绘制设备数量表
-                Entity[] NumbEqipeTable = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), fontStyleId);
-                #endregion
-                   
-                #region 绘制通信、信号电缆槽示意图
-                drawFunction df = new drawFunction();
-                Entity[] backgoundEntity = df.drawBackGround(db, trans, new Point2d(innerStartPoint.X, innerEndPoint.Y), fontStyleId);
-                #endregion
+                    #region 图表
+                    //绘制工程数量表 innerStartPoint
+                    Point2d tableInsertPoint = new Point2d(innerStartPoint.X, innerEndPoint.Y);
+                    Entity[] NumbEngineTable = createNumberTable("工程数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y), fontStyleId);
+                    //绘制设备数量表
+                    Entity[] NumbEqipeTable = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), fontStyleId);
+                    #endregion
 
-                //添加图内、外框
-                db1.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer); //框
-                db1.AddToCurrentSpace(backgoundEntity); //背景块
-                db1.AddToCurrentSpace(NumbEngineTable); //添加工程数量表
-                db1.AddToCurrentSpace(NumbEqipeTable); //添加设备数量表
-                trans1.Commit();
+                    #region 绘制通信、信号电缆槽示意图
+                    drawFunction df = new drawFunction();
+                    Entity[] backgoundEntity = df.drawBackGround(db1, trans1, new Point2d(innerStartPoint.X, innerEndPoint.Y), fontStyleId);
+                    #endregion
+
+                    //添加图内、外框
+                    db1.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer); //框
+                    db1.AddToCurrentSpace(backgoundEntity); //背景块
+                    db1.AddToCurrentSpace(NumbEngineTable); //添加工程数量表
+                    db1.AddToCurrentSpace(NumbEqipeTable); //添加设备数量表
+                    trans1.Commit();
+                }
+                catch (System.Exception ee)
+                {
+
+                    MessageBox.Show("出现错误！" + System.Environment.NewLine + "\t错误信息:" + ee.ToString(), "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    trans1.Abort();
+                }
             }
 
 
             Database db2 = HostApplicationServices.WorkingDatabase;
-            using (Transaction trans2 = db.TransactionManager.StartTransaction())
+            using (Transaction trans2 = db2.TransactionManager.StartTransaction())
             {
-                #region 添加图形
-                ObjectId spaceId = db2.CurrentSpaceId;//当期空间ID
-                                                      //插入图签
-                #region 添加图签
+                try {
+                    #region 添加图形
+                    ObjectId spaceId = db2.CurrentSpaceId;//当期空间ID
+                                                          //插入图签
+                    #region 添加图签
 
 
-                //块属性的字典对象
-                //图签块
-                Dictionary<string, string> attTQ = new Dictionary<string, string>();
-                attTQ.Add("项目名称", "新建吉林至珲春铁路工程");
-                attTQ.Add("图纸名称", "吉珲施防-01");
-                attTQ.Add("图纸比例", "1：100");
-                attTQ.Add("绘制日期", "2013.5");
-                attTQ.Add("页数", "第1张，共1张");
-                #endregion
+                    //块属性的字典对象
+                    //图签块
+                    Dictionary<string, string> attTQ = new Dictionary<string, string>();
+                    attTQ.Add("项目名称", "新建吉林至珲春铁路工程");
+                    attTQ.Add("图纸名称", "吉珲施防-01");
+                    attTQ.Add("图纸比例", "1：100");
+                    attTQ.Add("绘制日期", "2013.5");
+                    attTQ.Add("页数", "第1张，共1张");
+                    #endregion
 
-                #region 轨道图标
-                Dictionary<string, string> attGD = new Dictionary<string, string>();
-                attGD.Add("吉珲上行/下行线", "吉珲1上行/下行线");
-                #endregion
+                    #region 轨道图标
+                    Dictionary<string, string> attGD = new Dictionary<string, string>();
+                    attGD.Add("吉珲上行/下行线", "吉珲1上行/下行线");
+                    #endregion
 
-                BlockTable acBlkTbl = trans2.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-                acBlkTbl.UpgradeOpen();
-                // Open the Block table record Model space for write
-                BlockTableRecord acBlkTblRec = trans2.GetObject(acBlkTbl[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
-                acBlkTblRec.UpgradeOpen();
+                    BlockTable acBlkTbl = trans2.GetObject(db2.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    acBlkTbl.UpgradeOpen();
+                    // Open the Block table record Model space for write
+                    BlockTableRecord acBlkTblRec = trans2.GetObject(acBlkTbl[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                    acBlkTblRec.UpgradeOpen();
 
-                spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0, attTQ);
+                    spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0, attTQ);
 
-                spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 136, 0), new Scale3d(1), 0, attGD);
-                spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 158, 0), new Scale3d(1), 0, attGD);
-                acBlkTbl.DowngradeOpen();
-                acBlkTblRec.DowngradeOpen();
+                    spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 136, 0), new Scale3d(1), 0, attGD);
+                    spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 158, 0), new Scale3d(1), 0, attGD);
+                    acBlkTbl.DowngradeOpen();
+                    acBlkTblRec.DowngradeOpen();
 
-                trans2.Commit();
-                #endregion
+                    trans2.Commit();
+
+                    #endregion
+                }
+                catch (System.Exception ee)
+                {
+
+                    MessageBox.Show("出现错误！" + System.Environment.NewLine + "\t错误信息:" + ee.ToString(), "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    trans2.Abort();
+                }
             }
 
         }
@@ -166,6 +165,7 @@ namespace AutoDraw
             tableName.VerticalMode = TextVerticalMode.TextVerticalMid;
             tableName.AlignmentPoint = tableName.Position;
             tableName.WidthFactor = 0.7;
+            tableName.TextStyleId = styleId;
 
             #endregion
 
@@ -289,17 +289,28 @@ namespace AutoDraw
 
 
         //创建字体
-        public ObjectId createFont(Database db,Transaction trans)
+        public ObjectId createFont()
         {
-            //simsun.ttc 宋体
+            ObjectId styleId = new ObjectId();
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    //simsun.ttc 宋体
+                    styleId = db.AddTextStyle("宋-0.7", "宋体.ttf");
+                    //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc");
+                    //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc", false, false, 134, 2 | 0);
+                    styleId.SetTextStyleProp(3, 0.7, 0, false, false, false, AnnotativeStates.True, true);
+                    trans.Commit();
+                }
+                catch (System.Exception ee)
+                {
 
-            ObjectId styleId;
-            styleId = db.AddTextStyle("宋-0.7", "宋体.ttf");
-            //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc");
-            //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc", false, false, 134, 2 | 0);
-            styleId.SetTextStyleProp(3, 0.7, 0, false, false, false, AnnotativeStates.True, true);
-            trans.Commit();
-
+                    MessageBox.Show("出现错误！" + System.Environment.NewLine + "\t错误信息:" + ee.ToString(), "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    trans.Abort();
+                }
+            }
             return styleId;
         }
 
@@ -430,7 +441,7 @@ namespace AutoDraw
             text1.HorizontalMode = TextHorizontalMode.TextCenter;
             text1.VerticalMode = TextVerticalMode.TextVerticalMid;
             text1.AlignmentPoint = text1.Position;
-            text1.TextStyleId = fontId;
+            text1.WidthFactor = 0.7;
 
             DBText text2 = new DBText();
             text2.Position = new Point3d(tqUpLeft.X + 80, tqUpLeft.Y - 5.22, 0);
@@ -441,6 +452,7 @@ namespace AutoDraw
             text2.VerticalMode = TextVerticalMode.TextVerticalMid;
             text2.AlignmentPoint = text2.Position;
             text2.TextStyleId = fontId;
+            text2.WidthFactor = 0.7;
 
             DBText text3 = new DBText();
             text3.Position = new Point3d(tqDownRight.X - 35 - 7.5, tqDownRight.Y + 24, 0);
@@ -451,6 +463,7 @@ namespace AutoDraw
             text3.VerticalMode = TextVerticalMode.TextVerticalMid;
             text3.AlignmentPoint = text3.Position;
             text3.TextStyleId = fontId;
+            text3.WidthFactor = 0.7;
 
             DBText text4 = new DBText();
             text4.Position = new Point3d(tqDownRight.X - 35 - 7.5, tqDownRight.Y + 17.5, 0);
@@ -461,6 +474,7 @@ namespace AutoDraw
             text4.VerticalMode = TextVerticalMode.TextVerticalMid;
             text4.AlignmentPoint = text4.Position;
             text4.TextStyleId = fontId;
+            text4.WidthFactor = 0.7;
 
             DBText text5 = new DBText();
             text5.Position = new Point3d(tqDownRight.X - 35 - 7.5, tqDownRight.Y + 10.5, 0);
@@ -471,6 +485,7 @@ namespace AutoDraw
             text5.VerticalMode = TextVerticalMode.TextVerticalMid;
             text5.AlignmentPoint = text5.Position;
             text5.TextStyleId = fontId;
+            text5.WidthFactor = 0.7;
 
             DBText text6 = new DBText();
             if (nameTable == "三级图签")
@@ -488,6 +503,7 @@ namespace AutoDraw
             text6.VerticalMode = TextVerticalMode.TextVerticalMid;
             text6.AlignmentPoint = text6.Position;
             text6.TextStyleId = fontId;
+            text6.WidthFactor = 0.7;
 
             DBText text7 = new DBText();
             if (nameTable == "三级图签")
@@ -505,7 +521,7 @@ namespace AutoDraw
             text7.VerticalMode = TextVerticalMode.TextVerticalMid;
             text7.AlignmentPoint = text7.Position;
             text7.TextStyleId = fontId;
-
+            text7.WidthFactor = 0.7;
 
 
             DBText text8 = new DBText();
@@ -524,7 +540,7 @@ namespace AutoDraw
             text8.VerticalMode = TextVerticalMode.TextVerticalMid;
             text8.AlignmentPoint = text8.Position;
             text8.TextStyleId = fontId;
-
+            text8.WidthFactor = 0.7;
 
             DBText text9 = new DBText();
             if (nameTable == "四级图签")
@@ -539,7 +555,7 @@ namespace AutoDraw
 
             }
             text9.TextStyleId = fontId;
-
+            text9.WidthFactor = 0.7;
 
             Entity[] TqLines = new Entity[23];
             ArrayList a = new ArrayList();
@@ -645,6 +661,7 @@ namespace AutoDraw
             //表示门符号的属性定义
             AttributeDefinition attProjetName = new AttributeDefinition(Point3d.Origin, "xx铁路", "项目名称", "输入项目名称：", fontId);
             attProjetName.TextStyleId = fontId;
+            attProjetName.WidthFactor = 0.7;
             //表示属性定义的通用样式
             setStyleForAtt(attProjetName, 3, false);
             //对其点
@@ -653,6 +670,8 @@ namespace AutoDraw
 
             //表示门符号的属性定义
             AttributeDefinition attDrawName = new AttributeDefinition(Point3d.Origin, "xxx防-xx-xx", "图纸名称", "输入图纸名称：", fontId);
+            attDrawName.TextStyleId = fontId;
+            attDrawName.WidthFactor = 0.7;
             //表示属性定义的通用样式
             setStyleForAtt(attDrawName, 3, false);
             //对其点
@@ -660,6 +679,8 @@ namespace AutoDraw
 
             //表示门符号的属性定义
             AttributeDefinition attScale = new AttributeDefinition(Point3d.Origin, "1：100", "图纸比例", "输入图纸比例：", fontId);
+            attScale.TextStyleId = fontId;
+            attScale.WidthFactor = 0.7;
             //表示属性定义的通用样式
             setStyleForAtt(attScale, 3, invisibilityScale);
             //对其点
@@ -667,6 +688,8 @@ namespace AutoDraw
 
             //表示门符号的属性定义
             AttributeDefinition attYearMonth = new AttributeDefinition(Point3d.Origin, "xxxx.xx", "绘制日期", "输入图纸绘制日期：", fontId);
+            attYearMonth.TextStyleId = fontId;
+            attYearMonth.WidthFactor = 0.7;
             //表示属性定义的通用样式
             setStyleForAtt(attYearMonth, 3, false);
             //对其点
@@ -674,6 +697,8 @@ namespace AutoDraw
 
             //表示门符号的属性定义
             AttributeDefinition attPage = new AttributeDefinition(Point3d.Origin, "第 x 张,共 x 张", "页数", "输入图纸页数：", fontId);
+            attPage.TextStyleId = fontId;
+            attPage.WidthFactor = 0.7;
             //表示属性定义的通用样式
             setStyleForAtt(attPage, 3, false);
             //对其点

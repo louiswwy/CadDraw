@@ -141,7 +141,7 @@ namespace AutoDraw
                     if (!bt.Has("到达站站点标示"))
                     {
                         //StationAndLocation station_location = new StationAndLocation("1", "吉林站", "DK0+000");
-                        CreateStationMark(db, trans, insertPoint, false);
+                        CreateStationMark(db, trans, insertPoint, false, fontId);
                     }
 
                     //如果不存在左侧标识则新建块
@@ -149,7 +149,7 @@ namespace AutoDraw
                     if (!bt.Has("始发站站点标示"))
                     {
                         //StationAndLocation station_location = new StationAndLocation("1", "蛟河西站", "DK66+535");
-                        CreateStationMark(db, trans, insertPoint, true);
+                        CreateStationMark(db, trans, insertPoint, true, fontId);
                     }
 
                     //如果不存在铁轨标识则新建块
@@ -191,6 +191,7 @@ namespace AutoDraw
             ProjectNameShortAtt.Tag = "上行/下行线";
             ProjectNameShortAtt.Prompt = "输入线路名称";
             ProjectNameShortAtt.TextStyleId = FontId;
+            ProjectNameShortAtt.WidthFactor = 0.7;
             ProjectNameShortAtt.Justify = AttachmentPoint.MiddleLeft;
             ProjectNameShortAtt.HorizontalMode = TextHorizontalMode.TextLeft;
             ProjectNameShortAtt.VerticalMode = TextVerticalMode.TextVerticalMid;
@@ -275,7 +276,7 @@ namespace AutoDraw
         }
 
         //新建站点标识
-        private void CreateStationMark(Database db, Transaction trans, Point3d insertPoint, bool isLeft)
+        private void CreateStationMark(Database db, Transaction trans, Point3d insertPoint, bool isLeft,ObjectId fontId)
         {
             insertPoint = new Point3d(insertPoint.X, insertPoint.Y + 36, insertPoint.Z);
             // Open the Block table for read
@@ -354,7 +355,8 @@ namespace AutoDraw
             AttStationName.Tag = "站名";
             AttStationName.Prompt = "输入站点名称";
             SetStyleForAttribut(AttStationName, textHeight, false);
-            AttStationName.TextStyleId = ObjectId.Null;
+            AttStationName.TextStyleId = fontId;
+            AttStationName.WidthFactor = 0.7;
             AttStationName.Justify = AttachmentPoint.BaseCenter;
 
             //AttStationName.HorizontalMode = TextHorizontalMode.TextCenter; //水平方向取中点
@@ -368,7 +370,8 @@ namespace AutoDraw
             AttStationLocation.Tag = "里程";
             AttStationLocation.Prompt = "输入站点里程";
             SetStyleForAttribut(AttStationLocation, textHeight, false);
-            AttStationLocation.TextStyleId = ObjectId.Null;
+            AttStationLocation.TextStyleId = fontId;
+            AttStationLocation.WidthFactor = 0.7;
             AttStationLocation.Justify = AttachmentPoint.TopLeft;
             /*
              * AttStationLocation.HorizontalMode = TextHorizontalMode.TextCenter; //水平方向取终点
