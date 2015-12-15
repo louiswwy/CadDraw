@@ -23,7 +23,7 @@ namespace AutoDraw
 {
     public partial class MainInterface : Form
     {
-        private string filePath;  //文件位置
+        private string lastLoadFilePath;  //文件位置
         private string newFilePath;
         string xmlFilePath;       //xml文件位置
         private string imgStoragePath; //图像文件位置 imgPath
@@ -39,12 +39,7 @@ namespace AutoDraw
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
 
-                //
-                Point2d outerStartPoint = new Point2d(0, 0);
-                Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
 
-                Point2d innerStartPoint = new Point2d(outerStartPoint.X + 25, outerStartPoint.Y + 5);
-                Point2d innerEndPoint = new Point2d(outerEndPoint.X - 5, outerEndPoint.Y - 5);
 
                 try
                 {
@@ -52,54 +47,15 @@ namespace AutoDraw
 
 
                     //创建字体
-                    ObjectId fontStyleId = createFont();
-                    
-                    #region 绘制图框
-                    Polyline rectangleOuterLayer = new Polyline();
-                    Polyline rectangleInnerLayer = new Polyline();
-                    rectangleOuterLayer.CreateNewRectangle(outerStartPoint, outerEndPoint);
-                    rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
-                    #endregion
-
-                    #region 图表
-                    //绘制工程数量表 innerStartPoint
-                    Point2d tableInsertPoint = new Point2d(innerStartPoint.X, innerEndPoint.Y);
-
-
-                    Entity[] NumbEng = createNumberTable("工程数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y), fontStyleId);
-                    //绘制设备数量表
-                    Entity[] NumbEqu = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), fontStyleId);
-                    #endregion
-
-                    #region 添加图签
-
+                    ObjectId fontStyleId = createFont(db, trans);
+                    //检查图块
                     checkBlock(true, fontStyleId); //检查图块
-                    ObjectId spaceId = db.CurrentSpaceId;//当期空间ID
 
-                    //块属性的字典对象
-                    //图签块
-                    Dictionary<string, string> attST = new Dictionary<string, string>();
-                    attST.Add("项目名称", "新建吉林至珲春铁路工程");
-                    attST.Add("图纸名称", "吉珲施防-01");
-                    attST.Add("图纸比例", "1：100");
-                    attST.Add("绘制日期", "2013.5");
-                    attST.Add("页数", "第1张，共1张");
-                    #endregion
+                    Point2d insertSignlePoint = new Point2d(0, 0);
+                    drawSinglePicture(db, trans, insertSignlePoint, fontStyleId);
 
-                    #region 添加图形
-                    //插入图块
-                    spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0, attST);
-                    db.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer);
-                    db.AddToCurrentSpace(NumbEng); //工程数量表
-                    db.AddToCurrentSpace(NumbEqu); //设备数量表
+                    //trans.Commit();
 
-                    #endregion
-
-                    //db.SaveAs(this.Text.ToString().Replace(" ", ""), DwgVersion.AC1021);
-                    //db.SaveAs(db.Filename, DwgVersion.AC1021);
-
-                    trans.Commit();
-                    //saveFile(db, trans);
                     m_DocumentLock.Dispose();
 
                 }
@@ -112,8 +68,90 @@ namespace AutoDraw
             }
         }
 
-        //
-        //todo
+        public void drawSinglePicture(Database db,Transaction trans, Point2d insertSignlePoint,ObjectId fontStyleId)
+        {
+            Point2d outerStartPoint = insertSignlePoint;
+            Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
+
+            Point2d innerStartPoint = new Point2d(outerStartPoint.X + 25, outerStartPoint.Y + 5);
+            Point2d innerEndPoint = new Point2d(outerEndPoint.X - 5, outerEndPoint.Y - 5);
+            Database db1 = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans1 = db.TransactionManager.StartTransaction())
+            {
+                //单个图框的范围
+
+                #region 绘制图框
+                Polyline rectangleOuterLayer = new Polyline();
+                Polyline rectangleInnerLayer = new Polyline();
+                rectangleOuterLayer.CreateNewRectangle(outerStartPoint, outerEndPoint);
+                rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
+                #endregion
+
+                #region 图表
+                //绘制工程数量表 innerStartPoint
+                Point2d tableInsertPoint = new Point2d(innerStartPoint.X, innerEndPoint.Y);
+                Entity[] NumbEngineTable = createNumberTable("工程数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y), fontStyleId);
+                //绘制设备数量表
+                Entity[] NumbEqipeTable = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), fontStyleId);
+                #endregion
+                   
+                #region 绘制通信、信号电缆槽示意图
+                drawFunction df = new drawFunction();
+                Entity[] backgoundEntity = df.drawBackGround(db, trans, new Point2d(innerStartPoint.X, innerEndPoint.Y), fontStyleId);
+                #endregion
+
+                //添加图内、外框
+                db1.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer); //框
+                db1.AddToCurrentSpace(backgoundEntity); //背景块
+                db1.AddToCurrentSpace(NumbEngineTable); //添加工程数量表
+                db1.AddToCurrentSpace(NumbEqipeTable); //添加设备数量表
+                trans1.Commit();
+            }
+
+
+            Database db2 = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans2 = db.TransactionManager.StartTransaction())
+            {
+                #region 添加图形
+                ObjectId spaceId = db2.CurrentSpaceId;//当期空间ID
+                                                      //插入图签
+                #region 添加图签
+
+
+                //块属性的字典对象
+                //图签块
+                Dictionary<string, string> attTQ = new Dictionary<string, string>();
+                attTQ.Add("项目名称", "新建吉林至珲春铁路工程");
+                attTQ.Add("图纸名称", "吉珲施防-01");
+                attTQ.Add("图纸比例", "1：100");
+                attTQ.Add("绘制日期", "2013.5");
+                attTQ.Add("页数", "第1张，共1张");
+                #endregion
+
+                #region 轨道图标
+                Dictionary<string, string> attGD = new Dictionary<string, string>();
+                attGD.Add("吉珲上行/下行线", "吉珲1上行/下行线");
+                #endregion
+
+                BlockTable acBlkTbl = trans2.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                acBlkTbl.UpgradeOpen();
+                // Open the Block table record Model space for write
+                BlockTableRecord acBlkTblRec = trans2.GetObject(acBlkTbl[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                acBlkTblRec.UpgradeOpen();
+
+                spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0, attTQ);
+
+                spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 136, 0), new Scale3d(1), 0, attGD);
+                spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 158, 0), new Scale3d(1), 0, attGD);
+                acBlkTbl.DowngradeOpen();
+                acBlkTblRec.DowngradeOpen();
+
+                trans2.Commit();
+                #endregion
+            }
+
+        }
+
         public Entity[] createNumberTable(string stringTableName, Point2d insertPoint, ObjectId styleId)//Database db,Point2d insertPoint,Dictionary<string, string> ItemNumber)
         {
             Entity[] tableAndname = new Entity[2];
@@ -251,21 +289,17 @@ namespace AutoDraw
 
 
         //创建字体
-        public ObjectId createFont()
+        public ObjectId createFont(Database db,Transaction trans)
         {
-
             //simsun.ttc 宋体
-            Database db = HostApplicationServices.WorkingDatabase;
 
             ObjectId styleId;
-            using (Transaction trans = db.TransactionManager.StartTransaction())
-            {
-                styleId = db.AddTextStyle("宋-0.7", "宋体.ttf");
-                //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc");
-                //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc", false, false, 134, 2 | 0);
-                styleId.SetTextStyleProp(3, 0.7, 0, false, false, false, AnnotativeStates.True, true);
-                trans.Commit();
-            }
+            styleId = db.AddTextStyle("宋-0.7", "宋体.ttf");
+            //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc");
+            //styleId = db.AddTextStyle("宋体-0.7", "simsun.ttc", false, false, 134, 2 | 0);
+            styleId.SetTextStyleProp(3, 0.7, 0, false, false, false, AnnotativeStates.True, true);
+            trans.Commit();
+
             return styleId;
         }
 
@@ -277,6 +311,8 @@ namespace AutoDraw
         {
             string[] t = new string[1];
             MakeSignatureTable("三级图签", withoutScale, fontId);
+            drawFunction dF = new drawFunction();
+            dF.CheckBlock( fontId); //db, trans,
         }
 
         /// <summary>
@@ -285,7 +321,7 @@ namespace AutoDraw
         /// <param name="insertPoint">设置插入点，插入点为图框右下角</param>
         /// <param name="nameTable">签名块设置</param>
         /// <returns></returns>
-        public Entity[] MakeSignatureTable(string nameTable, bool withoutScale, ObjectId fontId)
+        public void MakeSignatureTable(string nameTable, bool withoutScale, ObjectId fontId)
         {
             #region 绘制签名图签
             //Point2d tqDownRight = new Point2d(insertPoint.X, insertPoint.Y);//图签右下
@@ -536,7 +572,7 @@ namespace AutoDraw
             MakeTableRecode(nameTable, TqLines, withoutScale, fontId);
             #endregion
 
-            return TqLines;
+            //return TqLines;
         }
 
         public ObjectId MakeTableRecode(string blockName, Entity[] entitys, bool withoutScale, ObjectId fontId)
@@ -605,6 +641,7 @@ namespace AutoDraw
 
             AttributeDefinition[] attD = new AttributeDefinition[5];
 
+
             //表示门符号的属性定义
             AttributeDefinition attProjetName = new AttributeDefinition(Point3d.Origin, "xx铁路", "项目名称", "输入项目名称：", fontId);
             attProjetName.TextStyleId = fontId;
@@ -650,6 +687,7 @@ namespace AutoDraw
 
             return attD;
         }
+
         private void setStyleForAtt(AttributeDefinition att, double height, bool invisible)
         {
             att.Height = height;//文字高度
@@ -776,8 +814,7 @@ namespace AutoDraw
                     toolStripStatusLabel1.Text = "检查块";
                     DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
 
-                    drawFunction dF = new drawFunction();
-                    dF.CheckBlock();
+
 
                     trans.Commit();
                     m_DocumentLock.Dispose();
@@ -814,6 +851,7 @@ namespace AutoDraw
 
         }
 
+        string FileName = "";
         /// <summary>
         /// 当文件状态将改变时触发，废弃。
         /// </summary>
@@ -824,7 +862,10 @@ namespace AutoDraw
             if (e.GlobalCommandName == "QSAVE" || e.GlobalCommandName == "SAVE" || e.GlobalCommandName == "SAVEAS")
             {
                 // do you code
-                toolStripStatusLabel1.Text = getFilePath();
+                FileName= getFilePath();
+                toolStripStatusLabel1.Text = FileName;
+                string[] splitFileName = FileName.Split(new char[] { '\\' });
+                FileName = splitFileName[splitFileName.Length - 1];
             }
         }
 
@@ -843,17 +884,14 @@ namespace AutoDraw
 
                 //获取文件位置
                 //当程序第一次运行
-                //if (filePath == "" || filePath == null)
-                //{
-                filePath = newFilePath;
-                addFiletoSystem(filePath); //检查并设置xml、icon文件夹
+
+                lastLoadFilePath = newFilePath;
+                addFiletoSystem(newFilePath); //检查并设置xml、icon文件夹
 
                 /****废弃******/
                 Form_LineType fLT = new Form_LineType(newFilePath + "\\setting.xml");
                 fLT.TimeMarkUpdated += new Form_LineType.TimeMarkUpdateHandler(getTimeMark);
                 /****废弃******/
-
-                
 
                 /*if (Local_lastLoadedLineTime == "" && Local_lastLoadedLineTime == fLT.dataTimeTag) //如果还没有读取linelist，切没有打开linetype界面
                 {
@@ -871,7 +909,7 @@ namespace AutoDraw
                 //filePath = newFilePath;
 
             }
-            if (filePath != newFilePath)
+            if (lastLoadFilePath != newFilePath)
             {
                 //文件位置
 
@@ -883,8 +921,16 @@ namespace AutoDraw
 
             //DoSomeWork();
         }
-        
 
+        private void modifyXml(string path, string newName)
+        {
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(path);
+
+            XmlNode rootNode = xmlDoc.SelectSingleNode("ProjetName");
+            rootNode.InnerText = newName;
+        }
         /// <summary>
         /// 设置变量、创建文件
         /// </summary>
@@ -1522,13 +1568,15 @@ namespace AutoDraw
                         if (TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.Text.ToString().Replace(" ","") != "")
                         {
                             PFunction pF=new PFunction();
-                            if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$"))
+                            if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //如果不是汉字
                             {
+                                MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "格式不符合规范。");
                                 return;
                             }
                             //if (!pF.isExMatch(T_SLocation.Text.ToString().Replace(" ", ""), @"^([A-Z]*)(\d*)([A-Z]*)(\d*).(\d{0,4})$"))   (\d+)+(\d{0,4})
-                            if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                            if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$")) //如果里程不符合规范
                             {
+                                MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "格式不符合规范。");
                                 return;
                             }
                             string sLocation = "";
@@ -2284,34 +2332,41 @@ namespace AutoDraw
                 selectListBlock = new List<string>();
 
                 //label7.Text = selectedWayPoint.Nodes.ToString();
-                TreeNode rootNode=new TreeNode();
-                rootNode = selectedWayPoint.SelectedNode.Parent;
-                if (rootNode == null)
+                TreeNode rootNode=new TreeNode(); //第一级节点。本次设计只有2级节点。 
+
+                rootNode = selectedWayPoint.SelectedNode.Parent;  //选中节点的父节点
+                if (rootNode == null)    //如果选中项不存在父节点，则该节点为第一级节点。
                 {
                     rootNode = selectedWayPoint.SelectedNode;
                 }
 
                 TreeNode Node = new TreeNode();
                 List<TreeNode> listNode = new List<TreeNode>();
-                foreach (TreeNode node in selectedWayPoint.Nodes)
+                foreach (TreeNode node in selectedWayPoint.Nodes)  //选中父节点的所有子节点
                 {
                     
                     if (node.FullPath.Contains(rootNode.Name.ToString())) //如果fullpath中有
                     {
                         Node = node;
-                        
-
+                        break;
                     }
-                }
-
-                foreach (TreeNode child in Node.Nodes)
-                {
-                    listNode.Add(child); //查找所亭节点下的所有node
                 }
 
                 //当不为空时
                 if (textBox1.Text.ToString() != "" && textBox2.Text.ToString() != "" && C_equipeType.SelectedItem.ToString() != "" && C_Line.SelectedItem.ToString() != "" && C_equipeType.SelectedItem.ToString() != null && C_Line.SelectedItem.ToString() != null)
                 {
+                    PFunction pF = new PFunction();
+                    if (!pF.isExMatch(textBox1.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //如果不是汉字
+                    {
+                        MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "格式不符合规范。");
+                        return;
+                    }
+                    //if (!pF.isExMatch(T_SLocation.Text.ToString().Replace(" ", ""), @"^([A-Z]*)(\d*)([A-Z]*)(\d*).(\d{0,4})$"))   (\d+)+(\d{0,4})
+                    if (!pF.isExMatch(textBox2.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$")) //如果里程不符合规范
+                    {
+                        MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "格式不符合规范。");
+                        return;
+                    }
                     //检查是否已经在表里
                     bool duplicate = false;
                     foreach (TreeNode node in listNode)
@@ -2506,13 +2561,26 @@ namespace AutoDraw
 
         private void C_equipeType_SelectedIndexChanged(object sender, EventArgs e)
         {
+
+            //如果选中下列设备，则里程自动变为选中项的里程，且textbox不能更改
             if (C_equipeType.SelectedText == "地震传感器" || C_equipeType.SelectedText == "信号中继站" || C_equipeType.SelectedText == "监控单元" || C_equipeType.SelectedText == "防灾控制箱")
             {
                 int nRow = dataGridView1.CurrentRow.Index; //选中行
 
                 string selectLocation = dataGridView1.Rows[nRow].Cells[0].Value.ToString();
 
-                textBox1.Text = selectLocation;
+                textBox1.Text = selectLocation; //
+                if (textBox1.Enabled == true)
+                {
+                    textBox1.Enabled = false; 
+                }
+            }
+            else
+            {
+                if (textBox1.Enabled == false)
+                {
+                    textBox1.Enabled = true; 
+                }
             }
         }
 
@@ -2708,8 +2776,7 @@ namespace AutoDraw
 
         private void button6_Click_1(object sender, EventArgs e)
         {
-            drawFunction dF = new drawFunction();
-            dF.CheckBlock();
+            
         }
     }
 }

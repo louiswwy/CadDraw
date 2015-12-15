@@ -41,6 +41,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.button6 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
@@ -83,7 +84,6 @@
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.listView1 = new System.Windows.Forms.ListView();
             this.label3 = new System.Windows.Forms.Label();
-            this.button6 = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -256,6 +256,16 @@
             this.splitContainer1.SplitterWidth = 8;
             this.splitContainer1.TabIndex = 12;
             // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(12, 267);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(75, 23);
+            this.button6.TabIndex = 13;
+            this.button6.Text = "button6";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click_1);
+            // 
             // button5
             // 
             this.button5.Location = new System.Drawing.Point(101, 267);
@@ -268,7 +278,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(68, 367);
+            this.button1.Location = new System.Drawing.Point(102, 352);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 1;
@@ -278,7 +288,7 @@
             // 
             // B_Draw
             // 
-            this.B_Draw.Location = new System.Drawing.Point(68, 396);
+            this.B_Draw.Location = new System.Drawing.Point(12, 352);
             this.B_Draw.Name = "B_Draw";
             this.B_Draw.Size = new System.Drawing.Size(75, 23);
             this.B_Draw.TabIndex = 0;
@@ -705,16 +715,6 @@
             this.label3.Size = new System.Drawing.Size(41, 12);
             this.label3.TabIndex = 0;
             this.label3.Text = "label3";
-            // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(12, 267);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(75, 23);
-            this.button6.TabIndex = 13;
-            this.button6.Text = "button6";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click_1);
             // 
             // MainInterface
             // 

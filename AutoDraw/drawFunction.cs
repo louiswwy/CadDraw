@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using DotNetARX;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,6 @@ namespace AutoDraw
 {
     class drawFunction
     {
-
         public class StationAndLocation
         {
             private string id = string.Empty;
@@ -70,13 +70,62 @@ namespace AutoDraw
         }
 
 
+        #region 绘至图形
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="trans"></param>
+        /// <param name="insertPoint">插入点，以内框左上角点为准</param>
+        public Entity[] drawBackGround(Database db, Transaction trans, Point2d insertPoint, ObjectId fontID)
+        {
+            //绘制图形背景。图形分为4个部分，左上的两个数量表、又上的标志、左下的说明与图例、右下的图签
+            //线槽
+            Point3d insertLineTable1 = new Point3d(insertPoint.X + 116, insertPoint.Y - 119, 0);
+            List<Entity> Fibre1 = drawDoubleFibre(db, trans, insertLineTable1, fontID);
+
+            Point3d insertLineTable2 = new Point3d(insertPoint.X + 116, insertPoint.Y - 176, 0);
+            List<Entity> Fibre2 = drawDoubleFibre(db, trans, insertLineTable2, fontID);
+
+            //右上方图表
+            Point3d insertUpRightTable = new Point3d(insertPoint.X + 116, insertPoint.Y - 8, 0);
+            List<Entity> rightUpTable = drawUpperTable(db, trans, insertUpRightTable, fontID);
+
+            //轨道图标
+
+            //左下方图表
+            Point3d insertDownRightTable = new Point3d(insertPoint.X + 116, insertPoint.Y - 190, 0);
+            List<Entity> rightDownTable = drawDownTable(db, trans, insertDownRightTable, fontID);
+            //标志
+            //说明与图例
+            //图签
+
+            //Entity[] return
+            var MergedList = Fibre1.Union(Fibre2).ToList();
+            MergedList = MergedList.Union(rightUpTable).ToList();
+            MergedList = MergedList.Union(rightDownTable).ToList();
+            List<Entity> returnListEntity = MergedList.ToList();
+
+            Entity[] returnEntity = new Entity[returnListEntity.Count];
+            int count = 0;
+            foreach(Entity ent in returnListEntity)
+            {
+                returnEntity[count] = ent;
+                count++;
+            }
+            return returnEntity;
+        }
+        #endregion
+
         #region 生成图块
-        public bool CheckBlock()
+        public bool CheckBlock( ObjectId fontId)//Database db, Transaction trans,
         {
             bool allCheck = false;
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
+                
+
                 try
                 {
                     DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
@@ -106,7 +155,7 @@ namespace AutoDraw
                     //如果不存在铁轨标识则新建块
                     if (!bt.Has("铁轨_Length_248"))
                     {
-                        CreateRailWayMark(db, trans, insertPoint);//, "XX上行线/下行线");
+                        CreateRailWayMark(db, trans, insertPoint, fontId);//, "XX上行线/下行线");
                     }
                     bt.DowngradeOpen();
                     trans.Commit();
@@ -121,7 +170,7 @@ namespace AutoDraw
         }
 
         //如果不存在则添加铁轨标识
-        private void CreateRailWayMark(Database db, Transaction trans, Point3d insertPoint)//, string RailWayDirection)
+        private void CreateRailWayMark(Database db, Transaction trans, Point3d insertPoint,ObjectId FontId)//, string RailWayDirection)
         {
             // Open the Block table for read
             BlockTable acBlkTbl = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -141,7 +190,7 @@ namespace AutoDraw
             ProjectNameShortAtt.TextString = "XXX上行/下行线";
             ProjectNameShortAtt.Tag = "上行/下行线";
             ProjectNameShortAtt.Prompt = "输入线路名称";
-            ProjectNameShortAtt.TextStyleId = ObjectId.Null;
+            ProjectNameShortAtt.TextStyleId = FontId;
             ProjectNameShortAtt.Justify = AttachmentPoint.MiddleLeft;
             ProjectNameShortAtt.HorizontalMode = TextHorizontalMode.TextLeft;
             ProjectNameShortAtt.VerticalMode = TextVerticalMode.TextVerticalMid;
@@ -412,77 +461,81 @@ namespace AutoDraw
         /// <param name="db"></param>
         /// <param name="trans"></param>
         /// <param name="insertPoint"></param>
-        public void drawDoubleFibre(Database db, Transaction trans, Point3d insertPoint)
+        public List<Entity> drawDoubleFibre(Database db, Transaction trans, Point3d insertPoint,ObjectId fontId)
         {
             Polyline pHorizonline1 = new Polyline();
             pHorizonline1.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y), new Point2d(insertPoint.X + 248, insertPoint.Y));
             Polyline pHorizonline2 = new Polyline();
-            pHorizonline2.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 4), new Point2d(insertPoint.X + 248, insertPoint.Y - 4));
+            pHorizonline2.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 4.2), new Point2d(insertPoint.X + 248, insertPoint.Y - 4.2));
             Polyline pHorizonline3 = new Polyline();
-            pHorizonline3.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 8), new Point2d(insertPoint.X + 248, insertPoint.Y - 8));
+            pHorizonline3.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 8.4), new Point2d(insertPoint.X + 248, insertPoint.Y - 8.4));
 
             DBText TFibreName1 = new DBText();
             TFibreName1.TextString = "信号电缆槽";
             TFibreName1.Height = 3;
+            TFibreName1.TextStyleId = fontId;
             TFibreName1.VerticalMode = TextVerticalMode.TextVerticalMid;
             TFibreName1.HorizontalMode = TextHorizontalMode.TextLeft;
-            TFibreName1.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 2, 0);
+            TFibreName1.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 2.1, 0);
 
             DBText TFibreName2 = new DBText();
             TFibreName2.TextString = "通信电缆槽";
             TFibreName2.Height = 3;
+            TFibreName2.TextStyleId = fontId;
             TFibreName2.VerticalMode = TextVerticalMode.TextVerticalMid;
             TFibreName2.HorizontalMode = TextHorizontalMode.TextLeft;
-            TFibreName2.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 6, 0);
+            TFibreName2.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 6.3, 0);
 
-            db.AddToModelSpace(TFibreName1, TFibreName2);
-            db.AddToModelSpace(pHorizonline1, pHorizonline2, pHorizonline3);
+            List<Entity> lineEntity = new List<Entity>();
+            lineEntity.Add(TFibreName1);
+            lineEntity.Add(TFibreName2); 
+            lineEntity.Add(pHorizonline1);
+            lineEntity.Add(pHorizonline2);
+            lineEntity.Add(pHorizonline3);
+
+            return lineEntity;
         }
 
-        public void drawTable(Database db, Transaction trans, Point3d insertPoint)
+        /// <summary>
+        /// 插入右上方表格，插入点为右上方
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="trans"></param>
+        /// <param name="insertPoint"></param>
+        public List<Entity> drawUpperTable(Database db, Transaction trans, Point3d insertPoint,ObjectId fontID)
         {
-            BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
-            bt.UpgradeOpen();
-            BlockTableRecord btr = (BlockTableRecord)trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
-
             Polyline pHorizonline1 = new Polyline();
             pHorizonline1.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y), new Point2d(insertPoint.X + 30, insertPoint.Y));
-            btr.AppendEntity(pHorizonline1);
-            trans.AddNewlyCreatedDBObject(pHorizonline1, true);
+
 
             Polyline pHorizonline2 = new Polyline();
             pHorizonline2.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 8.5), new Point2d(insertPoint.X + 30, insertPoint.Y - 8.5));
-            btr.AppendEntity(pHorizonline2);
-            trans.AddNewlyCreatedDBObject(pHorizonline2, true);
+
 
             Polyline pHorizonline3 = new Polyline();
             pHorizonline3.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 19), new Point2d(insertPoint.X + 30, insertPoint.Y - 19));
-            btr.AppendEntity(pHorizonline3);
-            trans.AddNewlyCreatedDBObject(pHorizonline3, true);
+
 
             Polyline pHorizonline4 = new Polyline();
-            pHorizonline4.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 32.5), new Point2d(insertPoint.X + 247, insertPoint.Y - 32.5));
-            btr.AppendEntity(pHorizonline4);
-            trans.AddNewlyCreatedDBObject(pHorizonline4, true);
+            pHorizonline4.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 32.5), new Point2d(insertPoint.X + 248, insertPoint.Y - 32.5));
+
 
             Polyline pHorizonline5 = new Polyline();
-            pHorizonline5.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 41), new Point2d(insertPoint.X + 247, insertPoint.Y - 41));
-            btr.AppendEntity(pHorizonline5);
-            trans.AddNewlyCreatedDBObject(pHorizonline5, true);
+            pHorizonline5.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 41), new Point2d(insertPoint.X + 248, insertPoint.Y - 41));
+
 
             Polyline pVerticalLine1 = new Polyline();
             pVerticalLine1.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y), new Point2d(insertPoint.X, insertPoint.Y - 41));
-            btr.AppendEntity(pVerticalLine1);
-            trans.AddNewlyCreatedDBObject(pVerticalLine1, true);
+
 
             Polyline pVerticalLine2 = new Polyline();
             pVerticalLine2.CreatePolyline(new Point2d(insertPoint.X + 30, insertPoint.Y), new Point2d(insertPoint.X + 30, insertPoint.Y - 41));
-            btr.AppendEntity(pVerticalLine2);
-            trans.AddNewlyCreatedDBObject(pVerticalLine2, true);
+
 
             DBText TStationName = new DBText();
             TStationName.TextString = "站名";
             TStationName.Height = 3;
+            TStationName.TextStyleId = fontID;
             TStationName.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationName.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationName.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - 8.5 / 2, 0);
@@ -490,6 +543,7 @@ namespace AutoDraw
             DBText TStationmark = new DBText();
             TStationmark.TextString = "图示";
             TStationmark.Height = 3;
+            TStationmark.TextStyleId = fontID;
             TStationmark.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationmark.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationmark.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - 8.5 - 8.5 / 2, 0);
@@ -497,6 +551,7 @@ namespace AutoDraw
             DBText TStationLocation = new DBText();
             TStationLocation.TextString = "站中心里程";
             TStationLocation.Height = 3;
+            TStationLocation.TextStyleId = fontID;
             TStationLocation.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationLocation.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationLocation.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - (19 + (32.5 - 19) / 2), 0);
@@ -504,15 +559,90 @@ namespace AutoDraw
             DBText TStationDistance = new DBText();
             TStationDistance.TextString = "站间距离";
             TStationDistance.Height = 3;
+            TStationDistance.TextStyleId = fontID;
             TStationDistance.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationDistance.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationDistance.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - (32.5 + (41 - 32.5) / 2), 0);
 
-            //db.AddToModelSpace(pHorizonline1, pHorizonline2, pHorizonline3, pHorizonline4, pHorizonline5, pVerticalLine1, pVerticalLine2);
-            db.AddToModelSpace(TStationName, TStationmark, TStationLocation, TStationDistance);
-            bt.DowngradeOpen();
-            btr.DowngradeOpen();
+
+            List<Entity> returnEntity = new List<Entity>();
+            returnEntity.Add(pHorizonline1);
+            returnEntity.Add(pHorizonline2);
+            returnEntity.Add(pHorizonline3);
+            returnEntity.Add(pHorizonline4);
+            returnEntity.Add(pHorizonline5);
+            returnEntity.Add(pVerticalLine1);
+            returnEntity.Add(pVerticalLine2);
+            returnEntity.Add(TStationName) ;
+            returnEntity.Add(TStationmark);
+            returnEntity.Add(TStationLocation);
+            returnEntity.Add(TStationDistance) ;
+
+            return returnEntity;
         }
+
+        /// <summary>
+        /// 插入图右下方表格，插入点为表格左上方
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="trans"></param>
+        /// <param name="insertPoint"></param>
+        public List<Entity> drawDownTable(Database db, Transaction trans, Point3d insertPoint,ObjectId fontid)
+        {
+            Point2d rectangleLeftUp = new Point2d(insertPoint.X, insertPoint.Y);
+            Point2d rectangleRightDown = new Point2d(insertPoint.X + 248, insertPoint.Y - 7.5 - 7.5 - 7.5);
+            Polyline rectangleDown = new Polyline();
+            rectangleDown.CreateNewRectangle(rectangleLeftUp, rectangleRightDown);
+
+            Polyline pHorizonline1 = new Polyline();
+            pHorizonline1.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y-7.5), new Point2d(insertPoint.X+248 , insertPoint.Y-7.5));
+
+
+            Polyline pHorizonline2 = new Polyline();
+            pHorizonline2.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 7.5 - 7.5), new Point2d(insertPoint.X + 248, insertPoint.Y - 7.5 - 7.5));
+
+
+            Polyline pVerticalLine1 = new Polyline();
+            pVerticalLine1.CreatePolyline(new Point2d(insertPoint.X + 30, insertPoint.Y), new Point2d(insertPoint.X + 30, insertPoint.Y - 7.5 - 7.5 - 7.5));
+
+
+            DBText TStationName = new DBText();
+            TStationName.TextString = "房屋编号/里程";
+            TStationName.Height = 3;
+            TStationName.TextStyleId = fontid;
+            TStationName.VerticalMode = TextVerticalMode.TextVerticalMid;
+            TStationName.HorizontalMode = TextHorizontalMode.TextCenter;
+            TStationName.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - 7.5 / 2, 0);
+
+            DBText TStationmark = new DBText();
+            TStationmark.TextString = "里程接触网杆里程";
+            TStationmark.Height = 3;
+            TStationmark.TextStyleId = fontid;
+            TStationmark.VerticalMode = TextVerticalMode.TextVerticalMid;
+            TStationmark.HorizontalMode = TextHorizontalMode.TextCenter;
+            TStationmark.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - 7.5 - 7.5 / 2, 0);
+
+            DBText TStationLocation = new DBText();
+            TStationLocation.TextString = "地形情况";
+            TStationLocation.Height = 3;
+            TStationLocation.TextStyleId = fontid;
+            TStationLocation.VerticalMode = TextVerticalMode.TextVerticalMid;
+            TStationLocation.HorizontalMode = TextHorizontalMode.TextCenter;
+            TStationLocation.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - (15 + 7.5 / 2), 0);
+
+            List<Entity> returnEntity = new List<Entity>();
+
+            returnEntity.Add(rectangleDown);
+            returnEntity.Add(pHorizonline1);
+            returnEntity.Add(pHorizonline2) ;
+            returnEntity.Add(pVerticalLine1);
+            returnEntity.Add(TStationName) ;
+            returnEntity.Add(TStationmark) ;
+            returnEntity.Add(TStationLocation) ;
+
+            return returnEntity;
+        }
+
 
     }
 }
