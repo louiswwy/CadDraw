@@ -196,7 +196,7 @@ namespace AutoDraw
             ProjectNameShortAtt.HorizontalMode = TextHorizontalMode.TextLeft;
             ProjectNameShortAtt.VerticalMode = TextVerticalMode.TextVerticalMid;
 
-            ProjectNameShortAtt.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - textHeight / 2, 0);
+            ProjectNameShortAtt.AlignmentPoint = new Point3d(insertPoint.X + 11.5, insertPoint.Y - 7 / 2, 0);
             SetStyleForAttribut(ProjectNameShortAtt, textHeight, false);
 
             acBlkTblRec.AppendEntity(ProjectNameShortAtt);
@@ -205,10 +205,10 @@ namespace AutoDraw
 
             //
             Polyline BigRectangle = new Polyline(4);
-            BigRectangle.AddVertexAt(0, new Point2d(insertPoint.X + 15, insertPoint.Y), 0, 0.1, 0.1);
-            BigRectangle.AddVertexAt(1, new Point2d(insertPoint.X + 15 + 228, insertPoint.Y), 0, 0.1, 0.1);
-            BigRectangle.AddVertexAt(2, new Point2d(insertPoint.X + 15 + 228, insertPoint.Y - 7), 0, 0.1, 0.1);
-            BigRectangle.AddVertexAt(3, new Point2d(insertPoint.X + 15, insertPoint.Y - 7), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(0, new Point2d(insertPoint.X + 23, insertPoint.Y), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(1, new Point2d(insertPoint.X + 23 + 225, insertPoint.Y), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(2, new Point2d(insertPoint.X + 23 + 225, insertPoint.Y - 7), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(3, new Point2d(insertPoint.X + 23, insertPoint.Y - 7), 0, 0.1, 0.1);
             BigRectangle.Closed = true;
             acBlkTblRec.AppendEntity(BigRectangle);
             trans.AddNewlyCreatedDBObject(BigRectangle, true);
@@ -477,6 +477,7 @@ namespace AutoDraw
             TFibreName1.TextString = "信号电缆槽";
             TFibreName1.Height = 3;
             TFibreName1.TextStyleId = fontId;
+            TFibreName1.WidthFactor = 0.7;
             TFibreName1.VerticalMode = TextVerticalMode.TextVerticalMid;
             TFibreName1.HorizontalMode = TextHorizontalMode.TextLeft;
             TFibreName1.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 2.1, 0);
@@ -485,6 +486,7 @@ namespace AutoDraw
             TFibreName2.TextString = "通信电缆槽";
             TFibreName2.Height = 3;
             TFibreName2.TextStyleId = fontId;
+            TFibreName2.WidthFactor = 0.7;
             TFibreName2.VerticalMode = TextVerticalMode.TextVerticalMid;
             TFibreName2.HorizontalMode = TextHorizontalMode.TextLeft;
             TFibreName2.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 6.3, 0);
@@ -539,6 +541,7 @@ namespace AutoDraw
             TStationName.TextString = "站名";
             TStationName.Height = 3;
             TStationName.TextStyleId = fontID;
+            TStationName.WidthFactor = 0.7;
             TStationName.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationName.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationName.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - 8.5 / 2, 0);
@@ -547,6 +550,7 @@ namespace AutoDraw
             TStationmark.TextString = "图示";
             TStationmark.Height = 3;
             TStationmark.TextStyleId = fontID;
+            TStationmark.WidthFactor = 0.7;
             TStationmark.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationmark.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationmark.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - 8.5 - 8.5 / 2, 0);
@@ -555,6 +559,7 @@ namespace AutoDraw
             TStationLocation.TextString = "站中心里程";
             TStationLocation.Height = 3;
             TStationLocation.TextStyleId = fontID;
+            TStationLocation.WidthFactor = 0.7;
             TStationLocation.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationLocation.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationLocation.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - (19 + (32.5 - 19) / 2), 0);
@@ -563,6 +568,7 @@ namespace AutoDraw
             TStationDistance.TextString = "站间距离";
             TStationDistance.Height = 3;
             TStationDistance.TextStyleId = fontID;
+            TStationDistance.WidthFactor = 0.7;
             TStationDistance.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationDistance.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationDistance.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - (32.5 + (41 - 32.5) / 2), 0);
@@ -613,6 +619,7 @@ namespace AutoDraw
             TStationName.TextString = "房屋编号/里程";
             TStationName.Height = 3;
             TStationName.TextStyleId = fontid;
+            TStationName.WidthFactor = 0.7;
             TStationName.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationName.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationName.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - 7.5 / 2, 0);
@@ -621,6 +628,7 @@ namespace AutoDraw
             TStationmark.TextString = "里程接触网杆里程";
             TStationmark.Height = 3;
             TStationmark.TextStyleId = fontid;
+            TStationmark.WidthFactor = 0.7;
             TStationmark.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationmark.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationmark.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - 7.5 - 7.5 / 2, 0);
@@ -629,6 +637,7 @@ namespace AutoDraw
             TStationLocation.TextString = "地形情况";
             TStationLocation.Height = 3;
             TStationLocation.TextStyleId = fontid;
+            TStationLocation.WidthFactor = 0.7;
             TStationLocation.VerticalMode = TextVerticalMode.TextVerticalMid;
             TStationLocation.HorizontalMode = TextHorizontalMode.TextCenter;
             TStationLocation.AlignmentPoint = new Point3d(insertPoint.X + 30 / 2, insertPoint.Y - (15 + 7.5 / 2), 0);

@@ -132,8 +132,8 @@ namespace AutoDraw
 
                     spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0, attTQ);
 
-                    spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 136, 0), new Scale3d(1), 0, attGD);
-                    spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 158, 0), new Scale3d(1), 0, attGD);
+                    spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 137.2, 0), new Scale3d(1), 0, attGD);
+                    spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 159.2, 0), new Scale3d(1), 0, attGD);
                     acBlkTbl.DowngradeOpen();
                     acBlkTblRec.DowngradeOpen();
 
@@ -441,6 +441,7 @@ namespace AutoDraw
             text1.HorizontalMode = TextHorizontalMode.TextCenter;
             text1.VerticalMode = TextVerticalMode.TextVerticalMid;
             text1.AlignmentPoint = text1.Position;
+            text1.TextStyleId = fontId;
             text1.WidthFactor = 0.7;
 
             DBText text2 = new DBText();
@@ -1092,6 +1093,7 @@ namespace AutoDraw
                         if (imgStoragePath != "" || imgStoragePath != null)
                         {
                             Size defSize = new System.Drawing.Size(30, 30);
+                            listView1.Clear();
                             fillImageList(imgStoragePath, defSize);
                             fileListView(imgStoragePath);
 
@@ -1135,14 +1137,14 @@ namespace AutoDraw
             string filename = openFilePath;
             // 在C盘根目录下创建一个临时文件夹，用来存放文件中的块预览图标
             string path = string.Empty;
-#if DEBUG
+            //#if DEBUG
 
             path = imgPath;//  StockLocation;
 
             //string b=
-#else
-            path = "..\\Resourse\\";
-#endif
+            //#else
+            //path = "..\\Resourse\\";
+            //#endif
 
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             using (Transaction trans = db.TransactionManager.StartTransaction())
@@ -1165,7 +1167,7 @@ namespace AutoDraw
                         if (btRecord.IsAnonymous || btRecord.IsLayout || !btRecord.HasPreviewIcon) continue;
 
                         //统一大小
-                       
+
                         Bitmap preview;
                         try
                         {
@@ -1173,6 +1175,10 @@ namespace AutoDraw
                             if (!btRecord.IsDynamicBlock)
                             {
                                 str.Append("Dynamique");
+                            }
+                            else
+                            {
+
                             }
 
                             if (btRecord.ExtensionDictionary == null)
@@ -1184,8 +1190,16 @@ namespace AutoDraw
                             //preview = BlockThumbnailHelper.GetBlockThumbanail(btr.ObjectId);
 
                             preview = btRecord.PreviewIcon; // 适用于AutoCAD 2009及以上版本 
-                            preview.Save(path + "\\" + btRecord.Name + "_" + str.ToString() + ".bmp"); // 保存块预览图案
-                            //trans.Commit();
+
+                            if (!getFileName(path).Contains(btRecord.Name.ToString()))
+                            {
+                                preview.Save(path + "\\" + btRecord.Name + ".bmp"); // 保存块预览图案
+
+                            }
+                            else
+                            {
+
+                            }
                         }
                         catch (Autodesk.AutoCAD.Runtime.Exception ee)
                         {
@@ -1207,6 +1221,22 @@ namespace AutoDraw
                     //preview = btr.PreviewIcon; // 适用于AutoCAD 2009及以上版本
                 }
             }
+        }
+
+        public string getFileName(string flodePath)
+        {
+            DirectoryInfo theFolder = new DirectoryInfo(@flodePath);
+            StringBuilder sb = new StringBuilder();
+            FileInfo[] dirInfo = theFolder.GetFiles();
+
+            foreach (FileInfo NextFile in dirInfo)  //遍历文件
+            {
+                if (NextFile.Extension == "bmp")
+                {
+                    sb.Append(NextFile.Name.ToString());
+                }
+            }
+            return sb.ToString();
         }
 
         public void autoFitBlock()
@@ -2129,7 +2159,7 @@ namespace AutoDraw
         /// <param name="imgSize"></param>
         private void fillImageList(string bmgFilesLocation, Size imgSize)
         {
-            DirectoryInfo Dir = new DirectoryInfo(bmgFilesLocation);
+            DirectoryInfo Dir = new DirectoryInfo(@bmgFilesLocation);
             imageList1 = new ImageList();
             filename = new List<string>();
             try
@@ -2802,6 +2832,19 @@ namespace AutoDraw
         private void button6_Click_1(object sender, EventArgs e)
         {
             
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            DirectoryInfo theFolder = new DirectoryInfo(@"C:\\Users\\wenyi\\Desktop\\新建文件夹 (2)\\icon"); 
+            StringBuilder sb = new StringBuilder();
+            FileInfo[] dirInfo = theFolder.GetFiles();
+
+            foreach (FileInfo NextFile in dirInfo)  //遍历文件
+            {
+                sb.Append(NextFile.Name.ToString());
+            }
+                    
         }
     }
 }
