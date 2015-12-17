@@ -811,6 +811,7 @@ namespace AutoDraw
             if (currentFilePath.ToLower().Contains("template"))
             {
                 toolStripStatusLabel1.Text = "未保存的文件.";
+                return;
             }
             else
             {
@@ -831,6 +832,7 @@ namespace AutoDraw
 
             #endregion
 
+            /*
             #region 检查块
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
@@ -850,7 +852,7 @@ namespace AutoDraw
                     Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("Message: " + ee.Message.ToString() + System.Environment.NewLine + "Source: " + ee.Source.ToString() + System.Environment.NewLine + "TargetSite: " + ee.TargetSite.ToString() + System.Environment.NewLine + "StackTrace: " + ee.StackTrace.ToString());
                 }
             }
-            #endregion
+            #endregion*/
         }
 
 
