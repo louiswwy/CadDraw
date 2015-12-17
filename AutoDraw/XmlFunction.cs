@@ -93,7 +93,7 @@ namespace AutoDraw
             foreach (var node in nodeList)
             {
                 XmlElement xe = (XmlElement)node;//将子节点类型转换为XmlElement类型   
-                if (xe.GetAttribute("location").ToUpper() == location)//如果genre属性值为“李赞红”   
+                if (xe.GetAttribute("location").ToUpper() == location)//如果location属性值为location的值   
                 {
                     elementFound = true;
                     break;
@@ -289,6 +289,27 @@ namespace AutoDraw
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
             XmlNode xe1 = root.SelectSingleNode("Connection");//查找<Connection> 
         }*/
+        #endregion
+
+        #region 规则部分
+        public void writeRule(string xmlPath,string Nequipe)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlPath);
+            XmlNode root = xmlDoc.SelectSingleNode("Rule");//查找<Rule> 
+            if (hasElement(root, xmlPath))
+            {
+                XmlElement xe1 = xmlDoc.CreateElement("equipement");//创建一个<equipement>节点
+                xe1.SetAttribute("Name", Nequipe);
+                root.AppendChild(xe1);
+                xmlDoc.Save(xmlPath);
+            }
+
+            
+            
+
+        }
+
         #endregion
     }
 }

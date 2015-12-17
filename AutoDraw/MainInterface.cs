@@ -1010,7 +1010,7 @@ namespace AutoDraw
         /// 获得当前文件储存位置
         /// </summary>
         /// <returns>文件位置</returns>
-        private string getFilePath()
+        public string getFilePath()
         {
             string p;
 
@@ -1802,11 +1802,14 @@ namespace AutoDraw
             
         }
 
+        //生成xml文件
         public void createXml(string CreatXmlFilePath)
         {
             string filepath = getFilePath();
             string[] strings = filepath.Split(new char[] { '\\' });
             string PName = strings[strings.Length - 1];
+
+            //生成setting文件
             XmlDocument xmlDoc = new XmlDocument();
             //创建类型声明节点  
             XmlNode node = xmlDoc.CreateXmlDeclaration("1.0", "gb2312", "");
@@ -1817,9 +1820,31 @@ namespace AutoDraw
             CreateNode(xmlDoc, root, "ProjetName", PName);
             CreateNode(xmlDoc, root, "WayPoints", "");
             CreateNode(xmlDoc, root, "Connection", "");
+
+
+            //生成drawRule.xml
+            XmlDocument xmlRule = new XmlDocument();
+            //创建类型声明节点  
+            XmlNode ruleNode = xmlRule.CreateXmlDeclaration("1.0", "gb2312", "");
+            xmlRule.AppendChild(ruleNode);
+            //创建根节点  
+            XmlNode ruleRoot = xmlRule.CreateElement("Rule");
+            ruleRoot.InnerText = "";
+            xmlRule.AppendChild(ruleRoot);
+
             try
             {
                 xmlDoc.Save(CreatXmlFilePath);
+                StringBuilder sB=new StringBuilder();
+                foreach (string str in CreatXmlFilePath.Split(new char[] { '\\' }))
+                {
+                    if (!str.Contains(".xml"))
+                    {
+                        sB.Append(str + "\\");
+                    }
+                }
+
+                xmlRule.Save(sB.ToString() + "\\rule.xml");
             }
             catch (System.Exception e)
             {
@@ -2847,6 +2872,19 @@ namespace AutoDraw
                 sb.Append(NextFile.Name.ToString());
             }
                     
+        }
+
+        private void 定制规则ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (true)//imgStoragePath != "") 
+            {
+                F_Rule FR = new F_Rule(imgStoragePath);
+                FR.ShowDialog();
+            }
+            else //文件没有保存的时候不能设置规则
+            {
+                MessageBox.Show("请先保存图形。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
     }
 }
