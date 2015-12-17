@@ -300,14 +300,48 @@ namespace AutoDraw
             if (hasElement(root, xmlPath))
             {
                 XmlElement xe1 = xmlDoc.CreateElement("equipement");//创建一个<equipement>节点
-                xe1.SetAttribute("Name", Nequipe);
+                xe1.SetAttribute("MaxInterval", "");
+                xe1.InnerText = Nequipe;
                 root.AppendChild(xe1);
                 xmlDoc.Save(xmlPath);
             }
 
-            
-            
 
+        }
+
+        public void updateRule(string xmlPath, string NameEquipe, List<string> rules)
+        {
+            string maxDis = rules[0];
+            List<string> spWayPoint = new List<string>();
+            if (rules.Count > 0)
+            {
+                rules.RemoveAt(0);
+            }
+            spWayPoint = rules;
+
+            //
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlPath);
+
+            XmlNode root = xmlDoc.SelectSingleNode("Rule");//查找<Projet> 
+            XmlNode subroot = root.SelectSingleNode("equipement");//查找<equipement> 
+            subroot.Attributes["MaxInterval"].Value = maxDis; //变更属性值
+
+
+            //检查值是否重复
+            bool isDupli = false;
+            foreach (XmlElement subEle in subroot.ChildNodes)
+            {
+                subroot.RemoveChild(subEle);
+            }
+            foreach (string rule in spWayPoint)
+            {
+                XmlElement specPoint = xmlDoc.CreateElement("SpWayPoint");//特殊的所亭
+
+                specPoint.InnerText = rule;
+
+                subroot.AppendChild(specPoint);
+            }
         }
 
         #endregion

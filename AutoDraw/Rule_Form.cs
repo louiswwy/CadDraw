@@ -14,11 +14,22 @@ namespace AutoDraw
     public partial class F_Rule : Form
     {
         string imgDictionPath = "";
+        string ruleFilePath = "";
         XmlFunction xF;
         public F_Rule(string iconPath)
         {
             InitializeComponent();
             imgDictionPath = iconPath;
+
+            StringBuilder sB = new StringBuilder();
+            foreach (var str in imgDictionPath.Split(new char[] { '\\' }))
+            {
+                if (!str.Contains("icon"))
+                {
+                    sB.Append(str + "\\");
+                }
+            }
+            ruleFilePath = sB.ToString();
         }
 
         private void T_MaxDistance_KeyDown(object sender, KeyEventArgs e)
@@ -47,15 +58,8 @@ namespace AutoDraw
                 T_MaxDistance.Text = "";
                 groupBox2.Text = "选中：" + selectItem;
 
-                StringBuilder sB = new StringBuilder();
-                foreach (var str in imgDictionPath.Split(new char[] { '\\' }))
-                {
-                    if (!str.Contains("icon"))
-                    {
-                        sB.Append(str + "\\");
-                    }
-                }
-                xF.writeRule(sB.ToString(),selectItem);
+
+                xF.writeRule(ruleFilePath.ToString(), selectItem);
             }
             else
             {
@@ -97,6 +101,13 @@ namespace AutoDraw
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void B_AddEquipe_Click(object sender, EventArgs e)
+        {
+            string seleName="";
+            List<string> listRules=new List<string>();
+            xF.updateRule(ruleFilePath, seleName, listRules);
         }
     }
 }
