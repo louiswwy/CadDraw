@@ -37,6 +37,8 @@
             this.图签名称ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.比例尺ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.可选线缆类型ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.项目属性ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.项目信息ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.导入图块ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
@@ -68,12 +70,10 @@
             this.button3 = new System.Windows.Forms.Button();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
             this.selectedWayPoint = new System.Windows.Forms.TreeView();
-            this.label7 = new System.Windows.Forms.Label();
             this.B_writeXML = new System.Windows.Forms.Button();
             this.C_Line = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
             this.B_CanChange = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.B_refresh = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -84,8 +84,6 @@
             this.B_AddEquipe = new System.Windows.Forms.Button();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.listView1 = new System.Windows.Forms.ListView();
-            this.项目属性ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.项目信息ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -161,7 +159,7 @@
             this.比例尺ToolStripMenuItem1,
             this.可选线缆类型ToolStripMenuItem});
             this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
-            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.比例尺ToolStripMenuItem.Text = "图纸属性";
             // 
             // 图签名称ToolStripMenuItem
@@ -184,6 +182,21 @@
             this.可选线缆类型ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.可选线缆类型ToolStripMenuItem.Text = "可选线缆类型";
             this.可选线缆类型ToolStripMenuItem.Click += new System.EventHandler(this.可选线缆类型ToolStripMenuItem_Click);
+            // 
+            // 项目属性ToolStripMenuItem
+            // 
+            this.项目属性ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.项目信息ToolStripMenuItem});
+            this.项目属性ToolStripMenuItem.Name = "项目属性ToolStripMenuItem";
+            this.项目属性ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.项目属性ToolStripMenuItem.Text = "项目属性";
+            // 
+            // 项目信息ToolStripMenuItem
+            // 
+            this.项目信息ToolStripMenuItem.Name = "项目信息ToolStripMenuItem";
+            this.项目信息ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.项目信息ToolStripMenuItem.Text = "项目信息";
+            this.项目信息ToolStripMenuItem.Click += new System.EventHandler(this.项目信息ToolStripMenuItem_Click);
             // 
             // 导入图块ToolStripMenuItem
             // 
@@ -539,12 +552,10 @@
             // 
             // splitContainer5.Panel2
             // 
-            this.splitContainer5.Panel2.Controls.Add(this.label7);
             this.splitContainer5.Panel2.Controls.Add(this.B_writeXML);
             this.splitContainer5.Panel2.Controls.Add(this.C_Line);
             this.splitContainer5.Panel2.Controls.Add(this.label8);
             this.splitContainer5.Panel2.Controls.Add(this.B_CanChange);
-            this.splitContainer5.Panel2.Controls.Add(this.checkBox1);
             this.splitContainer5.Panel2.Controls.Add(this.B_refresh);
             this.splitContainer5.Panel2.Controls.Add(this.textBox2);
             this.splitContainer5.Panel2.Controls.Add(this.label5);
@@ -565,15 +576,6 @@
             this.selectedWayPoint.Size = new System.Drawing.Size(345, 204);
             this.selectedWayPoint.TabIndex = 0;
             this.selectedWayPoint.Click += new System.EventHandler(this.selectedWayPoint_Click);
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(87, 14);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(41, 12);
-            this.label7.TabIndex = 1;
-            this.label7.Text = "label7";
             // 
             // B_writeXML
             // 
@@ -613,18 +615,6 @@
             this.B_CanChange.Text = "取消";
             this.B_CanChange.UseVisualStyleBackColor = true;
             this.B_CanChange.Click += new System.EventHandler(this.B_CanChange_Click);
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(33, 13);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(48, 16);
-            this.checkBox1.TabIndex = 9;
-            this.checkBox1.Text = "多选";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.Visible = false;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // B_refresh
             // 
@@ -720,21 +710,6 @@
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.Click += new System.EventHandler(this.listView1_Click);
-            // 
-            // 项目属性ToolStripMenuItem
-            // 
-            this.项目属性ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.项目信息ToolStripMenuItem});
-            this.项目属性ToolStripMenuItem.Name = "项目属性ToolStripMenuItem";
-            this.项目属性ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.项目属性ToolStripMenuItem.Text = "项目属性";
-            // 
-            // 项目信息ToolStripMenuItem
-            // 
-            this.项目信息ToolStripMenuItem.Name = "项目信息ToolStripMenuItem";
-            this.项目信息ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.项目信息ToolStripMenuItem.Text = "项目信息";
-            this.项目信息ToolStripMenuItem.Click += new System.EventHandler(this.项目信息ToolStripMenuItem_Click);
             // 
             // MainInterface
             // 
@@ -832,7 +807,6 @@
         private System.Windows.Forms.SplitContainer splitContainer4;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.SplitContainer splitContainer5;
@@ -841,7 +815,6 @@
         private System.Windows.Forms.ToolStripMenuItem 可选线缆类型ToolStripMenuItem;
         private System.Windows.Forms.ComboBox C_Line;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button B_writeXML;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;

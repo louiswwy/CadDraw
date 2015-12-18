@@ -2332,19 +2332,7 @@ namespace AutoDraw
 
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            listView1.MultiSelect = checkBox1.Checked;
-            if (checkBox1.Checked)
-            {
-                listView1.MultiSelect = true;
-                toolStripStatusLabel1.Text = "多选模式，按ctrl键可以多选块图案。";
-            }
-            else
-            {
-                toolStripStatusLabel1.Text = "单选模式。";
-            }
-        }
+
 
         /// <summary>
         /// 在右侧treeview中添加block信息子节点
