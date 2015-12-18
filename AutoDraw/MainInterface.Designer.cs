@@ -84,7 +84,6 @@
             this.B_AddEquipe = new System.Windows.Forms.Button();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.listView1 = new System.Windows.Forms.ListView();
-            this.定制规则ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -137,8 +136,7 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.设置ToolStripMenuItem,
-            this.导入图块ToolStripMenuItem,
-            this.定制规则ToolStripMenuItem});
+            this.导入图块ToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1239, 25);
@@ -160,7 +158,7 @@
             this.比例尺ToolStripMenuItem1,
             this.可选线缆类型ToolStripMenuItem});
             this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
-            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.比例尺ToolStripMenuItem.Text = "图纸属性";
             // 
             // 图签名称ToolStripMenuItem
@@ -720,13 +718,6 @@
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.Click += new System.EventHandler(this.listView1_Click);
             // 
-            // 定制规则ToolStripMenuItem
-            // 
-            this.定制规则ToolStripMenuItem.Name = "定制规则ToolStripMenuItem";
-            this.定制规则ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
-            this.定制规则ToolStripMenuItem.Text = "定制规则";
-            this.定制规则ToolStripMenuItem.Click += new System.EventHandler(this.定制规则ToolStripMenuItem_Click);
-            // 
             // MainInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -837,6 +828,5 @@
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.ToolStripMenuItem 定制规则ToolStripMenuItem;
     }
 }

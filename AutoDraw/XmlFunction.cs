@@ -297,12 +297,34 @@ namespace AutoDraw
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
             XmlNode root = xmlDoc.SelectSingleNode("Rule");//查找<Rule> 
-            if (hasElement(root, xmlPath))
+            if (!hasElement(root, xmlPath))
             {
                 XmlElement xe1 = xmlDoc.CreateElement("equipement");//创建一个<equipement>节点
-                xe1.SetAttribute("MaxInterval", "");
-                xe1.InnerText = Nequipe;
+                xe1.SetAttribute("Name", Nequipe);
+
+                XmlElement subXE = xmlDoc.CreateElement("Interval");//创建一个<Interval>节点
+                xe1.AppendChild(subXE);
+
+                XmlElement subXE1 = xmlDoc.CreateElement("terrain");//创建一个<MaxInterval>节点
+                subXE1.SetAttribute("MaxInterval", "");
+                subXE1.SetAttribute("MinInterval", "");
+                subXE1.InnerText = "路基";
+
+                XmlElement subXE2 = xmlDoc.CreateElement("terrain");//创建一个<MaxInterval>节点
+                subXE2.SetAttribute("MaxInterval", "");
+                subXE2.SetAttribute("MinInterval", "");
+                subXE2.InnerText = "桥梁";
+
+                XmlElement subXE3 = xmlDoc.CreateElement("terrain");//创建一个<MaxInterval>节点
+                subXE3.SetAttribute("MaxInterval", "");
+                subXE3.SetAttribute("MinInterval", "");
+                subXE3.InnerText = "山区垭口";
+
                 root.AppendChild(xe1);
+                subXE.AppendChild(subXE1);
+                subXE.AppendChild(subXE2);
+                subXE.AppendChild(subXE3);
+
                 xmlDoc.Save(xmlPath);
             }
 
@@ -342,6 +364,17 @@ namespace AutoDraw
 
                 subroot.AppendChild(specPoint);
             }
+        }
+
+        public List<string> loadRule(string xmlPath,string equName)
+        {
+            List<string> returnList = new List<string>();
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlPath);
+
+            XmlNode root = xmlDoc.SelectSingleNode("Rule");//查找<Projet> 
+
+            return returnList;
         }
 
         #endregion

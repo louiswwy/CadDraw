@@ -2874,18 +2874,7 @@ namespace AutoDraw
                     
         }
 
-        private void 定制规则ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (true)//imgStoragePath != "") 
-            {
-                F_Rule FR = new F_Rule(imgStoragePath);
-                FR.ShowDialog();
-            }
-            else //文件没有保存的时候不能设置规则
-            {
-                MessageBox.Show("请先保存图形。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
+
     }
 }
  
