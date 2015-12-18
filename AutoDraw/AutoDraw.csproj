@@ -61,6 +61,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="drawFunction.cs" />
+    <Compile Include="ProjetInfor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProjetInfor.Designer.cs">
+      <DependentUpon>ProjetInfor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Rule_Form.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -97,6 +103,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ProjetInfor.resx">
+      <DependentUpon>ProjetInfor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Rule_Form.resx">
       <DependentUpon>Rule_Form.cs</DependentUpon>
     </EmbeddedResource>

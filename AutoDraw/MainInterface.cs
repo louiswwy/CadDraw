@@ -816,6 +816,9 @@ namespace AutoDraw
             else
             {
                 addFiletoSystem(currentFilePath);
+
+                /*ProjetInfor pJ = new ProjetInfor();
+                pJ.ShowDialog();*/
             }
             #endregion
 
@@ -1633,7 +1636,7 @@ namespace AutoDraw
                             //if (!pF.isExMatch(T_SLocation.Text.ToString().Replace(" ", ""), @"^([A-Z]*)(\d*)([A-Z]*)(\d*).(\d{0,4})$"))   (\d+)+(\d{0,4})
                             if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$")) //如果里程不符合规范
                             {
-                                MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "格式不符合规范。");
+                                MessageBox.Show("里程： " + T_SName.Text.ToString().Replace(" ", "") + "格式不符合规范。");
                                 return;
                             }
                             string sLocation = "";
@@ -1817,34 +1820,19 @@ namespace AutoDraw
             //创建根节点  
             XmlNode root = xmlDoc.CreateElement("Projet");
             xmlDoc.AppendChild(root);
-            CreateNode(xmlDoc, root, "ProjetName", PName);
+
+            XmlNode node1= CreateNode(xmlDoc, root, "ProjetInfor", "");
+            CreateNode(xmlDoc, node1, "ProjetName", PName);
+            CreateNode(xmlDoc, node1, "PictureName", PName);
+
+
             CreateNode(xmlDoc, root, "WayPoints", "");
             CreateNode(xmlDoc, root, "Connection", "");
-
-
-            //生成drawRule.xml
-            XmlDocument xmlRule = new XmlDocument();
-            //创建类型声明节点  
-            XmlNode ruleNode = xmlRule.CreateXmlDeclaration("1.0", "gb2312", "");
-            xmlRule.AppendChild(ruleNode);
-            //创建根节点  
-            XmlNode ruleRoot = xmlRule.CreateElement("Rule");
-            ruleRoot.InnerText = "";
-            xmlRule.AppendChild(ruleRoot);
-
+            
             try
             {
                 xmlDoc.Save(CreatXmlFilePath);
-                StringBuilder sB=new StringBuilder();
-                foreach (string str in CreatXmlFilePath.Split(new char[] { '\\' }))
-                {
-                    if (!str.Contains(".xml"))
-                    {
-                        sB.Append(str + "\\");
-                    }
-                }
-
-                xmlRule.Save(sB.ToString() + "\\rule.xml");
+                
             }
             catch (System.Exception e)
             {
@@ -1862,11 +1850,12 @@ namespace AutoDraw
         /// <param name="name"></param>  节点名  
         /// <param name="value"></param>  节点值  
         ///   
-        public void CreateNode(XmlDocument xmlDoc, XmlNode parentNode, string name, string value)
+        public XmlNode CreateNode(XmlDocument xmlDoc, XmlNode parentNode, string name, string value)
         {
             XmlNode node = xmlDoc.CreateNode(XmlNodeType.Element, name, null);
             node.InnerText = value;
             parentNode.AppendChild(node);
+            return node;
         }  
 
         //读XML文件
@@ -1917,22 +1906,65 @@ namespace AutoDraw
         /// <param name="NoL">true时站名为主节点，false时里程为主节点</param>
         public void refreshTreeview(bool NoL)
         {
+
+            TreeNode rootStation = new TreeNode();  //添加车站
+            rootStation.Text = "车站";
+            treeView1.Nodes.Add(rootStation);
+
+            TreeNode rootTeleTower = new TreeNode();  //添加基站
+            rootTeleTower.Text = "基站";
+            treeView1.Nodes.Add(rootTeleTower);
+
+            TreeNode rootAT = new TreeNode();  //添加AT所
+            rootAT.Text = "AT所";
+            treeView1.Nodes.Add(rootAT);
+
+            TreeNode rootQY = new TreeNode();  //添加牵引变电所
+            treeView1.Text = "牵引变电所";
+
+            //rootQY.Nodes.Add(rootQY);
             //InfoStation=InfoStation.
+            int numS = 0;
+            int numJ = 0;
+            int numA = 0;
+            int numQ = 0;
             foreach (var item in InfoStation)
             {
                 if (NoL==true)
                 {
-                    TreeNode node1 = new TreeNode();
-                    node1.Text = item.Value.Split(new char[] { ',' })[0];
-                    treeView1.Nodes.Add(node1);
+                    TreeNode nameNode = new TreeNode();
+                    nameNode.Text = item.Value.Split(new char[] { ',' })[0];
 
-                    TreeNode node1_1 = new TreeNode();
-                    node1_1.Text = item.Key;
-                    node1.Nodes.Add(node1_1);
+                    TreeNode disNode = new TreeNode();
+                    disNode.Text = item.Key;
 
-                    TreeNode node1_2 = new TreeNode();
-                    node1_2.Text = item.Value.Split(new char[] { ',' })[1];
-                    node1.Nodes.Add(node1_2);
+                    TreeNode typeNode = new TreeNode();
+                    typeNode.Text = item.Value.Split(new char[] { ',' })[1];
+
+                    nameNode.Nodes.Add(disNode);
+
+                    nameNode.Nodes.Add(typeNode);
+
+                    if (item.Value.Split(new char[] { ',' })[1]=="车站")
+                    {
+                        rootStation.Nodes.Add(nameNode);
+                        numS++;
+                    }
+                    else if (item.Value.Split(new char[] { ',' })[1] == "基站")
+                    {
+                        rootTeleTower.Nodes.Add(nameNode);
+                        numJ++;
+                    }
+                    if (item.Value.Split(new char[] { ',' })[1] == "AT所")
+                    {
+                        rootAT.Nodes.Add(nameNode);
+                        numA++;
+                    }
+                    if (item.Value.Split(new char[] { ',' })[1] == "牵引变电所")
+                    {
+                        rootQY.Nodes.Add(nameNode);
+                        numQ++;
+                    }
                 }
                 else
                 {
@@ -1948,7 +1980,14 @@ namespace AutoDraw
                     node1_2.Text = item.Value.Split(new char[] { ',' })[1];
                     node1.Nodes.Add(node1_2); 
                 }
+
+
             }
+
+            rootStation.Text = rootStation.Text + " 共有：" + numS + "个";
+            rootTeleTower.Text = rootTeleTower.Text + " 共有：" + numJ + "个";
+            rootAT.Text = rootAT.Text + " 共有：" + numA + "个";
+            rootQY.Text = rootQY.Text + " 共有：" + numQ + "个";
         }
 
         private void 删除ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2874,7 +2913,11 @@ namespace AutoDraw
                     
         }
 
-
+        private void 项目信息ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ProjetInfor pJ = new ProjetInfor(xmlFilePath);
+            pJ.ShowDialog();
+        }
     }
 }
  

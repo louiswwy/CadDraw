@@ -44,7 +44,7 @@ namespace AutoDraw
                     }
 
                 }
-                xmlDoc.Save(xmlFile);   
+                xmlDoc.Save(xmlFile);
                 //loadedDic = infoStation;
             }
         }
@@ -53,7 +53,7 @@ namespace AutoDraw
         /// 读取xml文件
         /// </summary>
         /// <param name="xmlFile">文件地址</param>
-        public Dictionary<String,string> loadWayPoint(string xmlFile)
+        public Dictionary<String, string> loadWayPoint(string xmlFile)
         {
             Dictionary<string, string> inforStation = new Dictionary<string, string>();
 
@@ -143,16 +143,16 @@ namespace AutoDraw
             }
 
             subroot.AppendChild(xe1);
-            xmlDoc.Save(xmlFile);  
-            
-        }
-
-        public void loadConnectionXml(string xmlFile) 
-        { 
+            xmlDoc.Save(xmlFile);
 
         }
 
-#endregion
+        public void loadConnectionXml(string xmlFile)
+        {
+
+        }
+
+        #endregion
 
         #region 线缆部分
         /// <summary>
@@ -173,7 +173,7 @@ namespace AutoDraw
                 root.AppendChild(xe1);
             }
 
-               
+
 
             foreach (var item in NameAndType)
             {
@@ -292,7 +292,7 @@ namespace AutoDraw
         #endregion
 
         #region 规则部分
-        public void writeRule(string xmlPath,string Nequipe)
+        public void writeRule(string xmlPath, string Nequipe)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
@@ -366,7 +366,7 @@ namespace AutoDraw
             }
         }
 
-        public List<string> loadRule(string xmlPath,string equName)
+        public List<string> loadRule(string xmlPath, string equName)
         {
             List<string> returnList = new List<string>();
             XmlDocument xmlDoc = new XmlDocument();
@@ -378,6 +378,23 @@ namespace AutoDraw
         }
 
         #endregion
+
+
+        #region 项目信息
+        public void writeProjrtInfo(string xmlPath, string proName, string PictureName)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlPath);
+
+            XmlNode root = xmlDoc.SelectSingleNode("ProjetName");//查找<ProjetName> 
+            root.InnerText = proName;
+
+            XmlNode root2 = xmlDoc.SelectSingleNode("PictureName");//查找<PictureName> 
+            root2.InnerText = PictureName;
+
+            xmlDoc.Save(xmlPath);
+            #endregion
+        }
     }
 }
 

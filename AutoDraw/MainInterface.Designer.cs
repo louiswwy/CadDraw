@@ -84,6 +84,8 @@
             this.B_AddEquipe = new System.Windows.Forms.Button();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.listView1 = new System.Windows.Forms.ListView();
+            this.项目属性ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.项目信息ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -146,7 +148,8 @@
             // 设置ToolStripMenuItem
             // 
             this.设置ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.比例尺ToolStripMenuItem});
+            this.比例尺ToolStripMenuItem,
+            this.项目属性ToolStripMenuItem});
             this.设置ToolStripMenuItem.Name = "设置ToolStripMenuItem";
             this.设置ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
             this.设置ToolStripMenuItem.Text = "设置";
@@ -718,6 +721,21 @@
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.Click += new System.EventHandler(this.listView1_Click);
             // 
+            // 项目属性ToolStripMenuItem
+            // 
+            this.项目属性ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.项目信息ToolStripMenuItem});
+            this.项目属性ToolStripMenuItem.Name = "项目属性ToolStripMenuItem";
+            this.项目属性ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.项目属性ToolStripMenuItem.Text = "项目属性";
+            // 
+            // 项目信息ToolStripMenuItem
+            // 
+            this.项目信息ToolStripMenuItem.Name = "项目信息ToolStripMenuItem";
+            this.项目信息ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.项目信息ToolStripMenuItem.Text = "项目信息";
+            this.项目信息ToolStripMenuItem.Click += new System.EventHandler(this.项目信息ToolStripMenuItem_Click);
+            // 
             // MainInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -828,5 +846,7 @@
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.ToolStripMenuItem 项目属性ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 项目信息ToolStripMenuItem;
     }
 }
