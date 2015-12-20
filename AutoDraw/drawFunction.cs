@@ -361,27 +361,19 @@ namespace AutoDraw
 
             //AttStationName.HorizontalMode = TextHorizontalMode.TextCenter; //水平方向取中点
             //AttStationName.VerticalMode = TextVerticalMode.TextVerticalMid;
-            AttStationName.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y + 6 + 36, 0);
+            AttStationName.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y + 8, 0);
             acBlkTblRec.AppendEntity(AttStationName);
             trans.AddNewlyCreatedDBObject(AttStationName, true);
 
             AttributeDefinition AttStationLocation = new AttributeDefinition();
-            AttStationLocation.TextString = "XXX站";
+            AttStationLocation.TextString = "XXX+XXX";
             AttStationLocation.Tag = "里程";
             AttStationLocation.Prompt = "输入站点里程";
             SetStyleForAttribut(AttStationLocation, textHeight, false);
             AttStationLocation.TextStyleId = fontId;
             AttStationLocation.WidthFactor = 0.7;
             AttStationLocation.Justify = AttachmentPoint.TopLeft;
-            /*
-             * AttStationLocation.HorizontalMode = TextHorizontalMode.TextCenter; //水平方向取终点
-             * AttStationLocation.VerticalMode = TextVerticalMode.TextBottom;
-             * AttStationLocation.AlignmentPoint = new Point3d(insertPoint.X + 1, insertPoint.Y - 18, 0);          
-             */
-
-            //double rotatedAngle = 90;
-            //AttStationLocation.Rotation = rotatedAngle.DegreeToRadian();
-            AttStationLocation.AlignmentPoint = new Point3d(insertPoint.X + 1, insertPoint.Y - 18 + 36, 0);
+            AttStationLocation.AlignmentPoint = new Point3d(insertPoint.X + 1, insertPoint.Y - 17, 0);
 
             acBlkTblRec.AppendEntity(AttStationLocation);
             trans.AddNewlyCreatedDBObject(AttStationLocation, true);

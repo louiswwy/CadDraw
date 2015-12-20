@@ -35,6 +35,8 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBox3 = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,16 +51,16 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(78, 16);
+            this.textBox1.Location = new System.Drawing.Point(62, 16);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(157, 21);
+            this.textBox1.Size = new System.Drawing.Size(223, 21);
             this.textBox1.TabIndex = 1;
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(78, 54);
+            this.textBox2.Location = new System.Drawing.Point(62, 54);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(157, 21);
+            this.textBox2.Size = new System.Drawing.Size(223, 21);
             this.textBox2.TabIndex = 3;
             // 
             // label2
@@ -72,7 +74,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(3, 93);
+            this.button1.Location = new System.Drawing.Point(31, 131);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(92, 23);
             this.button1.TabIndex = 4;
@@ -82,7 +84,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(145, 92);
+            this.button2.Location = new System.Drawing.Point(173, 130);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(90, 24);
             this.button2.TabIndex = 5;
@@ -92,28 +94,44 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.textBox3);
+            this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.button2);
             this.panel1.Controls.Add(this.textBox1);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.textBox2);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.MaximumSize = new System.Drawing.Size(238, 132);
-            this.panel1.MinimumSize = new System.Drawing.Size(238, 132);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(238, 132);
+            this.panel1.Size = new System.Drawing.Size(297, 166);
             this.panel1.TabIndex = 6;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 92);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(53, 12);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "单    元";
+            // 
+            // textBox3
+            // 
+            this.textBox3.Location = new System.Drawing.Point(62, 89);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(223, 21);
+            this.textBox3.TabIndex = 7;
             // 
             // ProjetInfor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(237, 126);
+            this.ClientSize = new System.Drawing.Size(297, 166);
             this.Controls.Add(this.panel1);
-            this.MaximumSize = new System.Drawing.Size(253, 165);
-            this.MinimumSize = new System.Drawing.Size(253, 165);
+            this.MaximumSize = new System.Drawing.Size(313, 205);
+            this.MinimumSize = new System.Drawing.Size(313, 205);
             this.Name = "ProjetInfor";
             this.Text = "项目信息";
             this.panel1.ResumeLayout(false);
@@ -131,5 +149,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.Label label3;
     }
 }

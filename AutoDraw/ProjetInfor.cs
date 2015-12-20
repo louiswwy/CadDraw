@@ -24,7 +24,7 @@ namespace AutoDraw
             if (textBox1.Text.ToString() != "" && textBox2.Text.ToString() != "") //不为空时
             {
                 XmlFunction xF = new XmlFunction();
-                xF.writeProjrtInfo(xmlDicPath, textBox1.Text.ToString(), textBox2.Text.ToString());
+                xF.writeProjrtInfo(xmlDicPath + "\\setting.xml", textBox1.Text.ToString().Replace(" ", ""), textBox2.Text.ToString().Replace(" ", ""), textBox3.Text.ToString().Replace(" ", ""));
             }
         }
 

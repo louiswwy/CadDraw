@@ -23,7 +23,14 @@ namespace AutoDraw
             {
                 ed.WriteMessage("AutoDrawer 功能已载入.");
                 form = new MainInterface();
-                Application.ShowModelessDialog(form);  //显示非模态对话框 
+                try
+                {
+                    Application.ShowModelessDialog(form);  //显示非模态对话框 
+                }
+                catch (System.Exception ee)
+                {
+
+                }
                 //Application.ShowModalDialog(form);  //显示非模态对话框 
 
             }

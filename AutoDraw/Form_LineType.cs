@@ -50,7 +50,7 @@ namespace AutoDraw
             try
             {
                 xf = new XmlFunction();
-                xf.createLineType(xmlfile, DicNandT); //只在xml文件中没有lineName节点时写入
+                xf.createLineType(xmlfile, "lineName", DicNandT); //只在xml文件中没有lineName节点时写入
 
                 //只在运行过程中变更线类型表时触发,此处取消
                 dataTimeTag = DateTime.Now.ToLongTimeString();        //记录时间
@@ -185,7 +185,7 @@ namespace AutoDraw
 
                 //DataColumn col=NewRow.Table.Rows.co
             }
-            xf.updataLineType(XmlFilePath, newDataSet);
+            xf.updataLineType(XmlFilePath, "LineName", newDataSet);
 
             //
             dataTimeTag = DateTime.Now.ToLongTimeString();

@@ -12,11 +12,11 @@ namespace AutoDraw
         Dictionary<string, string> loadedDic;
 
         /// <summary>
-        /// xml文件中写入wayPoint
+        /// xml文件中写入站点信息
         /// </summary>
         /// <param name="xmlFile">文件地址</param>
         /// <param name="infoStation">字典</param>
-        public void addWayPointNode(string xmlFile, Dictionary<string, string> infoStation)
+        public void addWayPointNode(string xmlFile, string nodeName, Dictionary<string, string> infoStation)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
@@ -25,11 +25,12 @@ namespace AutoDraw
             {
                 XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
                 XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
+                XmlNode stationRoot = subroot.SelectSingleNode(nodeName);//查找<StationPoint> 
                 foreach (var item in infoStation)
                 {
-                    if (!hasElement(subroot, item.Key.ToUpper()))//loadedDic.ContainsKey(item.Key))
+                    if (!hasElement(stationRoot, item.Key.ToUpper()))//loadedDic.ContainsKey(item.Key))
                     {
-                        XmlElement xe1 = xmlDoc.CreateElement("WayPoint");//创建一个<WayPoint>节点 
+                        XmlElement xe1 = xmlDoc.CreateElement(nodeName);//创建一个<WayPoint>节点 
                         xe1.SetAttribute("location", item.Key.ToUpper());//设置该节点location属性 
 
                         XmlElement subxe1 = xmlDoc.CreateElement("PName");//创建一个<PName>节点 
@@ -40,7 +41,7 @@ namespace AutoDraw
 
                         xe1.AppendChild(subxe1);
                         xe1.AppendChild(subxe2);
-                        subroot.AppendChild(xe1);
+                        stationRoot.AppendChild(xe1);
                     }
 
                 }
@@ -49,11 +50,13 @@ namespace AutoDraw
             }
         }
 
+   
+
         /// <summary>
         /// 读取xml文件
         /// </summary>
         /// <param name="xmlFile">文件地址</param>
-        public Dictionary<String, string> loadWayPoint(string xmlFile)
+        public Dictionary<String, string> loadWayPoint(string xmlFile, string nodeName)
         {
             Dictionary<string, string> inforStation = new Dictionary<string, string>();
 
@@ -62,20 +65,30 @@ namespace AutoDraw
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<WayPoints> 
             XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
 
-            XmlNodeList nodeList = subroot.ChildNodes;//获取FatherNode节点的所有子节点   
-            foreach (var item in nodeList)
+            XmlNode subStationRoot = subroot.SelectSingleNode(nodeName);//查找<StationPoint>  
+            if (subStationRoot.HasChildNodes && subStationRoot != null)
             {
-                XmlElement xe = (XmlElement)item;
-                string key = xe.GetAttribute("location");
+                XmlNodeList nodeList = subStationRoot.ChildNodes;//获取FatherNode节点的所有子节点   
+                PFunction pf = new PFunction();
 
-                XmlNode nameNode = xe.SelectSingleNode("PName");//查找<PName> 
-                XmlNode typeNode = xe.SelectSingleNode("PType");//查找<PType> 
+                foreach (var item in nodeList)
+                {
+                    XmlElement xe = (XmlElement)item;
+                    string key = xe.GetAttribute("location");
+                    List<string> outList = new List<string>();
+                    pf.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out outList);
+                    Int32 DistNum = Int32.Parse(outList[1]) * 1000 + Int32.Parse(outList[2]);
 
-                string name = nameNode.InnerText;
-                string type = typeNode.InnerText;
+                    XmlNode nameNode = xe.SelectSingleNode("PName");//查找<PName> 
+                    XmlNode typeNode = xe.SelectSingleNode("PType");//查找<PType> 
 
-                inforStation.Add(key.ToUpper(), name + "," + type);
+                    string name = nameNode.InnerText;
+                    string type = typeNode.InnerText;
+
+                    inforStation.Add(key.ToUpper(), name + "," + type + "," + DistNum);
+                }
             }
+
             return inforStation;
 
         }
@@ -102,6 +115,16 @@ namespace AutoDraw
             return elementFound;
         }
 
+        public void modifWayPoint(string xmlFile, string NodeName, string OldDistance, Dictionary<string, string> newInfor)
+        {
+
+        }
+
+        public void supprimWayPoint(string xmlFile, string NodeName, string OldDistance)
+        {
+
+        }
+
 
         #region 连接情况信息
         /// <summary>
@@ -110,7 +133,7 @@ namespace AutoDraw
         /// <param name="xmlFile">文件地址</param>
         /// <param name="selectGrid">选中所亭项</param>
         /// <param name="selectBlock">选中的块图案</param>
-        public void createConnectionXml(string xmlFile, string selectGrid, List<string> selectBlocks)
+        public void createConnectionXml(string xmlFile, string selectGrid, string selectBlocks)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
@@ -123,26 +146,47 @@ namespace AutoDraw
                 subroot = xmlDoc.CreateElement("Connections"); //添加
                 root.AppendChild(subroot);
             }
-            XmlElement xe1 = xmlDoc.CreateElement("Pair");//创建一个<WayPoint>节点 
+            XmlElement xe1 = xmlDoc.CreateElement("Pair");//创建一个<Pair>节点 
 
-            xe1.SetAttribute("location", selectGrid.Split(new char[] { '-' })[0]);//设置该节点location属性 
-            xe1.SetAttribute("name", selectGrid.Split(new char[] { '-' })[1]);//设置该节点name属性 
+            xe1.SetAttribute("location", selectGrid.Split(new char[] { ',' })[0]);//设置该节点location属性 
+            xe1.SetAttribute("name", selectGrid.Split(new char[] { ',' })[1]);//设置该节点name属性 
 
-            foreach (string selectBlock in selectBlocks)
-            {
-                XmlElement subXml1 = xmlDoc.CreateElement("equipement");//创建一个<WayPoint>节点 
-                subXml1.SetAttribute("location", selectBlock.Split(new char[] { '-' })[0]);
 
-                subXml1.SetAttribute("number", selectBlock.Split(new char[] { '-' })[1]);
+            XmlElement subXml1 = xmlDoc.CreateElement("equipement");//创建一个<equipement>节点 
+            subXml1.SetAttribute("location", selectBlocks.Split(new char[] { ',' })[0]);
 
-                subXml1.SetAttribute("line", selectBlock.Split(new char[] { '-' })[2]);
 
-                subXml1.InnerText = selectBlock.Split(new char[] { '-' })[3];
+            subXml1.SetAttribute("line", "SPTYWPL,23,28芯");//selectBlocks.Split(new char[] { '-' })[2]);
 
-                xe1.AppendChild(subXml1);
-            }
+            subXml1.SetAttribute("Length", selectBlocks.Split(new char[] { ',' })[3]);
+            subXml1.InnerText = selectBlocks.Split(new char[] { ',' })[1]; 
+
+            xe1.AppendChild(subXml1);
+           
 
             subroot.AppendChild(xe1);
+            xmlDoc.Save(xmlFile);
+
+        }
+
+        public void removeCommection(string xmlFile)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode subroot = root.SelectSingleNode("Connections");//查找<Connection> 
+
+            if (subroot == null)
+            {
+                subroot = xmlDoc.CreateElement("Connections"); //添加
+                root.AppendChild(subroot);
+            }
+            else
+            {
+                subroot.RemoveAll();
+            }
+
             xmlDoc.Save(xmlFile);
 
         }
@@ -159,17 +203,17 @@ namespace AutoDraw
         /// 写入线缆类型
         /// </summary>
         /// <param name="xmlFile"></param>
-        public void createLineType(string xmlFile, Dictionary<string, string> NameAndType)
+        public void createLineType(string xmlFile,string nodeName, Dictionary<string, string> NameAndType)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
 
 
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
-            XmlNode xe1 = root.SelectSingleNode("LineName");
+            XmlNode xe1 = root.SelectSingleNode(nodeName);
             if (xe1 == null)
             {
-                xe1 = xmlDoc.CreateElement("LineName");//创建一个<LineName>节点 
+                xe1 = xmlDoc.CreateElement(nodeName);//创建一个<LineName>节点 
                 root.AppendChild(xe1);
             }
 
@@ -210,7 +254,7 @@ namespace AutoDraw
             }
             return isDupli;
         }
-        public void updataLineType(string xmlFile, Dictionary<string, string> NameAndType)
+        public void updataLineType(string xmlFile, string NodeName, Dictionary<string, string> NameAndType)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
@@ -219,14 +263,14 @@ namespace AutoDraw
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
 
 
-            XmlNode xe1 = root.SelectSingleNode("LineName");//创建一个<LineName>节点
+            XmlNode xe1 = root.SelectSingleNode(NodeName);//选择一个<LineName>节点
 
             if (xe1 != null)
             {
                 xe1.RemoveAll(); //删除现有项
 
                 xmlDoc.Save(xmlFile);
-                createLineType(xmlFile, NameAndType);
+                createLineType(xmlFile,NodeName, NameAndType);
 
             }
 
@@ -381,20 +425,61 @@ namespace AutoDraw
 
 
         #region 项目信息
-        public void writeProjrtInfo(string xmlPath, string proName, string PictureName)
+        public void writeProjrtInfo(string xmlPath, string proName, string PictureName,string NumChapter)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
 
-            XmlNode root = xmlDoc.SelectSingleNode("ProjetName");//查找<ProjetName> 
-            root.InnerText = proName;
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode subroot = root.SelectSingleNode("ProjetInfor");//查找<ProjetInfor> 
 
-            XmlNode root2 = xmlDoc.SelectSingleNode("PictureName");//查找<PictureName> 
-            root2.InnerText = PictureName;
+            XmlNode subrootName = subroot.SelectSingleNode("ProjetName");//查找<ProjetName> 
+            subrootName.InnerText = proName;
+
+            XmlNode subrootPName = subroot.SelectSingleNode("PictureName");//查找<PictureName> 
+            subrootPName.InnerText = PictureName;
+
+            XmlNode subrootCName = subroot.SelectSingleNode("ChapterName");//查找<ChapterName> 
+            subrootCName.InnerText = NumChapter;
 
             xmlDoc.Save(xmlPath);
-            #endregion
+            
         }
+
+        public List<string> readProjrtInfo(string xmlPath)//, string proName, string PictureName,string NumChapter)
+        {
+            try
+            {
+                List<string> projectInfo = new List<string>();
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(xmlPath);
+
+                XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+                XmlNode subroot = root.SelectSingleNode("ProjetInfor");//查找<ProjetInfor> 
+
+                XmlNode subrootName = subroot.SelectSingleNode("ProjetName");//查找<ProjetName> 
+                string proName = subrootName.InnerText;
+
+                XmlNode subrootPName = subroot.SelectSingleNode("PictureName");//查找<PictureName> 
+                string PictureName = subrootPName.InnerText;
+
+                XmlNode subrootCName = subroot.SelectSingleNode("ChapterName");//查找<ChapterName> 
+                string NumChapter = subrootCName.InnerText;
+
+                projectInfo.Add(proName);
+                projectInfo.Add(PictureName);
+                projectInfo.Add(NumChapter);
+                return projectInfo;
+            }
+            catch (Exception ee)
+            {
+                List<string> errorList = new List<string>();
+                errorList.Add(ee.ToString());
+                return errorList;
+                
+            }
+        }
+        #endregion
     }
 }
 
