@@ -89,24 +89,40 @@ namespace AutoDraw
                     int[] dictChecked=new int[connectionDict.Count]; //生成一个数组，用来记录已经遍历过的字典项
                     List<string> CheckList = new List<string>();
 
-                    List<string> equipeBeDraw = new List<string>();
+                    List<string> equipeBeDraw;
                     List<string> equipement = new List<string>(); //当前所亭连接的防灾设备
 
                     int count=0;
                     int rollBack = 0;
+
+                    //绘图原点
+                    Point2d insertOriginSignlePoint = new Point2d(0, 0);
+                    //绘图次数
+                    int drawRound = 0;
                     while (count < connectionDict.Count) //当为真的时候一直
                     {
+                        equipeBeDraw = new List<string>();
+
+                        //以所亭信息为准合并同类项
                         foreach (var item in connectionDict)
                         {
                             //如果不包含则添加
-                            if (CheckList.Count == 0 || rollBack == 0)
+                            if (CheckList.Count == 0 && rollBack == 0)
                             {
                                 CheckList.Add(item.Split(new char[] { '-' })[0]);
                                 equipeBeDraw.Add(item.Split(new char[] { '-' })[1]);
-                                count++; 
+                                count++;
                                 rollBack++;
                                 continue;
                             }
+                            else if (CheckList.Count != 0 && rollBack == 0 && !CheckList.Contains(item.Split(new char[] { '-' })[1])) //循环回来
+                            {
+                                CheckList.Add(item.Split(new char[] { '-' })[0]);
+                                equipeBeDraw.Add(item.Split(new char[] { '-' })[1]);
+                                count++;
+                                continue;
+                            }
+
                             if (CheckList.Contains(item.Split(new char[] { '-' })[0]))
                             {
                                 //CheckList.Add(item.Split(new char[] { '-' })[0]);
@@ -115,83 +131,91 @@ namespace AutoDraw
                                 rollBack++;
                                 continue;
                             }
-
-                            
                         }
 
+                        rollBack = 0; //归0， 当程序画完一个基站的图后， 再次添加
 
-                        rollBack = 0;
-                    
 
-                    Point2d insertSignlePoint = new Point2d(0, 0);
+                        ///确认本张图的绘图位置
+                        Point2d insertSignlePoint = new Point2d(insertOriginSignlePoint.X + drawRound * 450, insertOriginSignlePoint.Y);
+                        drawRound++;
 
-                    #region 找到所亭的左右两侧的点
-                    Dictionary<string, string> a=new Dictionary<string, string>();
-                    a.Add(connectionDict[0].Split(new char[] { '-' })[0],connectionDict[0].Split(new char[] { '-' })[1]);
-                    //dictRailStation.Add(connectionDict[0].Split(new char[] { '-' })[0], connectionDict[0].Split(new char[] { '-' })[1]);
-                    int leftSide = -1;
-                    int rightSide = -1;
-                    int current = 0;
-                    foreach (var stat in dictRailStation)
-                    {
-                        int dis = int.Parse(stat.Value.ToString().Split(new char[] { ',' })[2]);
-                        string[] y = CheckList[CheckList.Count - 1].ToString().Split(new char[] { ',' });
-                        int equ = int.Parse(CheckList[CheckList.Count - 1].ToString().Split(new char[] { ',' })[3]);
-
-                        if (equ <= dis)
+                        foreach (var SignalStation in dictRailStation)
                         {
-                            rightSide = current + 1;
-                            leftSide = current - 1;
-                            break;
+
                         }
-                        current++;
-                    }
-
-                    if (rightSide == -1&&leftSide == -1) //如果两个数的值都为0，则说明设备里程比所有站点都大
-                    {
-                        leftSide = dictRailStation.Count - 1;
-                        rightSide = -1;
-                    }
-                    else if (rightSide == -1 && leftSide != -1)
-                    {
-
-                    }
- 
-                    current = 0;
-                    List<string> leftStation = new List<string>();
-                    List<string> RighStation = new List<string>();
-                    foreach (var stat in dictRailStation)
-                    {
-                        if (current == rightSide)
+                        #region 找到所亭的左右两侧的点
+                        //由最后的一个CheckList中的站点信息，与监测点信息作比较
+                        //Dictionary<string, string> a = new Dictionary<string, string>();
+                        //a.Add(connectionDict[0].Split(new char[] { '-' })[0], connectionDict[0].Split(new char[] { '-' })[1]);
+                        //dictRailStation.Add(connectionDict[0].Split(new char[] { '-' })[0], connectionDict[0].Split(new char[] { '-' })[1]);
+                        int leftSide = -1;
+                        int rightSide = -1;
+                        int current = 0;
+                        
+                        //确定基站在哪个区间内
+                        foreach (var stat in dictRailStation)
                         {
-                            RighStation.Add(stat.Key.ToString());
-                            RighStation.Add(stat.Value.ToString().Split(new char[] { ',' })[0]);
+                            //Point2d insertSignlePoint = new Point2d(insertOriginSignlePoint.X + round * 450, insertOriginSignlePoint.Y);
+                            int dis = int.Parse(stat.Value.ToString().Split(new char[] { ',' })[2]);
+                            string[] y = CheckList[CheckList.Count - 1].ToString().Split(new char[] { ',' });
+                            int equ = int.Parse(CheckList[CheckList.Count - 1].ToString().Split(new char[] { ',' })[3]);
+
+                            if (equ <= dis)
+                            {
+                                rightSide = current + 1;
+                                leftSide = current - 1;
+                                break;
+                            }
+                            current++;
                         }
-                        else if (current == leftSide)
+
+                        if (rightSide == -1 && leftSide == -1) //如果两个数的值都为0，则说明设备里程比所有站点都大
                         {
-                            leftStation.Add(stat.Key.ToString());
-                            leftStation.Add(stat.Value.ToString().Split(new char[] { ',' })[0]);
+                            leftSide = dictRailStation.Count - 1;
+                            rightSide = -1;
                         }
-                        current++;
-                    }
+                        else if (rightSide == -1 && leftSide != -1)
+                        {
 
-                    List<string> leftRightStation = new List<string>();
-                    if (RighStation.Count == 0)
-                    {
-                        leftRightStation.Add(null);
-                        leftRightStation.Add(null);
-                    }
-                    if (leftStation.Count >= 2)
-                    {
+                        }
 
-                        leftRightStation.Add(leftStation[0]);
-                        leftRightStation.Add(leftStation[1]);
-                    }
-                    #endregion
-                    //foreach()
-                    drawSinglePicture(insertSignlePoint, fontStyleId, projetInfor, CheckList[CheckList.Count-1], leftRightStation, equipeBeDraw);//db, trans, 
+                        current = 0;
+                        List<string> leftStation = new List<string>();
+                        List<string> RighStation = new List<string>();
+                        foreach (var stat in dictRailStation)
+                        {
+                            if (current == rightSide)
+                            {
+                                RighStation.Add(stat.Key.ToString());
+                                RighStation.Add(stat.Value.ToString().Split(new char[] { ',' })[0]);
+                            }
+                            else if (current == leftSide)
+                            {
+                                leftStation.Add(stat.Key.ToString());
+                                leftStation.Add(stat.Value.ToString().Split(new char[] { ',' })[0]);
+                            }
+                            current++;
+                        }
 
-}
+                        List<string> leftRightStation = new List<string>();
+                        if (RighStation.Count == 0)
+                        {
+                            leftRightStation.Add(null);
+                            leftRightStation.Add(null);
+                        }
+                        if (leftStation.Count >= 2)
+                        {
+
+                            leftRightStation.Add(leftStation[0]);
+                            leftRightStation.Add(leftStation[1]);
+                        }
+                        #endregion
+
+                        //foreach()
+                        drawSinglePicture(insertSignlePoint, fontStyleId, projetInfor, CheckList[CheckList.Count - 1], leftRightStation, equipeBeDraw);//db, trans, 
+
+                    }
 
                     //插入块
 

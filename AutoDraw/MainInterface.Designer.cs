@@ -54,12 +54,7 @@
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.button7 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.B_Draw = new System.Windows.Forms.Button();
             this.类型 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
             this.B_SupWayPoint = new System.Windows.Forms.Button();
             this.B_Add = new System.Windows.Forms.Button();
             this.B_AddWayPoint = new System.Windows.Forms.Button();
@@ -104,6 +99,11 @@
             this.B_AddEquipe = new System.Windows.Forms.Button();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.listView1 = new System.Windows.Forms.ListView();
+            this.button6 = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.B_Draw = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -309,50 +309,6 @@
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(177, 12);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(75, 23);
-            this.button6.TabIndex = 13;
-            this.button6.Text = "button6";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Visible = false;
-            this.button6.Click += new System.EventHandler(this.button6_Click_1);
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(96, 41);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(75, 23);
-            this.button5.TabIndex = 12;
-            this.button5.Text = "button5";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Visible = false;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(96, 12);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Visible = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // B_Draw
-            // 
-            this.B_Draw.Location = new System.Drawing.Point(15, 41);
-            this.B_Draw.Name = "B_Draw";
-            this.B_Draw.Size = new System.Drawing.Size(75, 23);
-            this.B_Draw.TabIndex = 0;
-            this.B_Draw.Text = "/n绘图";
-            this.B_Draw.UseVisualStyleBackColor = true;
-            this.B_Draw.Visible = false;
-            this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
-            // 
             // 类型
             // 
             this.类型.AutoSize = true;
@@ -361,17 +317,6 @@
             this.类型.Size = new System.Drawing.Size(29, 12);
             this.类型.TabIndex = 4;
             this.类型.Text = "类型";
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(15, 12);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "？";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Visible = false;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // B_SupWayPoint
             // 
@@ -943,6 +888,61 @@
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.Click += new System.EventHandler(this.listView1_Click);
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(177, 12);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(75, 23);
+            this.button6.TabIndex = 13;
+            this.button6.Text = "button6";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Visible = false;
+            this.button6.Click += new System.EventHandler(this.button6_Click_1);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(96, 12);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // B_Draw
+            // 
+            this.B_Draw.Location = new System.Drawing.Point(15, 41);
+            this.B_Draw.Name = "B_Draw";
+            this.B_Draw.Size = new System.Drawing.Size(75, 23);
+            this.B_Draw.TabIndex = 0;
+            this.B_Draw.Text = "/n绘图";
+            this.B_Draw.UseVisualStyleBackColor = true;
+            this.B_Draw.Visible = false;
+            this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(96, 41);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 23);
+            this.button5.TabIndex = 12;
+            this.button5.Text = "button5";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Visible = false;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(15, 12);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "？";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Visible = false;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // MainInterface
             // 
