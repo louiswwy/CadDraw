@@ -44,7 +44,6 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.比例尺ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.图签名称ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.比例尺ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.可选线缆类型ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.项目属性ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -186,19 +185,11 @@
             // 比例尺ToolStripMenuItem
             // 
             this.比例尺ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.图签名称ToolStripMenuItem,
             this.比例尺ToolStripMenuItem1,
             this.可选线缆类型ToolStripMenuItem});
             this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
             this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.比例尺ToolStripMenuItem.Text = "图纸属性";
-            // 
-            // 图签名称ToolStripMenuItem
-            // 
-            this.图签名称ToolStripMenuItem.Name = "图签名称ToolStripMenuItem";
-            this.图签名称ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
-            this.图签名称ToolStripMenuItem.Text = "图签名称";
-            this.图签名称ToolStripMenuItem.Click += new System.EventHandler(this.图签名称ToolStripMenuItem_Click);
             // 
             // 比例尺ToolStripMenuItem1
             // 
@@ -338,6 +329,7 @@
             this.B_Add.TabIndex = 0;
             this.B_Add.Text = "写入";
             this.B_Add.UseVisualStyleBackColor = true;
+            this.B_Add.Visible = false;
             this.B_Add.Click += new System.EventHandler(this.B_Add_Click);
             // 
             // B_AddWayPoint
@@ -705,7 +697,7 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 1;
-            this.button3.Text = "确认变更定";
+            this.button3.Text = "确认变更";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -737,6 +729,7 @@
             this.splitContainer5.Size = new System.Drawing.Size(521, 204);
             this.splitContainer5.SplitterDistance = 345;
             this.splitContainer5.TabIndex = 2;
+            this.splitContainer5.Visible = false;
             // 
             // selectedWayPoint
             // 
@@ -1021,7 +1014,6 @@
         private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem;
         private System.Windows.Forms.ComboBox TypeWayPoint;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.ToolStripMenuItem 图签名称ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem 导入图块ToolStripMenuItem;
         private System.Windows.Forms.Button button1;

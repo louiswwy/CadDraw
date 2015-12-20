@@ -2816,11 +2816,15 @@ namespace AutoDraw
                 }
             }
             stTable.DefaultView.Sort = "公里" + " " + "ASC";
-            stTable = stTable.DefaultView.ToTable();
+            DataView dv = new DataView(stTable);
+            dv.Sort = "公里" + " " + "ASC";
+            stTable.DefaultView.ToTable();
             stTable.AcceptChanges();
             //dataGridView1.Columns.Add("里程", "名称");
             //dataGridView1.Columns.Add("EnglishName", "ChineseName"); 
             componant.DataSource = tableST.Tables[tableName];
+            //componant.
+            componant.Sort(componant.Columns["公里"], ListSortDirection.Ascending);
             /*dataGridView1.Columns.Add("设备1","equipe1");
             dataGridView1.Columns.Add("设备2", "equipe2");
             dataGridView1.Columns.Add("设备3", "equipe3");
@@ -2845,18 +2849,25 @@ namespace AutoDraw
 
                 if (!table.Rows.Contains(station.Key.ToUpper())) //如果datatable中不含有所亭项 
                 {
-
-                    table.Rows.Add(station.Key.ToUpper(), station.Value.ToString());  //添加
+                    string[] a=station.Value.ToString().Split(new char[]{','});
+                    table.Rows.Add(station.Key.ToUpper(), a[0]+","+a[1],a[2]);  //添加
                 }
 
 
             }
             table.DefaultView.Sort = "公里" + " " + "ASC";
-            table = stTable.DefaultView.ToTable();
+
+            DataView dv = new DataView(table);
+            dv.Sort = "公里" + " " + "ASC";
+
+
+            stTable.DefaultView.ToTable();
             table.AcceptChanges();
             //dataGridView1.Columns.Add("里程", "名称");
             //dataGridView1.Columns.Add("EnglishName", "ChineseName"); 
             componant.DataSource = tableFill.Tables[tableName];
+            componant.Sort(componant.Columns["公里"], ListSortDirection.Ascending);
+
             /*dataGridView1.Columns.Add("设备1","equipe1");
             dataGridView1.Columns.Add("设备2", "equipe2");
             dataGridView1.Columns.Add("设备3", "equipe3");
@@ -2911,10 +2922,10 @@ namespace AutoDraw
                                     MessageBox.Show("数据：" + location + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     return;
                                 }
-                                if (!pF.isExMatch(name, @"^([\u4e00-\u9fa5]*)\d*$"))  //
+                                //if (!pF.isExMatch(name, @"^([\u4e00-\u9fa5]*)\d*$"))  //
                                 {
-                                    MessageBox.Show("数据：" + name + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                    return;
+                                    //MessageBox.Show("数据：" + name + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    //return;
                                 }
 
                                 if (!InfoWindPoint.ContainsKey(location))
