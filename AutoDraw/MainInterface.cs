@@ -103,16 +103,20 @@ namespace AutoDraw
                             {
                                 CheckList.Add(item.Split(new char[] { '-' })[0]);
                                 equipeBeDraw.Add(item.Split(new char[] { '-' })[1]);
-                                count++;
+                                count++; 
+                                rollBack++;
+                                continue;
                             }
                             if (CheckList.Contains(item.Split(new char[] { '-' })[0]))
                             {
                                 //CheckList.Add(item.Split(new char[] { '-' })[0]);
                                 equipeBeDraw.Add(item.Split(new char[] { '-' })[1]);
                                 count++;
+                                rollBack++;
+                                continue;
                             }
 
-                            rollBack++;
+                            
                         }
 
 
@@ -185,7 +189,7 @@ namespace AutoDraw
                     }
                     #endregion
                     //foreach()
-                    drawSinglePicture(insertSignlePoint, fontStyleId, projetInfor, leftRightStation, equipeBeDraw);//db, trans, 
+                    drawSinglePicture(insertSignlePoint, fontStyleId, projetInfor, CheckList[CheckList.Count-1], leftRightStation, equipeBeDraw);//db, trans, 
 
 }
 
@@ -204,7 +208,15 @@ namespace AutoDraw
             }
         }
 
-        public void drawSinglePicture(Point2d insertSignlePoint,ObjectId fontStyleId,List<string> projetInfo,List<string> DAStation,List<string> N_Equipment)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="insertSignlePoint"></param>
+        /// <param name="fontStyleId"></param>
+        /// <param name="projetInfo">项目信息</param>
+        /// <param name="DAStation">相对于基站的左右站点</param>
+        /// <param name="N_Equipment">监测点信息</param>
+        public void drawSinglePicture(Point2d insertSignlePoint, ObjectId fontStyleId, List<string> projetInfo, string CommucationCenter, List<string> DAStation, List<string> N_Equipment)
         {
             Point2d outerStartPoint = insertSignlePoint;
             Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
@@ -216,7 +228,8 @@ namespace AutoDraw
             {
                 //单个图框的范围
 
-                try {
+                try
+                {
                     #region 绘制图框
                     Polyline rectangleOuterLayer = new Polyline();
                     Polyline rectangleInnerLayer = new Polyline();
@@ -256,10 +269,11 @@ namespace AutoDraw
             Database db2 = HostApplicationServices.WorkingDatabase;
             using (Transaction trans2 = db2.TransactionManager.StartTransaction())
             {
-                try {
+                try
+                {
                     #region 添加图形
                     ObjectId spaceId = db2.CurrentSpaceId;//当期空间ID
-                                                          //插入图签
+                    //插入图签
                     #region 添加图签
 
 
@@ -275,7 +289,7 @@ namespace AutoDraw
 
                     #region 轨道图标
                     Dictionary<string, string> attGD = new Dictionary<string, string>();
-                    attGD.Add("吉珲上行/下行线", "吉珲1上行/下行线");
+                    attGD.Add("上行/下行线", projetInfo[1] + "上行/下行线");
                     #endregion
 
                     BlockTable acBlkTbl = trans2.GetObject(db2.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -288,27 +302,174 @@ namespace AutoDraw
 
                     spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 137.2, 0), new Scale3d(1), 0, attGD);
                     spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 159.2, 0), new Scale3d(1), 0, attGD);
+                    spaceId.InsertBlockReference("0", "图例", new Point3d(innerStartPoint.X + 5.5, innerStartPoint.Y + 57, 0), new Scale3d(1), 0);
 
 
                     #region 变动部分
-                    if(DAStation[3]!=null)
+                    #region  车站标
+
+                    PFunction pf = new PFunction();
+                    int departStation = -1;
+                    int arriveStation = -1;
+
+                    if (DAStation[0] != null)
                     {
                         Dictionary<string, string> attArrive = new Dictionary<string, string>();
-                        attArrive.Add("XXX站", DAStation[3]);
-                        attArrive.Add("XXX+XXX", DAStation[2]);
-                        spaceId.InsertBlockReference("0", "到达站站点标示", new Point3d(innerStartPoint.X + 168, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attArrive);
-
+                        attArrive.Add("站名", DAStation[1]);
+                        attArrive.Add("里程", DAStation[0]);
+                        spaceId.InsertBlockReference("0", "到达站站点标示", new Point3d(innerStartPoint.X + 175 + 196, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attArrive);
+                        //换算成距离
+                        List<string> temp = new List<string>();
+                        pf.isExMatch(DAStation[2], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out temp);
+                        departStation = Int32.Parse(temp[1]) * 1000 + Int32.Parse(temp[2]);
                     }
 
-                    if(DAStation[0]!=null)
+                    if (DAStation[3] != null)
                     {
                         Dictionary<string, string> attdepart = new Dictionary<string, string>();
-                        attdepart.Add("XXX站", DAStation[1]);
-                        attdepart.Add("XXX+XXX", DAStation[1]);
-                        spaceId.InsertBlockReference("0", "始发站站点标示", new Point3d(innerStartPoint.X + 168, innerStartPoint.Y + 363, 0), new Scale3d(1), 0, attdepart);
+                        attdepart.Add("站名", DAStation[3]);
+                        attdepart.Add("里程", DAStation[2]);
+                        spaceId.InsertBlockReference("0", "始发站站点标示", new Point3d(innerStartPoint.X + 175-8.21, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attdepart);
+                        //换算成距离
+                        List<string> temp = new List<string>();
+                        pf.isExMatch(DAStation[2], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out temp);
+                        arriveStation = System.Math.Abs(Int32.Parse(temp[1]) * 1000 + Int32.Parse(temp[2]));
                     }
- 
+
+                    string textDistance = " ";
+                    if (departStation != -1 && arriveStation != -1) //
+                    {
+                        textDistance = System.Math.Abs(departStation - arriveStation).ToString();
+                    }
+                    DBText DistanceText = (DBText)insertText(textDistance, new Point3d(innerStartPoint.X + 168 + (362.7 - 168) / 2, innerStartPoint.Y + 363, 0), fontStyleId);
+                    db2.AddToModelSpace(DistanceText);
+
                     #endregion
+
+                    #region 设备标
+                    //跟据图块数量决定每个块的间距   innerStartPoint.X + 168+, innerStartPoint.Y + 363, 0)
+                    int marginEqui = 210 / (N_Equipment.Count + 1);
+                    //绘图起始点
+                    Point3d equipeInsertPoint = new Point3d(innerStartPoint.X + 175, innerStartPoint.Y + 220, 0);
+                    int numInsert = 0;
+                    //每一个都插入一次
+                    bool stationInsertion = false;
+
+                    List<Point3d> registEquipeInsertPoint = new List<Point3d>();  //记录插入点用于画线
+                    Point3d registStationInsertPoint = new Point3d();
+
+                    foreach (string equipeName in N_Equipment)
+                    {
+
+                        //equipeInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y, 0);
+
+                        string[] centerInfor=CommucationCenter.Split(new char[]{','});
+                        int centerLocation = int.Parse(centerInfor[centerInfor.Count() - 1]);
+
+                        string[] equipeInfor=equipeName.Split(new char[]{','});
+                        int equipeLocation = int.Parse(equipeInfor[equipeInfor.Count() - 1]);
+
+                        if (equipeLocation < centerLocation)  //当监控点里程比站点里程小时。
+                        {
+                            //插入设备
+                            string blockName = transforBlockName(equipeInfor[2]);
+                            spaceId.InsertBlockReference("0", blockName, new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y, 0), new Scale3d(1), 0);
+                            spaceId.InsertBlockReference("0", "接触网杆_g", new Point3d(equipeInsertPoint.X - 8.2 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 39.7 + 79, 0), new Scale3d(1), 0);
+                            spaceId.InsertBlockReference("0", "防灾控制箱_G", new Point3d(equipeInsertPoint.X - 6.8 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 23.4 + 40, 0), new Scale3d(1), 0);
+                            registEquipeInsertPoint.Add(new Point3d(equipeInsertPoint.X - 6.8 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 23.4 + 40, 0));
+
+                            //加入设备文字信息
+                            DBText equipeText = (DBText)insertText(equipeInfor[0] + " " + equipeInfor[1], new Point3d(equipeInsertPoint.X - 8.2 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 39.7 + 79 - 82.8752 - 15 - 35.67, 0), fontStyleId);
+                            db2.AddToModelSpace(equipeText);
+                            numInsert++;//画一次图，增加一次
+                        }
+                        else  //当监控点里程比站点里程大时。  equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40, 0
+                        { 
+                            //插入站点
+                            string stationName = transforBlockName(centerInfor[2]);
+                            spaceId.InsertBlockReference("0", stationName, new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40, 0), new Scale3d(1), 0);
+
+                            spaceId.InsertBlockReference("0", "监控单元_G", new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40 + 5, 0), new Scale3d(1), 0);
+                            registStationInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40 + 5, 0);
+
+                            DBText equipeText = (DBText)insertText(centerInfor[0] + " " + centerInfor[1], new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40 + 5 - 83 - 7.75, 0), fontStyleId);
+                            db2.AddToModelSpace(equipeText);
+
+                            stationInsertion = true;
+                            numInsert++;
+                            //插入设备
+                            equipeInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40, 0);
+                            string blockName = transforBlockName(equipeInfor[2]);
+                            spaceId.InsertBlockReference("0", blockName, equipeInsertPoint, new Scale3d(1), 0);
+                            spaceId.InsertBlockReference("0", "接触网杆_g", new Point3d(equipeInsertPoint.X - 8.2 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 39.7 + 79, 0), new Scale3d(1), 0);
+                            spaceId.InsertBlockReference("0", "防灾控制箱_G", new Point3d(equipeInsertPoint.X - 6.8 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 23.4 + 40, 0), new Scale3d(1), 0);
+                            registEquipeInsertPoint.Add(new Point3d(equipeInsertPoint.X - 6.8 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 23.4 + 40, 0));
+
+                            //加入设备文字信息
+                            DBText equipeText2 = (DBText)insertText(equipeInfor[0] + " " + equipeInfor[1], new Point3d(equipeInsertPoint.X - 8.2 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 39.7 + 79 - 82.8752 - 15 - 35.67, 0), fontStyleId);
+                            db2.AddToModelSpace(equipeText2);
+                        }
+
+                    }
+                    //如果在循环中没有添加基站、所亭
+                    if (stationInsertion == false)
+                    {
+                        string stationName = transforBlockName(CommucationCenter.Split(new char[] { ',' })[2]);
+                        spaceId.InsertBlockReference("0", stationName, new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40, 0), new Scale3d(1), 0);
+                        spaceId.InsertBlockReference("0", "监控单元_G", new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40 + 5, 0), new Scale3d(1), 0);
+                        registStationInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40 + 5, 0);
+
+                        DBText equipeText = (DBText)insertText(CommucationCenter.Split(new char[] { ',' })[0] + " " + CommucationCenter.Split(new char[] { ',' })[1], new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40 + 5 - 83 - 7.75, 0), fontStyleId);
+                        db2.AddToModelSpace(equipeText);
+                        stationInsertion = true;
+                    }
+
+
+
+                    #endregion
+
+                    StringBuilder Shuoming =new StringBuilder();
+                    Shuoming.Append("说明：" + System.Environment.NewLine + "  " + "1.图中所示风、雨、雪所用的控制电缆型号，施工阶段根据实际情况可做调整。" + System.Environment.NewLine + "  " + "2.风、雨、雪现场监测设备均安装于接触网杆上，具体里程可根据现场实际情况调整。");
+
+                    if (CommucationCenter.Contains("牵引"))
+                    {
+                        Shuoming.Append("3.电气化所亭内地震子系统的工程数量详见电气化所亭防灾安全监控系统设备平面布置图。");
+                    }
+
+                    #region 说明
+                    // Create a multiline text object
+                    MText acMText = new MText();
+                    acMText.Location = new Point3d(innerStartPoint.X+10, innerStartPoint.Y + 110, 0);
+                    acMText.Width = 115;
+                    acMText.TextStyleId = fontStyleId;
+                    acMText.Contents = Shuoming.ToString();
+
+                    //acBlkTblRec.AppendEntity(acMText);
+                    db2.AddToModelSpace(acMText);
+                    #endregion
+
+                    #region 表示线缆走向
+
+                    #endregion
+                    //LineWeight defautLineWeight = new LineWeight();
+                    //defautLineWeight.
+                    //db2.Celweight = new LineWeight(20);
+                    db2.LineWeightDisplay = true;
+
+
+                    LinetypeTable acLinTbl = trans2.GetObject(db2.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+
+                    if (acLinTbl.Has("DASH") == true)
+                    {
+                        ObjectId loneTypeId = acLinTbl["DASH"];
+
+                        Polyline[] mLines = drawMutiLine(registEquipeInsertPoint, registStationInsertPoint, new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 137.2, 0), loneTypeId);
+                        db2.AddToModelSpace(mLines);
+                    }
+
+                    #endregion
+
+
 
                     acBlkTbl.DowngradeOpen();
                     acBlkTblRec.DowngradeOpen();
@@ -324,6 +485,90 @@ namespace AutoDraw
                     trans2.Abort();
                 }
             }
+
+        }
+
+        public Polyline[] drawMutiLine(List<Point3d> registPoint, Point3d stationPoint, Point3d ChaoDao,ObjectId lineType)
+        {
+            Polyline[] mLines = new Polyline[registPoint.Count];
+
+
+            List<Point3d> equipePoint;
+            double minLength=0;
+
+            int num = 0;
+            foreach (Point3d equipe in registPoint)
+            {
+                Point3d vect1 = new Point3d(stationPoint.X, ChaoDao.Y + 1, 0); //所亭下方与槽道的交点
+                Point3d vect2 = new Point3d(equipe.X, ChaoDao.Y + 1, 0);       //设备下方与槽道的交点
+
+                Polyline pl = new Polyline();
+                pl.AddVertexAt(0, new Point2d(stationPoint.X, stationPoint.Y), 0, 0.75, 0.75);
+                pl.AddVertexAt(1, new Point2d(vect1.X, vect1.Y), 0, 0.75, 0.75);
+                pl.AddVertexAt(2, new Point2d(vect2.X, vect2.Y), 0, 0.75, 0.75);
+                pl.AddVertexAt(3, new Point2d(equipe.X, equipe.Y), 0, 0.75, 0.75);
+                //.Color=Autodesk.AutoCAD.Colors.Color
+                pl.LinetypeId = lineType;
+                pl.LinetypeScale = 20;
+                pl.LineWeight = LineWeight.LineWeight025;//(LineWeight)20;
+                mLines[num] = pl;
+                num++;
+            }
+
+
+
+            return mLines;
+        }
+
+        public Entity insertText(string text, Point3d insertPoint, ObjectId fontStyleId)
+        {
+            DBText equipeText = new DBText();
+            equipeText.Position = insertPoint;
+            equipeText.Height = 4.5;
+            equipeText.TextString = text;
+            equipeText.HorizontalMode = TextHorizontalMode.TextCenter;
+            equipeText.VerticalMode = TextVerticalMode.TextVerticalMid;
+            equipeText.AlignmentPoint = equipeText.Position;
+            equipeText.WidthFactor = 0.7;
+            equipeText.TextStyleId = fontStyleId;
+            return equipeText;
+        }
+
+        /// <summary>
+        /// 将程序中的设备名称与块名称对应
+        /// </summary>
+        /// <param name="equipeName"></param>
+        /// <returns></returns>
+        public string transforBlockName(string equipeName)
+        {
+            string stantardName="";
+
+            if (equipeName == "风速计")
+            {
+                stantardName = "风向风速计_G";
+            }
+            else if(equipeName == "雪深计")
+            {
+                stantardName = "雪深计_G";
+            }
+            else if(equipeName == "雨量计")
+            {
+                stantardName = "雨量计_G";
+            }
+            else if (equipeName == "基站")
+            {
+                stantardName = "GSM-R基站_G";
+            }
+            else if (equipeName == "车站")
+            {
+                stantardName = "车站_GS";
+            }
+            else if (equipeName.Contains("所"))
+            {
+                stantardName = "牵引变电所_G";
+            }
+
+            return stantardName;
 
         }
 
@@ -1383,22 +1628,7 @@ namespace AutoDraw
 
                         Bitmap preview;
                         try
-                        {
-                            StringBuilder str = new StringBuilder();
-                            if (!btRecord.IsDynamicBlock)
-                            {
-                                str.Append("Dynamique");
-                            }
-                            else
-                            {
-
-                            }
-
-                            if (btRecord.ExtensionDictionary == null)
-                            {
-                                str.Append("Extension");
-                            }
-
+                        {                           
                             // 获取块预览图案（适用于AutoCAD 2008及以下版本）
                             //preview = BlockThumbnailHelper.GetBlockThumbanail(btr.ObjectId);
 
@@ -1423,6 +1653,7 @@ namespace AutoDraw
 
 
                     }
+                    trans.Commit();
                     m_DocumentLock.Dispose();
                 }
 
@@ -3470,140 +3701,143 @@ namespace AutoDraw
         /// <param name="e"></param>
         private void button7_Click(object sender, EventArgs e)
         {
-            XmlFunction XF = new XmlFunction();
-
-            #region 读取数据
-            Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPoint");
-            Dictionary<string, string> STstationPoint = new Dictionary<string, string>();
-            Dictionary<string, string> RailstationPoint = new Dictionary<string, string>();
-            foreach (var par in origStation)
+            if (listView1.Items.Count!=0)
             {
-                if (par.Value.ToString().Contains("所") || par.Value.ToString().Contains("基站"))
+
+                XmlFunction XF = new XmlFunction();
+
+                #region 读取数据
+                Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPoint");
+                Dictionary<string, string> STstationPoint = new Dictionary<string, string>();
+                Dictionary<string, string> RailstationPoint = new Dictionary<string, string>();
+                foreach (var par in origStation)
                 {
-                    STstationPoint.Add(par.Key, par.Value);
-                }
-                else
-                {
-                    RailstationPoint.Add(par.Key, par.Value);
-                }
-            }
-            Dictionary<string, string> windPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPoints");
-            Dictionary<string, string> rainPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPoints");
-            Dictionary<string, string> snowPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPoints");
-            #endregion
-
-            #region 生成二维数组
-            int tWith = STstationPoint.Count();
-
-            int[,] tableWindLengt = new int[windPoint.Count, tWith]; //生成风距离表
-            int[,] tableRainLengt = new int[rainPoint.Count, tWith]; //生成雨距离表
-            int[,] tableSnowLengt = new int[snowPoint.Count, tWith]; //生成雪距离表
-
-            //填充风距离表
-            int W_w = 0;
-            int W_h = 0;
-
-            int R_w = 0;
-            int R_h = 0;
-
-
-            int S_w = 0;
-            int S_h = 0;
-
-            //填充雨点
-            foreach (var Sstation in STstationPoint)
-            {
-                W_w = 0;
-                foreach (var wind in windPoint)
-                {
-                    tableWindLengt[W_w, W_h] = System.Math.Abs(int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(wind.Value.ToString().Split(new char[] { ',' })[2]));
-                    W_w++;
-                }
-                W_h++;
-            }
-
-            //填充雨距离表
-            foreach (var Sstation in STstationPoint)
-            {
-                R_w = 0;
-                foreach (var rain in rainPoint)
-                {
-                    tableRainLengt[R_w, R_h] = System.Math.Abs(int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(rain.Value.ToString().Split(new char[] { ',' })[2]));
-                    R_w++;
-                }
-                R_h++;
-            }
-
-            //填充雪距离表
-            foreach (var Sstation in STstationPoint)
-            {
-                S_w = 0;
-                foreach (var snow in snowPoint)
-                {
-                    tableSnowLengt[S_w, S_h] = System.Math.Abs(int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(snow.Value.ToString().Split(new char[] { ',' })[2]));
-                    S_w++;
-                }
-                S_h++;
-            }
-            #endregion
-            List<string> WindToStation = findNear(tableWindLengt);//找到
-            List<string> RainToStation = findNear(tableRainLengt);
-            List<string> SnowToStation = findNear(tableSnowLengt);
-
-            List<string> stationToEqui = new List<string>();
-            List<string> SEWpair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);
-            List<string> SERpair = StationToEquipInfo(RainToStation, STstationPoint, rainPoint);//合并雨点信息
-            List<string> SESpair = StationToEquipInfo(SnowToStation, STstationPoint, snowPoint);//合并雪点信息
-
-            List<string> connectionDict = new List<string>();
-            foreach (var a in SEWpair)
-            {
-                stationToEqui.Add(a);
-            }
-            foreach (var a in SERpair)
-            {
-                stationToEqui.Add(a);
-            } 
-            foreach (var a in SESpair)
-            {
-                stationToEqui.Add(a);
-            }
-
-            //写入连接情况
-            XmlFunction xF = new XmlFunction();
-            xF.removeCommection(xmlFilePath + "\\setting.xml"); //删除所有connection节点
-
-            selectedWayPoint.Nodes.Clear(); //清空点
-            foreach (var sTe in stationToEqui)
-            {
-                
-                #region 写入连接信息
-                string station = sTe.Split(new char[] { '_' })[0];
-                string equipe = sTe.Split(new char[] { '_' })[1];
-
-                connectionDict.Add(station + "-" + equipe);
-
-                xF.createConnectionXml(xmlFilePath + "\\setting.xml", station, equipe);
-                #endregion
-
-
-                #region
-                TreeNode root=new TreeNode();
-                root.Text = (station.Split(new char[] { ',' })[0] + "," + station.Split(new char[] { ',' })[1]);
-                bool isduplicate = false;
-                foreach (TreeNode node in selectedWayPoint.Nodes)
-                {
-                    if (node.Text == station.Split(new char[] { ',' })[0] + "," + station.Split(new char[] { ',' })[1])
+                    if (par.Value.ToString().Contains("所") || par.Value.ToString().Contains("基站"))
                     {
-                        isduplicate = true;
-                        root = node;
-                        break;
+                        STstationPoint.Add(par.Key, par.Value);
+                    }
+                    else
+                    {
+                        RailstationPoint.Add(par.Key, par.Value);
                     }
                 }
-                if (!isduplicate)
+                Dictionary<string, string> windPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPoints");
+                Dictionary<string, string> rainPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPoints");
+                Dictionary<string, string> snowPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPoints");
+                #endregion
+
+                #region 生成二维数组
+                int tWith = STstationPoint.Count();
+
+                int[,] tableWindLengt = new int[windPoint.Count, tWith]; //生成风距离表
+                int[,] tableRainLengt = new int[rainPoint.Count, tWith]; //生成雨距离表
+                int[,] tableSnowLengt = new int[snowPoint.Count, tWith]; //生成雪距离表
+
+                //填充风距离表
+                int W_w = 0;
+                int W_h = 0;
+
+                int R_w = 0;
+                int R_h = 0;
+
+
+                int S_w = 0;
+                int S_h = 0;
+
+                //填充雨点
+                foreach (var Sstation in STstationPoint)
                 {
-                    selectedWayPoint.Nodes.Add(root);
+                    W_w = 0;
+                    foreach (var wind in windPoint)
+                    {
+                        tableWindLengt[W_w, W_h] = System.Math.Abs(int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(wind.Value.ToString().Split(new char[] { ',' })[2]));
+                        W_w++;
+                    }
+                    W_h++;
                 }
+
+                //填充雨距离表
+                foreach (var Sstation in STstationPoint)
+                {
+                    R_w = 0;
+                    foreach (var rain in rainPoint)
+                    {
+                        tableRainLengt[R_w, R_h] = System.Math.Abs(int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(rain.Value.ToString().Split(new char[] { ',' })[2]));
+                        R_w++;
+                    }
+                    R_h++;
+                }
+
+                //填充雪距离表
+                foreach (var Sstation in STstationPoint)
+                {
+                    S_w = 0;
+                    foreach (var snow in snowPoint)
+                    {
+                        tableSnowLengt[S_w, S_h] = System.Math.Abs(int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(snow.Value.ToString().Split(new char[] { ',' })[2]));
+                        S_w++;
+                    }
+                    S_h++;
+                }
+                #endregion
+                List<string> WindToStation = findNear(tableWindLengt);//找到
+                List<string> RainToStation = findNear(tableRainLengt);
+                List<string> SnowToStation = findNear(tableSnowLengt);
+
+                List<string> stationToEqui = new List<string>();
+                List<string> SEWpair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);
+                List<string> SERpair = StationToEquipInfo(RainToStation, STstationPoint, rainPoint);//合并雨点信息
+                List<string> SESpair = StationToEquipInfo(SnowToStation, STstationPoint, snowPoint);//合并雪点信息
+
+                List<string> connectionDict = new List<string>();
+                foreach (var a in SEWpair)
+                {
+                    stationToEqui.Add(a);
+                }
+                foreach (var a in SERpair)
+                {
+                    stationToEqui.Add(a);
+                }
+                foreach (var a in SESpair)
+                {
+                    stationToEqui.Add(a);
+                }
+
+                //写入连接情况
+                XmlFunction xF = new XmlFunction();
+                xF.removeCommection(xmlFilePath + "\\setting.xml"); //删除所有connection节点
+
+                selectedWayPoint.Nodes.Clear(); //清空点
+                foreach (var sTe in stationToEqui)
+                {
+
+                    #region 写入连接信息
+                    string station = sTe.Split(new char[] { '_' })[0];
+                    string equipe = sTe.Split(new char[] { '_' })[1];
+
+                    connectionDict.Add(station + "-" + equipe);
+
+                    xF.createConnectionXml(xmlFilePath + "\\setting.xml", station, equipe);
+                    #endregion
+
+
+                    #region
+                    TreeNode root = new TreeNode();
+                    root.Text = (station.Split(new char[] { ',' })[0] + "," + station.Split(new char[] { ',' })[1]);
+                    bool isduplicate = false;
+                    foreach (TreeNode node in selectedWayPoint.Nodes)
+                    {
+                        if (node.Text == station.Split(new char[] { ',' })[0] + "," + station.Split(new char[] { ',' })[1])
+                        {
+                            isduplicate = true;
+                            root = node;
+                            break;
+                        }
+                    }
+                    if (!isduplicate)
+                    {
+                        selectedWayPoint.Nodes.Add(root);
+                    }
 
 
                     TreeNode equipeRoot = new TreeNode();
@@ -3621,13 +3855,18 @@ namespace AutoDraw
                     {
                         root.Nodes.Add(equipeRoot);
                     }
-                
-                //selectedWayPoint.Nodes
-                #endregion
+
+                    //selectedWayPoint.Nodes
+                    #endregion
+                }
+                //
+                //windPoint 
+                DrawPicture(RailstationPoint, connectionDict); 
             }
-            //
-            //windPoint 
-            DrawPicture(RailstationPoint,connectionDict);
+            else
+            {
+                MessageBox.Show("请先导入标准图块", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         /// <summary>
@@ -3672,6 +3911,8 @@ namespace AutoDraw
             }
             return stationEquipePair;
         }
+
+
         /// <summary>
         /// 找到离横坐标对应的监控点最近的基站、所亭
         /// </summary>

@@ -142,6 +142,7 @@
             this.splitContainer5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
             this.splitContainer6.Panel1.SuspendLayout();
+            this.splitContainer6.Panel2.SuspendLayout();
             this.splitContainer6.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -279,12 +280,7 @@
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.button7);
-            this.splitContainer1.Panel1.Controls.Add(this.button6);
-            this.splitContainer1.Panel1.Controls.Add(this.button5);
-            this.splitContainer1.Panel1.Controls.Add(this.button1);
-            this.splitContainer1.Panel1.Controls.Add(this.B_Draw);
             this.splitContainer1.Panel1.Controls.Add(this.类型);
-            this.splitContainer1.Panel1.Controls.Add(this.button2);
             this.splitContainer1.Panel1.Controls.Add(this.B_SupWayPoint);
             this.splitContainer1.Panel1.Controls.Add(this.B_Add);
             this.splitContainer1.Panel1.Controls.Add(this.B_AddWayPoint);
@@ -305,52 +301,56 @@
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(101, 310);
+            this.button7.Location = new System.Drawing.Point(10, 495);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(75, 23);
+            this.button7.Size = new System.Drawing.Size(165, 23);
             this.button7.TabIndex = 14;
-            this.button7.Text = "button7";
+            this.button7.Text = "绘图";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(12, 267);
+            this.button6.Location = new System.Drawing.Point(177, 12);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(75, 23);
             this.button6.TabIndex = 13;
             this.button6.Text = "button6";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Visible = false;
             this.button6.Click += new System.EventHandler(this.button6_Click_1);
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(101, 267);
+            this.button5.Location = new System.Drawing.Point(96, 41);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(75, 23);
             this.button5.TabIndex = 12;
             this.button5.Text = "button5";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Visible = false;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(102, 352);
+            this.button1.Location = new System.Drawing.Point(96, 12);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 1;
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // B_Draw
             // 
-            this.B_Draw.Location = new System.Drawing.Point(12, 352);
+            this.B_Draw.Location = new System.Drawing.Point(15, 41);
             this.B_Draw.Name = "B_Draw";
             this.B_Draw.Size = new System.Drawing.Size(75, 23);
             this.B_Draw.TabIndex = 0;
-            this.B_Draw.Text = "绘图";
+            this.B_Draw.Text = "/n绘图";
             this.B_Draw.UseVisualStyleBackColor = true;
+            this.B_Draw.Visible = false;
             this.B_Draw.Click += new System.EventHandler(this.B_Draw_Click);
             // 
             // 类型
@@ -364,12 +364,13 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(101, 238);
+            this.button2.Location = new System.Drawing.Point(15, 12);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 2;
             this.button2.Text = "？";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Visible = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // B_SupWayPoint
@@ -386,9 +387,9 @@
             // 
             // B_Add
             // 
-            this.B_Add.Location = new System.Drawing.Point(12, 238);
+            this.B_Add.Location = new System.Drawing.Point(10, 466);
             this.B_Add.Name = "B_Add";
-            this.B_Add.Size = new System.Drawing.Size(75, 23);
+            this.B_Add.Size = new System.Drawing.Size(165, 23);
             this.B_Add.TabIndex = 0;
             this.B_Add.Text = "写入";
             this.B_Add.UseVisualStyleBackColor = true;
@@ -458,7 +459,7 @@
             this.treeView1.ContextMenuStrip = this.contextMenutTreeView;
             this.treeView1.Location = new System.Drawing.Point(10, 130);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(166, 102);
+            this.treeView1.Size = new System.Drawing.Size(166, 325);
             this.treeView1.TabIndex = 3;
             // 
             // contextMenutTreeView
@@ -921,6 +922,14 @@
             // splitContainer6.Panel1
             // 
             this.splitContainer6.Panel1.Controls.Add(this.listView1);
+            // 
+            // splitContainer6.Panel2
+            // 
+            this.splitContainer6.Panel2.Controls.Add(this.button6);
+            this.splitContainer6.Panel2.Controls.Add(this.button1);
+            this.splitContainer6.Panel2.Controls.Add(this.B_Draw);
+            this.splitContainer6.Panel2.Controls.Add(this.button5);
+            this.splitContainer6.Panel2.Controls.Add(this.button2);
             this.splitContainer6.Size = new System.Drawing.Size(508, 529);
             this.splitContainer6.SplitterDistance = 226;
             this.splitContainer6.TabIndex = 0;
@@ -991,6 +1000,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
             this.splitContainer5.ResumeLayout(false);
             this.splitContainer6.Panel1.ResumeLayout(false);
+            this.splitContainer6.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).EndInit();
             this.splitContainer6.ResumeLayout(false);
             this.ResumeLayout(false);

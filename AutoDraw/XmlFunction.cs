@@ -77,7 +77,7 @@ namespace AutoDraw
                     string key = xe.GetAttribute("location");
                     List<string> outList = new List<string>();
                     pf.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out outList);
-                    Int32 DistNum = Int32.Parse(outList[1]) * 1000 + Int32.Parse(outList[2]);
+                    Int32 DistNum = System.Math.Abs(Int32.Parse(outList[1]) * 1000 + Int32.Parse(outList[2]));
 
                     XmlNode nameNode = xe.SelectSingleNode("PName");//查找<PName> 
                     XmlNode typeNode = xe.SelectSingleNode("PType");//查找<PType> 
