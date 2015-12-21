@@ -2790,6 +2790,9 @@ namespace AutoDraw
             this.listView1.EndUpdate();  //结束数据处理，UI界面一次性绘制。  
         }
 
+
+
+
         /// <summary>
         /// 填充站点信息
         /// </summary>
