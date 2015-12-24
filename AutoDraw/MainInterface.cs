@@ -2757,6 +2757,9 @@ namespace AutoDraw
                     //imageListSmall.Images.Add(Bitmap.FromFile(@"..\..\绘图.bmp"));
                 }
             }
+
+
+
             catch (System.Exception e)
             {
                 MessageBox.Show(e.Message);
