@@ -122,7 +122,23 @@ namespace AutoDraw
 
         public void supprimWayPoint(string xmlFile, string NodeName, string OldDistance)
         {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<WayPoints> 
+            XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
+            XmlNode wypointRoot = xmlDoc.SelectSingleNode("StationPoint");//查找<StationPoint> 
 
+            foreach (XmlNode xn in wypointRoot.ChildNodes)
+            {
+                XmlElement xe = (XmlElement)xn;
+                if (xe.Attributes.ToString() == NodeName)
+                {
+                    xn.ParentNode.RemoveChild(xn);  
+                }
+            }
+
+
+            xmlDoc.Save(xmlFile);  
         }
 
 
@@ -169,7 +185,7 @@ namespace AutoDraw
 
         }
 
-        public void removeCommection(string xmlFile)
+        public void removeConnection(string xmlFile)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);

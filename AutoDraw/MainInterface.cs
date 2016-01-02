@@ -1242,6 +1242,7 @@ namespace AutoDraw
             colName = new List<string>();
             colName.Add("里程");
             colName.Add("名称");
+            colName.Add("类型");
             colName.Add("公里");
             #region 添加事件
             try
@@ -1286,24 +1287,28 @@ namespace AutoDraw
                     System.Data.DataColumn ST = stTable.Columns.Add(colName[0], typeof(string));// station.Key.ToUpper());
                     stTable.Columns.Add(colName[1], typeof(string));
                     stTable.Columns.Add(colName[2], typeof(string));
+                    stTable.Columns.Add(colName[3], typeof(string));
                     stTable.PrimaryKey = new System.Data.DataColumn[] { ST };
 
                     WindTable = tableST.Tables.Add("WindTable");//创建‘风点’表
                     System.Data.DataColumn WT = WindTable.Columns.Add(colName[0], typeof(string));// station.Key.ToUpper());
                     WindTable.Columns.Add(colName[1], typeof(string));
                     WindTable.Columns.Add(colName[2], typeof(string));
+                    WindTable.Columns.Add(colName[3], typeof(string));
                     WindTable.PrimaryKey = new System.Data.DataColumn[] { WT };
 
                     RainTable = tableST.Tables.Add("RainTable");//创建‘雨点’表
                     System.Data.DataColumn RT = RainTable.Columns.Add(colName[0], typeof(string));// station.Key.ToUpper());
                     RainTable.Columns.Add(colName[1], typeof(string));
                     RainTable.Columns.Add(colName[2], typeof(string));
+                    RainTable.Columns.Add(colName[3], typeof(string));
                     RainTable.PrimaryKey = new System.Data.DataColumn[] { RT };
 
                     SnowTable = tableST.Tables.Add("SnowTable");//创建‘雪点’表
                     System.Data.DataColumn SnowT = SnowTable.Columns.Add(colName[0], typeof(string));// station.Key.ToUpper());
                     SnowTable.Columns.Add(colName[1], typeof(string));
                     SnowTable.Columns.Add(colName[2], typeof(string));
+                    SnowTable.Columns.Add(colName[3], typeof(string));
                     SnowTable.PrimaryKey = new System.Data.DataColumn[] { SnowT };
 
 
@@ -2491,62 +2496,48 @@ namespace AutoDraw
 
         private void 删除ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            supprimeTreeView();
+            TreeNode selectedNode = treeView1.SelectedNode;
+            supprimeTreeView(selectedNode);
         }
 
         /// <summary>
         /// 删除选中路点信息功能
         /// </summary>
         bool modifData = false;
-        private void supprimeTreeView()
+        private void supprimeTreeView(TreeNode selectNode)
         {
             if (treeView1.SelectedNode!=null)
             {
-                TreeNode selectNode = treeView1.SelectedNode;
 
+                XmlFunction xf = new XmlFunction();
                 if (selectNode.Level == 1)
                 {
                     //TreeNode selectKeyNode = selectNode.LastNode;
-
-                    if (MessageBox.Show("确定删除项:\n里程:" + selectNode.FirstNode.Text.ToString() + "\n类型:" + selectNode.LastNode.Text.ToString() + "\n站名:" + selectNode.Text.ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                    List<string> inforOneStation = new List<string>();
+                    inforOneStation = treeViewFunction(selectNode);
+                    if (MessageBox.Show("确定删除项:\n里程:" + inforOneStation[0].ToString() + "\n类型:" + inforOneStation[2].ToString() + "\n站名:" + inforOneStation[1].ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                     {
                         treeView1.Nodes.Clear();
-                        InfoStation.Remove(selectNode.FirstNode.Text.ToString());
+                        xf.supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""), "");
+                        InfoStation.Remove(inforOneStation[0].ToString());
 
                         refreshTreeview(treeView1, InfoStation, true);
                     }
                 }
                 else if (selectNode.Level > 1)
                 {
-                    if (selectNode.Text.ToString().Split(new char[] { '+' }).Length > 1)
-                    {
-                        TreeNode selectKeyNode = selectNode;
-                        TreeNode typeNode = selectNode.NextNode;
-                        TreeNode selectParentNode = selectNode.Parent;
+                    List<string> inforOneStation = new List<string>();
+                    inforOneStation = treeViewFunction(selectNode.Parent);
 
-                        if (MessageBox.Show("确定删除项:\n里程:" + selectKeyNode.Text.ToString() + "\n类型:" + typeNode.Text.ToString() + "\n站名" + selectParentNode.Text.ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
-                        {
+                    if (MessageBox.Show("确定删除项:\n里程:" + inforOneStation[0].ToString() + "\n类型:" + inforOneStation[2].ToString() + "\n站名:" + inforOneStation[1].ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                    {
                             treeView1.Nodes.Clear();
-                            InfoStation.Remove(selectKeyNode.Text.ToString());
+                            xf.supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""), "");
+                            InfoStation.Remove(inforOneStation[0].ToString());
 
                             refreshTreeview(treeView1, InfoStation, true);
                         }
 
-                    }
-                    else if (selectNode.Text.ToString().Split(new char[] { '+' }).Length == 1)
-                    {
-                        TreeNode selectKeyNode = selectNode.PrevNode;
-                        TreeNode selectNameNode = selectNode.Parent;
-                        TreeNode selectTypeNode = selectNode;
-
-                        if (MessageBox.Show("确定删除项:\n里程:" + selectKeyNode.Text.ToString() + "\n类型:" + selectTypeNode.Text.ToString() + "\n站名" + selectNameNode.Text.ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
-                        {
-                            treeView1.Nodes.Clear();
-                            InfoStation.Remove(selectKeyNode.Text.ToString());
-
-                            refreshTreeview(treeView1, InfoStation, true);
-                        }
-                    }
                 }
                 else if (selectNode.Level == 0)
                 {
@@ -2557,6 +2548,47 @@ namespace AutoDraw
             {
                 MessageBox.Show("未选择项目.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        //
+        public List<string> treeViewFunction(TreeNode selectedNode)
+        {
+            List<string> LNT = new List<string>(); //里程＼名字＼类型
+            string licheng = "";
+            string Name = "";
+            string TypeS = "";
+            PFunction pF = new PFunction();
+            foreach (TreeNode childNode in selectedNode.Nodes)
+            {
+                if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //汉字
+                {
+                    if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
+                    {
+                        TypeS = childNode.Text.ToString();
+                    }
+                    else
+                    {
+                        Name = childNode.Text.ToString();
+                    }
+                }
+                else if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                {
+                    licheng = childNode.Text.ToString();
+                } 
+            }
+
+            if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$"))
+            {
+                if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
+                {
+                    Name = selectedNode.Text.ToString();
+                }
+            }
+            LNT.Add(licheng);
+            LNT.Add(Name);
+            LNT.Add(TypeS);
+
+            return LNT;
         }
 
         /// <summary>
@@ -2572,7 +2604,8 @@ namespace AutoDraw
             {
                 if (modifData == false)
                 {
-                    supprimeTreeView();
+                    //treeView1.SelectedNode;
+                    supprimeTreeView(treeView1.SelectedNode);
                 }
                 else//当修改数据时
                 {
@@ -2666,18 +2699,18 @@ namespace AutoDraw
         }
 
         //保存要修改项的原数值
-        string registName = "";
-        string registLocation = "";
-        string registType = "";
+        //string registName = "";
+        //string registLocation = "";
+        //string registType = "";
 
         private void 修改ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (treeView1.Nodes.Count > 3) //默认有三个节点
             {
-                //清零保存的数值
-                registName = "";
-                registLocation = "";
-                registType = "";
+                //清空
+                T_SName.Text = "";
+                T_SLocation.Text = "";
+                TypeWayPoint.SelectedItem = "";
 
                 modifData = true;
                 B_AddWayPoint.Text = "确认";
@@ -2688,46 +2721,76 @@ namespace AutoDraw
                 TreeNode SLocaNode = new TreeNode();
                 TreeNode SNameNode = new TreeNode();
                 TreeNode STypeNode = new TreeNode();
+
+                PFunction pF = new PFunction();
+
                 if (selectedNode.Level == 1)
                 {
-                    SLocaNode = selectedNode.FirstNode;
-                    SNameNode = selectedNode;
-                    STypeNode = selectedNode.LastNode;
-
+                    foreach (TreeNode childNode in selectedNode.Nodes)
+                    {
+                        if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //汉字
+                        {
+                            if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
+                            {
+                                TypeWayPoint.SelectedItem = childNode.Text.ToString();
+                            }
+                            else
+                            {
+                                T_SName.Text = childNode.Text.ToString();
+                            }
+                        }
+                        else if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                        {
+                            T_SLocation.Text = childNode.Text.ToString();
+                        }
+                    }
+                    if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$"))
+                    {
+                        if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
+                        {
+                            T_SName.Text = selectedNode.Text.ToString();
+                        }
+                    }
 
 
 
                 }
                 else if (selectedNode.Level == 2)
                 {
-                    string[] temp = selectedNode.Text.Split(new char[] { '+' });
-                    if (temp.Length == 1) //不是里程
+                    foreach (TreeNode childNode in selectedNode.Parent.Nodes)
                     {
-                        SLocaNode = selectedNode.PrevNode;
-                        SNameNode = selectedNode.Parent;
-                        STypeNode = selectedNode;
-
-
+                        if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //汉字
+                        {
+                            if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
+                            {
+                                TypeWayPoint.SelectedItem = childNode.Text.ToString();
+                            }
+                            else
+                            {
+                                T_SName.Text = childNode.Text.ToString();
+                            }
+                        }
+                        else if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                        {
+                            T_SLocation.Text = childNode.Text.ToString();
+                        }
                     }
-                    else if (temp.Length > 1) //是里程
+                    if (pF.isExMatch(selectedNode.Parent.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$"))
                     {
-                        SLocaNode = selectedNode;
-                        SNameNode = selectedNode.Parent;
-                        STypeNode = selectedNode.NextNode;
-
-
+                        if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
+                        {
+                            T_SName.Text = selectedNode.Parent.Text.ToString();
+                        }
                     }
-                    registName = registName = SNameNode.Text.ToString();
-                    registLocation = SLocaNode.Text.ToString().ToUpper().Replace(" ", "");
-                    registType = STypeNode.Text.ToString();
+                    else if (pF.isExMatch(selectedNode.Parent.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                    {
+                        T_SLocation.Text = selectedNode.Parent.Text.ToString();
+                    }
 
-                    T_SLocation.Text = registLocation;
-                    T_SName.Text = registName;
-                    TypeWayPoint.SelectedItem = registType;
                 }
                 else if (selectedNode.Level ==0)
                 {
-                    MessageBox.Show("此节点：" + treeView1.SelectedNode.Text.ToString().Split(new char[]{' '})[0] + "。不能修改！", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("此节点：" + selectedNode.Text.ToString().Split(new char[] { ' ' })[0] + "。不能修改！", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             
@@ -2820,7 +2883,7 @@ namespace AutoDraw
                     {
                         string[] Loadvalue = station.Value.ToString().Split(new char[] { ',' });
 
-                        stTable.Rows.Add(station.Key.ToUpper(), Loadvalue[0] + "," + Loadvalue[1], Loadvalue[2]);  //添加
+                        stTable.Rows.Add(station.Key.ToUpper(), Loadvalue[0] , Loadvalue[1], Loadvalue[2]);  //添加
                     }
 
                 }
@@ -3850,7 +3913,7 @@ namespace AutoDraw
 
                 //写入连接情况
                 XmlFunction xF = new XmlFunction();
-                xF.removeCommection(xmlFilePath + "\\setting.xml"); //删除所有connection节点
+                xF.removeConnection(xmlFilePath + "\\setting.xml"); //删除所有connection节点
 
                 selectedWayPoint.Nodes.Clear(); //清空点
                 foreach (var sTe in stationToEqui)
