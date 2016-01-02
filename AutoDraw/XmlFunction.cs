@@ -126,14 +126,16 @@ namespace AutoDraw
             xmlDoc.Load(xmlFile);
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<WayPoints> 
             XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
-            XmlNode wypointRoot = xmlDoc.SelectSingleNode("StationPoint");//查找<StationPoint> 
+            XmlNode wypointRoot = subroot.SelectSingleNode("StationPoint");//查找<StationPoint> 
 
             foreach (XmlNode xn in wypointRoot.ChildNodes)
             {
                 XmlElement xe = (XmlElement)xn;
-                if (xe.Attributes.ToString() == NodeName)
+                string a = xe.GetAttribute("location").ToString();
+                if (xe.GetAttribute("location").ToString() == NodeName)
                 {
-                    xn.ParentNode.RemoveChild(xn);  
+                    xn.ParentNode.RemoveChild(xn);
+                    break;
                 }
             }
 

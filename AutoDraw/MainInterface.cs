@@ -2517,10 +2517,25 @@ namespace AutoDraw
                     inforOneStation = treeViewFunction(selectNode);
                     if (MessageBox.Show("确定删除项:\n里程:" + inforOneStation[0].ToString() + "\n类型:" + inforOneStation[2].ToString() + "\n站名:" + inforOneStation[1].ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                     {
-                        treeView1.Nodes.Clear();
+                        
                         xf.supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""), "");
+                        treeView1.Nodes.Clear();
                         InfoStation.Remove(inforOneStation[0].ToString());
+                        System.Data.DataTable stationData = tableST.Tables["StationTable"];
 
+                        int removeIndex = 0;
+                        foreach (DataRow row in stationData.Rows)
+                        {
+                            //row
+                            if (row.ItemArray.Contains(inforOneStation[0].ToString().Replace(" ", "")))
+                            {
+                                stationData.Rows[removeIndex].Delete();
+                                stationData.AcceptChanges();
+                                break;
+                            }
+                            removeIndex++;
+
+                        }
                         refreshTreeview(treeView1, InfoStation, true);
                     }
                 }
@@ -2560,9 +2575,9 @@ namespace AutoDraw
             PFunction pF = new PFunction();
             foreach (TreeNode childNode in selectedNode.Nodes)
             {
-                if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //汉字
+                if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$") || childNode.Text.ToString().Replace(" ", "").Contains("AT所")) //汉字
                 {
-                    if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
+                    if (childNode.Text.ToString().Replace(" ", "").Contains("AT所") || childNode.Text.ToString().Replace(" ", "").Contains("牵引变电所") || childNode.Text.ToString().Replace(" ", "").Contains("车站") || childNode.Text.ToString().Replace(" ", "").Contains("基站") || childNode.Text.ToString().Replace(" ", "").Contains("桥梁"))
                     {
                         TypeS = childNode.Text.ToString();
                     }
