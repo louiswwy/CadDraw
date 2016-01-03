@@ -529,6 +529,7 @@
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridStation.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridStation.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridStation.Enabled = false;
             this.dataGridStation.Location = new System.Drawing.Point(3, 3);
             this.dataGridStation.Name = "dataGridStation";
             this.dataGridStation.RowTemplate.Height = 23;

@@ -2247,9 +2247,7 @@ namespace AutoDraw
 
                         //修改xml文件
                         //
-                        //清除treeview
-                        treeView1.Nodes.Clear();
-                        refreshTreeview(treeView1, InfoStation, true);
+
 
                         XmlFunction xf = new XmlFunction();
                         //supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""));
@@ -2276,6 +2274,13 @@ namespace AutoDraw
                             //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
                             //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
                         }
+
+                        //清除treeview
+                        treeView1.Nodes.Clear();
+                        refreshTreeview(treeView1, InfoStation, true);
+                        dataGridStation.DataSource = "";
+
+                        //dataGridStation(st)
                         fileStationDataView(dataGridStation, colName, InfoStation, "StationTable");
                         modifData = false;
                         B_AddWayPoint.Text = "+";
@@ -2938,8 +2943,8 @@ namespace AutoDraw
         public void fileStationDataView(Control comp, List<string> listGridName, Dictionary<string, string> dictionyToFill, string tableName)
         {
             DataGridView componant = (DataGridView)comp;
-
-
+            System.Data.DataTable a = tableST.Tables["StationTable"];
+            //stTable.Clear();
             foreach (var station in dictionyToFill)
             {
                 if (station.Value.ToString().Contains("所") || station.Value.ToString().Contains("站"))
@@ -2952,22 +2957,23 @@ namespace AutoDraw
                     }
 
                 }
+                else
+                {
+
+                }
             }
-            stTable.DefaultView.Sort = "公里" + " " + "ASC";
-            DataView dv = new DataView(stTable);
-            dv.Sort = "公里" + " " + "ASC";
-            stTable.DefaultView.ToTable();
+            //stTable.DefaultView.Sort = "公里" + " " + "ASC";
+            //DataView dv = new DataView(stTable);
+            //dv.Sort = "公里" + " " + "ASC";
+            //stTable.DefaultView.ToTable();
+
+            //componant.cle
+
             stTable.AcceptChanges();
-            //dataGridView1.Columns.Add("里程", "名称");
-            //dataGridView1.Columns.Add("EnglishName", "ChineseName"); 
             componant.DataSource = tableST.Tables[tableName];
-            //componant.
-            componant.Sort(componant.Columns["公里"], ListSortDirection.Ascending);
-            /*dataGridView1.Columns.Add("设备1","equipe1");
-            dataGridView1.Columns.Add("设备2", "equipe2");
-            dataGridView1.Columns.Add("设备3", "equipe3");
-            dataGridView1.Columns.Add("设备4", "equipe4");
-            dataGridView1.Columns.Add("设备5", "equipe5");*/
+
+            //componant.Sort(componant.Columns["公里"], ListSortDirection.Ascending);
+
         }
 
         /// <summary>
@@ -3246,7 +3252,8 @@ namespace AutoDraw
                 }
 
             }
-            else
+
+            else if (selectNode.Contains("列表"))
             {
 
             }
