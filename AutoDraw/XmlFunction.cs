@@ -56,7 +56,7 @@ namespace AutoDraw
         /// 读取xml文件
         /// </summary>
         /// <param name="xmlFile">文件地址</param>
-        public Dictionary<String, string> loadWayPoint(string xmlFile, string nodeName)
+        public Dictionary<string, string> loadWayPoint(string xmlFile, string nodeName)
         {
             Dictionary<string, string> inforStation = new Dictionary<string, string>();
 
@@ -115,12 +115,54 @@ namespace AutoDraw
             return elementFound;
         }
 
-        public void modifWayPoint(string xmlFile, string NodeName, string OldDistance, Dictionary<string, string> newInfor)
+
+        public void modifWayPoint(string xmlFile,List<string> oldInfor, List<string> newInfor)
         {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<WayPoints> 
+            XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
+            XmlNode wypointRoot = subroot.SelectSingleNode("StationPoint");//查找<StationPoint> 
+
+            
+            foreach (XmlNode xn in wypointRoot.ChildNodes)
+            {
+                XmlElement xe = (XmlElement)xn;
+                //string a = xe.GetAttribute("location").ToString();
+                //string b = oldInfor.Keys.ToString().Replace(" ", "");
+                if (xe.GetAttribute("location").ToString().Replace(" ", "") == oldInfor[0].Split(new char[]{','})[0])
+                {
+                    xe.SetAttribute("location", newInfor[0].Split(new char[] { ',' })[0].ToUpper());
+
+                    XmlNodeList nls = xe.ChildNodes;//继续获取xe子节点的所有子节点
+                    foreach (XmlNode xn1 in nls)//遍历
+                    {
+                        XmlElement xe2 = (XmlElement)xn1;//转换类型
+                        if (xe2.Name == "PName")//如果找到
+                        {
+                            xe2.InnerText = newInfor[0].Split(new char[]{','})[1];//则修改
+                            
+                        }
+                        else if (xe2.Name == "PType")//如果找到
+                        {
+                            xe2.InnerText = newInfor[0].Split(new char[] { ',' })[2];//则修改
+                            
+                        }
+                    }
+                    
+                    break;//找到退出来就可以了
+                }
+            }
+            xmlDoc.Save(xmlFile);
 
         }
 
-        public void supprimWayPoint(string xmlFile, string NodeName, string OldDistance)
+        /// <summary>
+        /// 删除项
+        /// </summary>
+        /// <param name="xmlFile"></param>
+        /// <param name="NodeName"></param>
+        public void supprimWayPoint(string xmlFile, string NodeName)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
@@ -235,8 +277,6 @@ namespace AutoDraw
                 root.AppendChild(xe1);
             }
 
-
-
             foreach (var item in NameAndType)
             {
                 if (!duplicateXML(xe1.ChildNodes, item.Key.ToString()))
@@ -246,12 +286,18 @@ namespace AutoDraw
                     string sx = text.Split(new char[] { ',' })[1];  //short
                     string num = text.Split(new char[] { ',' })[2]; //num1
                     string numX = text.Split(new char[] { ',' })[3]; //numX
+                    string fournisseur = text.Split(new char[] { ',' })[4]; //厂家
+                    string minDis = text.Split(new char[] { ',' })[5]; //最近距离
+                    string maxDis = text.Split(new char[] { ',' })[6]; //最远距离
 
                     XmlElement childNode = xmlDoc.CreateElement("Line");//创建一个<Line>节点  
                     childNode.SetAttribute("Type", name);//设置该节点 线缆类型 名字属性 
                     childNode.SetAttribute("Short", sx);//设置该节点 缩写 属性 
                     childNode.SetAttribute("num1", num);//设置该节点 第一个数量 属性 
-                    childNode.SetAttribute("num2", numX);//设置该节点 芯数 属性 
+                    childNode.SetAttribute("numXin", numX);//设置该节点 芯数 属性 
+                    childNode.SetAttribute("fournisseur", fournisseur);//设置该节点 芯数 属性 
+                    childNode.SetAttribute("minDistance", minDis);//设置该节点 芯数 属性 
+                    childNode.SetAttribute("maxDistance", maxDis);//设置该节点 芯数 属性 
                     childNode.InnerText = item.Key.ToString();
                     xe1.AppendChild(childNode);
                 }
@@ -259,6 +305,12 @@ namespace AutoDraw
             xmlDoc.Save(xmlFile);
         }
 
+        /// <summary>
+        /// 查找重复项
+        /// </summary>
+        /// <param name="xmlList"></param>
+        /// <param name="toCheck"></param>
+        /// <returns></returns>
         public bool duplicateXML(XmlNodeList xmlList, string toCheck)
         {
             bool isDupli = false;
@@ -272,6 +324,13 @@ namespace AutoDraw
             }
             return isDupli;
         }
+
+        /// <summary>
+        /// 更改线缆型号
+        /// </summary>
+        /// <param name="xmlFile"></param>
+        /// <param name="NodeName"></param>
+        /// <param name="NameAndType"></param>
         public void updataLineType(string xmlFile, string NodeName, Dictionary<string, string> NameAndType)
         {
             XmlDocument xmlDoc = new XmlDocument();
@@ -281,7 +340,7 @@ namespace AutoDraw
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
 
 
-            XmlNode xe1 = root.SelectSingleNode(NodeName);//选择一个<LineName>节点
+            XmlNode xe1 = root.SelectSingleNode(NodeName);//选择一个<lineName>节点
 
             if (xe1 != null)
             {
@@ -294,7 +353,11 @@ namespace AutoDraw
 
         }
 
-
+        /// <summary>
+        /// 读取线缆型号
+        /// </summary>
+        /// <param name="xmlFile"></param>
+        /// <returns></returns>
         public Dictionary<string, string> loadLineType(string xmlFile)
         {
             Dictionary<string, string> retuneValue = new Dictionary<string, string>();
@@ -308,7 +371,7 @@ namespace AutoDraw
 
                 //foreach (string item in NameAndType)
 
-                XmlNode xe1 = root.SelectSingleNode("LineName");//创建一个<LineName>节点
+                XmlNode xe1 = root.SelectSingleNode("lineName");//创建一个<LineName>节点
 
                 if (xe1 != null)
                 {
@@ -322,10 +385,13 @@ namespace AutoDraw
                             string type = childElement.GetAttribute("Type");
                             string Short = childElement.GetAttribute("Short");
                             string num1 = childElement.GetAttribute("num1");
-                            string num2 = childElement.GetAttribute("num2");
+                            string num2 = childElement.GetAttribute("numXin");
+                            string fourni = childElement.GetAttribute("fournisseur");
+                            string minD = childElement.GetAttribute("minDistance");
+                            string maxD = childElement.GetAttribute("maxDistance");
                             string fullName = childElement.InnerText;
 
-                            retuneValue.Add(fullName, type + "," + Short + "," + num1 + "," + num2);
+                            retuneValue.Add(fullName, type + "," + Short + "," + num1 + "," + num2 + "," + fourni + "," + minD + "," + maxD);
                         }
                     }
                 }

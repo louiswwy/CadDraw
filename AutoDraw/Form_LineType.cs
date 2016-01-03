@@ -40,12 +40,12 @@ namespace AutoDraw
         public Dictionary<string, string> defautLineType(string xmlfile)
         {
             DicNandT = new Dictionary<string, string>();
-            DicNandT.Add("SPTYWPL23 8芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,8芯");
-            DicNandT.Add("SPTYWPL23 12芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,12芯");
-            DicNandT.Add("SPTYWPL23 16芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,16芯");
-            DicNandT.Add("SPTYWPL23 21芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,21芯");
-            DicNandT.Add("SPTYWPL23 29芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,28芯");
-            DicNandT.Add("PTYL23 12芯", "敷设铝护套信号电缆,PTYL,23,12芯");
+            DicNandT.Add("SPTYWPL23 8芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,8芯,defaut,100,1000");
+            DicNandT.Add("SPTYWPL23 12芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,12芯,defaut,1000,2000");
+            DicNandT.Add("SPTYWPL23 16芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,16芯,defaut,2000,4000");
+            DicNandT.Add("SPTYWPL23 21芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,21芯,defaut,4000,6000");
+            DicNandT.Add("SPTYWPL23 29芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,28芯,defaut,6000,8000");
+            DicNandT.Add("PTYL23 12芯", "敷设铝护套信号电缆,PTYL,23,12芯,defaut,100,1000");
 
             try
             {
@@ -81,18 +81,28 @@ namespace AutoDraw
                 try
                 {
                     newDicNandT = xf.loadLineType(XmlFilePath); //读取的项
-                    if (newDicNandT.Count == 0)
+                    if (newDicNandT != null)
                     {
-                        defautLineList = defautLineType(XmlFilePath);
-                        newDicNandT = defautLineList;
+                        if (newDicNandT.Count == 0)
+                        {
+                            defautLineList = defautLineType(XmlFilePath);
+                            newDicNandT = defautLineList;
+                        }
+
+                        fileDataView(newDicNandT);
+                        //dataGridView1.Columns[0].ReadOnly = true;  //只读
+                    }
+                    else
+                    {
+                        MessageBox.Show("读取线型时发生错误！");
+                        this.Close();
                     }
 
-                    fileDataView(newDicNandT);
-                    //dataGridView1.Columns[0].ReadOnly = true;  //只读
                 }
                 catch (System.Exception ex)
                 {
                     MessageBox.Show("错误:" + ex.ToString());
+                    this.Close();
                     return;
                 }
             }
@@ -116,6 +126,12 @@ namespace AutoDraw
 
                 lineTable.Columns.Add("芯数", typeof(string));
 
+                lineTable.Columns.Add("厂家", typeof(string));
+
+                lineTable.Columns.Add("最短传输距离", typeof(string));
+
+                lineTable.Columns.Add("最长传输距离", typeof(string));
+
                 //lineTable.PrimaryKey = new System.Data.DataColumn[] { ST };
 
 
@@ -128,10 +144,13 @@ namespace AutoDraw
                     string sx = text.Split(new char[] { ',' })[1];
                     string num = text.Split(new char[] { ',' })[2];
                     string numX = text.Split(new char[] { ',' })[3];
+                    string four = text.Split(new char[] { ',' })[4];
+                    string minD = text.Split(new char[] { ',' })[5];
+                    string maxD = text.Split(new char[] { ',' })[6];
 
                     if (true)//!lineTable.Rows.Contains(station.Key.ToUpper())) //如果datatable中不含有所亭项 
                     {
-                        lineTable.Rows.Add(name, sx, num, numX);  //添加
+                        lineTable.Rows.Add(name, sx, num, numX, four, minD, maxD);  //添加
                         
                     }
                 }
@@ -180,12 +199,15 @@ namespace AutoDraw
                 string sx = a[1].ToString();
                 string num1 = a[2].ToString();
                 string numX = a[3].ToString();
+                string four = a[4].ToString();
+                string minD = a[5].ToString();
+                string maxD = a[6].ToString();
 
-                newDataSet.Add(sx + num1 + " " + numX, type + "," + sx + "," + num1 + "," + numX);
+                newDataSet.Add(sx + num1 + " " + numX, type + "," + sx + "," + num1 + "," + numX + "," + four + "," + minD + "," + maxD);
 
                 //DataColumn col=NewRow.Table.Rows.co
             }
-            xf.updataLineType(XmlFilePath, "LineName", newDataSet);
+            xf.updataLineType(XmlFilePath, "lineName", newDataSet);
 
             //
             dataTimeTag = DateTime.Now.ToLongTimeString();

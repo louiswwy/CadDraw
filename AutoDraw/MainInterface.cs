@@ -618,9 +618,7 @@ namespace AutoDraw
             int tabCol = 6; //暂定
 
             Table tb = new Table();
-
-            //tb.TableStyle = db.Tablestyle;
-
+            
             tb.NumRows = 10;
 
             tb.NumColumns = tabCol;
@@ -1239,6 +1237,7 @@ namespace AutoDraw
         //string filePath;
         private void MainInterface_Load(object sender, EventArgs e)
         {
+            InforStatusLabel.Text = "";
             colName = new List<string>();
             colName.Add("里程");
             colName.Add("名称");
@@ -1330,8 +1329,11 @@ namespace AutoDraw
             }
 
             #endregion
-
-  
+            
+            #region 添加线型
+            Form_LineType fmL = new Form_LineType(xmlFilePath+"\\setting.xml");
+            fmL.defautLineType(xmlFilePath + "\\setting.xml");
+            #endregion
 
             /*
             #region 检查块
@@ -2103,6 +2105,11 @@ namespace AutoDraw
                                 MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                 return;
                             }
+                            else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})-([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
+                            {
+                                MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
+                                return;
+                            }
                             string sLocation = "";
                             string sName = T_SName.Text.ToString().Replace(" ","");
                             string sType = TypeWayPoint.SelectedItem.ToString().Replace(" ", "");
@@ -2172,39 +2179,42 @@ namespace AutoDraw
 
                     
                 }
-                else //修改功能开启时，变更dictionary中数据
+                else //modifData==true的时候。修改功能开启时，变更dictionary中数据
                 {
                     #region 修改字典信息
 
-                    TreeNode selectedNode = treeView1.SelectedNode;
-
-                    TreeNode keyLNode = new TreeNode(); //里程
-                    TreeNode nameNode = new TreeNode(); //站名
-                    TreeNode typeNode = new TreeNode(); //类型
-
-                    if (selectedNode.Level == 1)
+                    PFunction pF = new PFunction();
+                    if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //如果不是汉字
                     {
-                        nameNode = selectedNode;
-                        keyLNode = selectedNode.FirstNode;
-                        typeNode = selectedNode.LastNode;
+                        MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
+                        return;
                     }
-                    else if (selectedNode.Level > 1)
+                    if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() != "桥梁") //如果里程不符合规范
                     {
-                        //如果选中项包含‘+’
-                        if (selectedNode.Text.ToString().Split(new char[] { '+' }).Length > 1)
-                        {
-                            keyLNode = selectedNode;
-                            nameNode = selectedNode.Parent;
-                            typeNode = selectedNode.NextNode;
-                        }
-                        //选中项不包含‘+’
-                        else if (selectedNode.Text.ToString().Split(new char[] { '+' }).Length == 1)
-                        {
-                            typeNode = selectedNode;
-                            nameNode = selectedNode.Parent;
-                            keyLNode = selectedNode.PrevNode;
-                        }
+                        MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
+                        return;
                     }
+                    else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})-([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
+                    {
+                        MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
+                        return;
+                    }
+
+                    
+                    //treeview选中项
+                    TreeNode selectNode = treeView1.SelectedNode;
+
+                    List<string> LNT = new List<string>();
+                    if (selectNode.Level == 1)
+                    {
+                        LNT = treeViewFunction(selectNode);
+                    }
+                    else if (selectNode.Level == 2)
+                    {
+                        LNT = treeViewFunction(selectNode.Parent);
+
+                    }
+
                     //为3个变量赋值
                     string location = "";
 
@@ -2220,16 +2230,61 @@ namespace AutoDraw
                         location = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", "")) + "-" + transferDistanceToNumberToString(tempText.Text.ToString().ToUpper().Replace(" ", ""));
                     }
 
-                    if (typeNode.Text.ToString() == type && nameNode.Text.ToString() == name && keyLNode.Text.ToString() == location)
+                    if (LNT[2] == type && LNT[1] == name && LNT[0] == location) //如果数据没有变
                     {
-                        MessageBox.Show("项目数据没有改变.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        InforStatusLabel.Text = "项目数据没有改变.";
                         return;
                     }
-                    else
+                    else //如果数据改变了
                     {
-                        InfoStation.Remove(keyLNode.Text.ToString());
-                        InfoStation.Add(location, name + "," + type);
+                        InfoStation.Remove(LNT[0]);
+                        PFunction pf = new PFunction();
+                        List<string> listLoc = new List<string>();
+                        pf.isExMatch(LNT[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+
+                        double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+                        InfoStation.Add(location.Split(new char[]{'-'})[0], name + "," + type + "," + distance);
+
+                        //修改xml文件
+                        //
+                        //清除treeview
+                        treeView1.Nodes.Clear();
+                        refreshTreeview(treeView1, InfoStation, true);
+
+                        XmlFunction xf = new XmlFunction();
+                        //supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""));
+                        //旧字典
+                        List<string> oldDic = new List<string>();
+                        oldDic.Add(LNT[0] + "," + LNT[1] + "," + LNT[2]);
+                        //新字典
+                        List<string> newDic = new List<string>();
+                        newDic.Add(location + "," + name + "," + type);
+                        xf.modifWayPoint(xmlFilePath + "\\setting.xml", oldDic, newDic);
+
+
+                        stTable.Clear();
+                        Dictionary<double, string> tempDict = new Dictionary<double, string>();
+
+                        string licheng = "";
+                        tempDict = LocationToInt(InfoStation, out licheng);
+                        InfoStation.Clear();
+                        foreach (KeyValuePair<double, string> pair in tempDict)
+                        {
+                            InfoStation.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pair.Value);
+
+                            //string name = pair.Value.Split(new char[] { ',' })[0];
+                            //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
+                            //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
+                        }
+                        fileStationDataView(dataGridStation, colName, InfoStation, "StationTable");
+                        modifData = false;
+                        B_AddWayPoint.Text = "+";
+                        B_SupWayPoint.Text = "-";
+
+                        
+
                     }
+                    #endregion
                     /*
                     //改变key-value
                     if (InfoStation.ContainsKey(location)) //如果字典中包含key（里程点）
@@ -2264,13 +2319,7 @@ namespace AutoDraw
                         }
                     }*/
 
-                    treeView1.Nodes.Clear();
-                    refreshTreeview(treeView1, InfoStation, true);
 
-                    modifData = false;
-                    B_AddWayPoint.Text = "+";
-                    B_SupWayPoint.Text = "-";
-                    #endregion
                 }
             }
             else
@@ -2518,7 +2567,7 @@ namespace AutoDraw
                     if (MessageBox.Show("确定删除项:\n里程:" + inforOneStation[0].ToString() + "\n类型:" + inforOneStation[2].ToString() + "\n站名:" + inforOneStation[1].ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                     {
                         
-                        xf.supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""), "");
+                        xf.supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""));
                         treeView1.Nodes.Clear();
                         InfoStation.Remove(inforOneStation[0].ToString());
                         System.Data.DataTable stationData = tableST.Tables["StationTable"];
@@ -2547,7 +2596,7 @@ namespace AutoDraw
                     if (MessageBox.Show("确定删除项:\n里程:" + inforOneStation[0].ToString() + "\n类型:" + inforOneStation[2].ToString() + "\n站名:" + inforOneStation[1].ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                     {
                             treeView1.Nodes.Clear();
-                            xf.supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""), "");
+                            xf.supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""));
                             InfoStation.Remove(inforOneStation[0].ToString());
 
                             refreshTreeview(treeView1, InfoStation, true);
@@ -2620,7 +2669,8 @@ namespace AutoDraw
                 if (modifData == false)
                 {
                     //treeView1.SelectedNode;
-                    supprimeTreeView(treeView1.SelectedNode);
+                    删除ToolStripMenuItem_Click(null, null);
+
                 }
                 else//当修改数据时
                 {
@@ -3730,10 +3780,34 @@ namespace AutoDraw
                 List<string> listLoc = new List<string>();
                 pF.isExMatch(wayPoint.Key,@"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
 
-                double distance = Int32.Parse(listLoc[0]) * 1000 + Int32.Parse(listLoc[1]);
+                double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
                 distanceWP.Add(distance, wayPoint.Value);
             }
             Dictionary<double, string> Sortdic = DictonarySort(distanceWP);
+            return Sortdic;
+        }
+
+        /// <summary>
+        /// 里程格式的字符串换算为数字，并返回排序后的列表
+        /// </summary>
+        /// <param name="origDic"></param>
+        /// <returns></returns>
+        public Dictionary<double, string> LocationToInt(Dictionary<string, string> origDic,out string licheng)
+        {
+            licheng = "";
+            Dictionary<double, string> distanceWP = new Dictionary<double, string>();
+            foreach (var wayPoint in origDic)
+            {
+                PFunction pF = new PFunction();
+                List<string> listLoc = new List<string>();
+                pF.isExMatch(wayPoint.Key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+
+                double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+                distanceWP.Add(distance, wayPoint.Value);
+                licheng = listLoc[0];
+            }
+            Dictionary<double, string> Sortdic = DictonarySort(distanceWP);
+            
             return Sortdic;
         }
         /// <summary>
