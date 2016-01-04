@@ -59,6 +59,12 @@ namespace AutoDraw
         System.Data.DataTable SnowTable;
         Dictionary<string, string> InfoSnowPoint = new Dictionary<string, string>();
 
+        /// <summary>
+        /// 地震监控
+        /// </summary>
+        System.Data.DataTable EarthTable;
+        Dictionary<string, string> InfoEarthPoint = new Dictionary<string, string>();
+
         public MainInterface()
         {
             InitializeComponent();
@@ -307,7 +313,7 @@ namespace AutoDraw
                     attTQ.Add("项目名称", projetInfo[0]);
                     attTQ.Add("图纸名称", projetInfo[1] + "-" + projetInfo[2] + "-01");
                     attTQ.Add("图纸比例", "1：100");
-                    attTQ.Add("绘制日期", "2013.5");
+                    attTQ.Add("绘制日期", System.DateTime.Now.Year + "." + System.DateTime.Now.Month);
                     attTQ.Add("页数", "第1张，共1张");
                     #endregion
 
@@ -1264,7 +1270,7 @@ namespace AutoDraw
             }
             else
             {
-                addFiletoSystem(currentFilePath);
+                addFiletoSystem(currentFilePath);  //新建xml文件
             }
             #endregion
 
@@ -1272,10 +1278,10 @@ namespace AutoDraw
             if (xmlFilePath != null)
             {
                 XmlFunction xf = new XmlFunction();
-                InfoStation = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPoint");
-                InfoWindPoint = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPoints");
-                InfoRainPoint = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPoints");
-                InfoSnowPoint = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPoints");
+                InfoStation = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists");
+                InfoWindPoint = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPointLists");
+                InfoRainPoint = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists");
+                InfoSnowPoint = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPointLists");
 
                 #region 给各个dataGridView指定datasource
                 if (tableST == null)
@@ -1310,7 +1316,12 @@ namespace AutoDraw
                     SnowTable.Columns.Add(colName[3], typeof(string));
                     SnowTable.PrimaryKey = new System.Data.DataColumn[] { SnowT };
 
-
+                    EarthTable = tableST.Tables.Add("EarthTable");//创建‘地震点’表
+                    System.Data.DataColumn EarthT = EarthTable.Columns.Add(colName[0], typeof(string));// station.Key.ToUpper());
+                    EarthTable.Columns.Add(colName[1], typeof(string));
+                    EarthTable.Columns.Add(colName[2], typeof(string));
+                    EarthTable.Columns.Add(colName[3], typeof(string));
+                    EarthTable.PrimaryKey = new System.Data.DataColumn[] { EarthT };
 
                 }
                 #endregion
@@ -2176,13 +2187,29 @@ namespace AutoDraw
                                     #region 读写xml-wayPoint
                                     XmlFunction xF = new XmlFunction();
 
-                                    xF.addWayPointNode(xmlFilePath + "\\setting.xml", "StationPoint", InfoStation);
+                                    xF.addWayPointNode(xmlFilePath + "\\setting.xml", "StationPointLists", "StationPoints", InfoStation);
+                                    if (sType.Contains("牵引变电所")) //如果是牵引变电所则写入
+                                    {
+                                        PFunction pf = new PFunction();
+                                        List<string> listLoc = new List<string>();
 
-                                    Dictionary<string, string> loadedInfor = xF.loadWayPoint(xmlFilePath + "\\setting.xml","StationPoint");
+                                        pf.isExMatch(sLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+
+                                        double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+                                        InfoEarthPoint.Add(sLocation, sName + "," + "地震仪" + "," + distance);
+                                        xF.addWayPointNode(xmlFilePath + "\\setting.xml", "EarthPointLists", "EarthPoints", InfoEarthPoint);
+                                    }
+
+
+                                    Dictionary<string, string> loadedInfor = xF.loadWayPoint(xmlFilePath + "\\setting.xml","StationPointLists");
                                     #endregion
 
                                     //
-                                    stTable.Clear();
+                                    if (stTable != null)
+                                    {
+                                        stTable.Clear();
+                                    }
+                                    
                                     Dictionary<double, string> tempDict = new Dictionary<double, string>();
 
                                     string licheng = "";
@@ -2206,6 +2233,11 @@ namespace AutoDraw
 
                                     treeView1.Nodes.Clear();
                                     refreshTreeview(treeView1, loadedInfor, true);
+
+                                    //如果数据插入成功，清空各输入栏
+                                    T_SLocation.Text = "";
+                                    T_SName.Text = "";
+                                    TypeWayPoint.SelectedItem = "";
                                 }
                                 
                             }
@@ -2314,7 +2346,9 @@ namespace AutoDraw
                         InfoStation.Clear();
                         foreach (KeyValuePair<double, string> pair in tempDict)
                         {
-                            InfoStation.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pair.Value);
+                            string[] listString = pair.Value.Split(new char[] { ',' });
+                            string pairValue = listString[0] + "," + listString[1] + "," + pair.Key;
+                            InfoStation.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pairValue);
 
                             //string name = pair.Value.Split(new char[] { ',' })[0];
                             //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
@@ -2332,7 +2366,9 @@ namespace AutoDraw
                         B_AddWayPoint.Text = "+";
                         B_SupWayPoint.Text = "-";
 
-                        
+                        T_SLocation.Text = "";
+                        T_SName.Text = "";
+                        TypeWayPoint.SelectedItem = "";
 
                     }
                     #endregion
@@ -2421,11 +2457,11 @@ namespace AutoDraw
             CreateNode(xmlDoc, node1, "ChapterName", "?");
 
             XmlNode WayPointNode = CreateNode(xmlDoc, root, "WayPoints", ""); //所亭
-            CreateNode(xmlDoc, WayPointNode, "StationPoint", ""); //所亭
-            CreateNode(xmlDoc, WayPointNode, "WindPoints", "");//风点
-            CreateNode(xmlDoc, WayPointNode, "RainPoints", "");//雨点
-            CreateNode(xmlDoc, WayPointNode, "SnowPoints", "");//雪点
-            CreateNode(xmlDoc, WayPointNode, "EarthquakePoints", "");//地震点
+            CreateNode(xmlDoc, WayPointNode, "StationPointLists", ""); //所亭
+            CreateNode(xmlDoc, WayPointNode, "WindPointLists", "");//风点
+            CreateNode(xmlDoc, WayPointNode, "RainPointLists", "");//雨点
+            CreateNode(xmlDoc, WayPointNode, "SnowPointLists", "");//雪点
+            CreateNode(xmlDoc, WayPointNode, "EarthPointLists", "");//地震点
 
 
             CreateNode(xmlDoc, root, "Connection", ""); //监控设备与站点的连接信息
@@ -3035,13 +3071,14 @@ namespace AutoDraw
             DataGridView componant = (DataGridView)comp;
 
             System.Data.DataTable table = tableFill.Tables[tableName];
+            table.Clear();
             foreach (var station in dictionyToFill)
             {
 
                 if (!table.Rows.Contains(station.Key.ToUpper())) //如果datatable中不含有所亭项 
                 {
-                    string[] a=station.Value.ToString().Split(new char[]{','});
-                    table.Rows.Add(station.Key.ToUpper(), a[0]+","+a[1],a[2]);  //添加
+                    string[] a=station.Value.ToString().Split(new char[]{','});  //以‘，’号分割
+                    table.Rows.Add(station.Key.ToUpper(), a[0], a[1], a[2]);  //添加
                 }
 
 
@@ -3135,21 +3172,42 @@ namespace AutoDraw
 
 
                         }
+                        Dictionary<string, string> tempD = new Dictionary<string, string>();
+                        foreach(KeyValuePair<string,string> pair in InfoWindPoint)
+                        {
+                            string key = pair.Key;
+                            
+                            List<string> listLoc = new List<string>();
+                            PFunction pF = new PFunction();
+                            pF.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
 
-                        Dictionary<string, string> sortedWindDiction = LocationToIntToString(InfoWindPoint);
-                        fileStationDataView(dataGridWind, tableST, colName, sortedWindDiction, "WindTable");
+                            double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+
+                            string value = pair.Value;
+                            if (!value.Contains("" + distance))
+                            {
+                                value = pair.Value + "," + distance;
+                            }
+                            //InfoWindPoint.Remove(key);
+                            tempD.Add(key, value);
+                        }
+                        InfoWindPoint.Clear();
+                        InfoWindPoint = LocationToIntToString(tempD);
+                        dataGridWind.DataSource="";
+                        fileStationDataView(dataGridWind, tableST, colName, InfoWindPoint, "WindTable");
 
                         //WindTable = sortedWindDiction;
                         WindTable.AcceptChanges();
 
-                        xF.addWayPointNode(xmlFilePath + "\\setting.xml", "WindPoints", sortedWindDiction);
+                        xF.supprimWayPoint(xmlFilePath + "\\setting.xml", "WindPointLists", ""); //移除WindPointLists下所有子节点
+                        xF.addWayPointNode(xmlFilePath + "\\setting.xml", "WindPointLists", "WindPoints", InfoWindPoint);
 
                         
                     }
                 }
                 catch (System.Exception ee)
                 {
-                    MessageBox.Show("发生错误" + ee.ToString(), "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("处理风点数据时发生错误" + ee.ToString(), "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 
                 //dataGridWind.DataSource
@@ -3157,145 +3215,302 @@ namespace AutoDraw
             }
             else if(selectNode.Contains("雨"))
             {
-                if (MessageBox.Show("确认要保存雨量计列表么", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                try
                 {
-                    System.Data.DataTable RainT = tableST.Tables["RainTable"];
-                    int rowNum = 1;
-                    //检查数据格式
-                    foreach (var item in RainTable.Rows)
+                    if (MessageBox.Show("确认要保存雨量计列表么", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                     {
-                        DataRow rowItem = (DataRow)item;
-                        string location = rowItem.ItemArray[0].ToString().ToUpper().Replace(" ", "");
-                        rowItem[0] = location;
+                        System.Data.DataTable RainT = tableST.Tables["RainTable"];
+                        int rowNum = 1;
+                        //检查数据格式
+                        foreach (var item in RainTable.Rows)
+                        {
+                            DataRow rowItem = (DataRow)item;
+                            string location = rowItem.ItemArray[0].ToString().ToUpper().Replace(" ", "");
+                            rowItem[0] = location;
 
-                        string name     = rowItem.ItemArray[1].ToString();
-                        if (name == "")
-                        {
-                            name = "雨量计";
-                            rowItem[1] = name;
-                        }
-                        else if (name == "雨量计,雨量计")
-                        {
-                            name = "雨量计";
-                            rowItem[1] = name;
-                        }
-                        PFunction pF=new PFunction();
-
-                        //名字可以为空，里程不能为空
-                        if (location != "") 
-                        {
-                            if (!pF.isExMatch(location, @"^([A-Z]+)(\d+)\+(\d{0,4})$")) //里程格式
+                            string name = rowItem.ItemArray[1].ToString();
+                            if (name == "")
                             {
-                                MessageBox.Show("数据：" + location + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                name = "雨量计";
+                                rowItem[1] = name;
+                            }
+                            else if (name == "雨量计,雨量计")
+                            {
+                                name = "雨量计";
+                                rowItem[1] = name;
+                            }
+                            PFunction pF = new PFunction();
+
+                            //名字可以为空，里程不能为空
+                            if (location != "")
+                            {
+                                if (!pF.isExMatch(location, @"^([A-Z]+)(\d+)\+(\d{0,4})$")) //里程格式
+                                {
+                                    MessageBox.Show("数据：" + location + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    return;
+                                }
+                                if (!pF.isExMatch(name, @"^([\u4e00-\u9fa5]*)\d*$"))  //
+                                {
+                                    MessageBox.Show("数据：" + name + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    return;
+                                }
+                                if (!InfoRainPoint.ContainsKey(location))
+                                {
+                                    InfoRainPoint.Add(location, name + ",雨量计"); //添加到字典
+
+                                }
+                            }
+                            else
+                            {
+
+                                MessageBox.Show("第" + rowNum + "行数据里程数为空", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 return;
                             }
-                            if (!pF.isExMatch(name, @"^([\u4e00-\u9fa5]*)\d*$"))  //
-                            {
-                                MessageBox.Show("数据：" + name + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                return;
-                            }
-                            if (!InfoRainPoint.ContainsKey(location))
-                            {
-                                InfoRainPoint.Add(location, name + ",雨量计"); //添加到字典
+                            rowNum++;
 
-                            }
                         }
-                        else
+
+                        Dictionary<string, string> tempD = new Dictionary<string, string>();
+                        foreach (KeyValuePair<string, string> pair in InfoRainPoint)
                         {
+                            string key = pair.Key;
 
-                            MessageBox.Show("第" + rowNum + "行数据里程数为空", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return;
+                            List<string> listLoc = new List<string>();
+                            PFunction pF = new PFunction();
+                            pF.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+
+                            double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+
+                            string value = pair.Value;
+                            if (!value.Contains("" + distance))
+                            {
+                                value = pair.Value + "," + distance;
+                            }
+                            //InfoWindPoint.Remove(key);
+                            tempD.Add(key, value);
                         }
-                        rowNum++;
+                        InfoRainPoint.Clear();
+                        InfoRainPoint = LocationToIntToString(tempD);
+
+                        dataGridRain.DataSource = null; //清空
+                                                        //RainTable.sor
+                        fileStationDataView(dataGridRain, tableST, colName, InfoRainPoint, "RainTable");
+
+                        //WindTable = sortedWindDiction;
+                        RainTable.AcceptChanges();
+
+                        xF.supprimWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists", ""); //移除RainPointLists下所有子节点
+                        xF.addWayPointNode(xmlFilePath + "\\setting.xml", "RainPointLists", "RainPoints", InfoRainPoint);
 
                     }
-                    Dictionary<string, string> sortedWindDiction = LocationToIntToString(InfoRainPoint);
-                    dataGridRain.DataSource = null; //清空
-                    //RainTable.sor
-                    fileStationDataView(dataGridRain, tableST, colName, sortedWindDiction, "RainTable");
-
-                    //WindTable = sortedWindDiction;
-                    RainTable.AcceptChanges();
-
-                    xF.addWayPointNode(xmlFilePath + "\\setting.xml", "RainPoints", sortedWindDiction);
-                    
                 }
+                catch (System.Exception ee)
+                {
+                    MessageBox.Show("处理雨点数据时发生错误" + ee.ToString(), "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
             }
             else if(selectNode.Contains("雪"))
             {
-                if (MessageBox.Show("确认要保存雪深计列表么", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                try
                 {
-                    System.Data.DataTable snowT = tableST.Tables["SnowTable"];
-
-                    int rowNum = 1;
-                    //检查数据格式
-                    foreach (var item in SnowTable.Rows)
+                    if (MessageBox.Show("确认要保存雪深计列表么", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                     {
-                        DataRow rowItem = (DataRow)item;
-                        string location = rowItem.ItemArray[0].ToString().ToUpper().Replace(" ", "");
-                        rowItem[0] = location;
+                        System.Data.DataTable snowT = tableST.Tables["SnowTable"];
 
-                        string name = rowItem.ItemArray[1].ToString();
-
-                        if (name == "")
+                        int rowNum = 1;
+                        //检查数据格式
+                        foreach (var item in SnowTable.Rows)
                         {
-                            name = "雪深计";
-                            rowItem[1] = name;
-                        }
-                        else if (name == "雪深计,雪深计")
-                        {
-                            name = "雪深计";
-                            rowItem[1] = name;
-                        }
+                            DataRow rowItem = (DataRow)item;
+                            string location = rowItem.ItemArray[0].ToString().ToUpper().Replace(" ", "");
+                            rowItem[0] = location;
 
-                        PFunction pF = new PFunction();
+                            string name = rowItem.ItemArray[1].ToString();
 
-                        //名字可以为空，里程不能为空
-                        if (location != "")
-                        {
-                            if (!pF.isExMatch(location, @"^([A-Z]+)(\d+)\+(\d{0,4})\d*$")) //里程格式
+                            if (name == "")
                             {
-                                MessageBox.Show("数据：" + location + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                name = "雪深计";
+                                rowItem[1] = name;
+                            }
+                            else if (name == "雪深计,雪深计")
+                            {
+                                name = "雪深计";
+                                rowItem[1] = name;
+                            }
+
+                            PFunction pF = new PFunction();
+
+                            //名字可以为空，里程不能为空
+                            if (location != "")
+                            {
+                                if (!pF.isExMatch(location, @"^([A-Z]+)(\d+)\+(\d{0,4})\d*$")) //里程格式
+                                {
+                                    MessageBox.Show("数据：" + location + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    return;
+                                }
+                                if (!pF.isExMatch(name, @"^([\u4e00-\u9fa5]*)$"))  //
+                                {
+                                    MessageBox.Show("数据：" + name + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    return;
+                                }
+                                if (!InfoSnowPoint.ContainsKey(location))
+                                {
+                                    InfoSnowPoint.Add(location, name + ",雪深计"); //添加到字典
+
+                                }
+                            }
+                            else
+                            {
+
+                                MessageBox.Show("第" + rowNum + "行数据里程数为空", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 return;
                             }
-                            if (!pF.isExMatch(name, @"^([\u4e00-\u9fa5]*)$"))  //
-                            {
-                                MessageBox.Show("数据：" + name + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                return;
-                            } 
-                            if (!InfoSnowPoint.ContainsKey(location))
-                            {
-                                InfoSnowPoint.Add(location, name + ",雨量计"); //添加到字典
+                            rowNum++;
 
-                            }
                         }
-                        else
+
+                        Dictionary<string, string> tempD = new Dictionary<string, string>();
+                        foreach (KeyValuePair<string, string> pair in InfoSnowPoint)
                         {
+                            string key = pair.Key;
 
-                            MessageBox.Show("第" + rowNum + "行数据里程数为空", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return;
+                            List<string> listLoc = new List<string>();
+                            PFunction pF = new PFunction();
+                            pF.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+
+                            double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+
+                            string value = pair.Value;
+                            if (!value.Contains("" + distance))
+                            {
+                                value = pair.Value + "," + distance;
+                            }
+                            //InfoWindPoint.Remove(key);
+                            tempD.Add(key, value);
                         }
-                        rowNum++;
 
+                        InfoSnowPoint.Clear();
+                        InfoSnowPoint = LocationToIntToString(tempD);
+
+                        fileStationDataView(dataGridSnow, tableST, colName, InfoSnowPoint, "SnowTable");
+
+                        //WindTable = sortedWindDiction;
+                        SnowTable.AcceptChanges();
+
+                        xF.supprimWayPoint(xmlFilePath + "\\setting.xml", "SnowPointLists", ""); //移除SnowPointLists下所有子节点
+                        xF.addWayPointNode(xmlFilePath + "\\setting.xml", "SnowPointLists", "SnowPoints", InfoSnowPoint);
                     }
-                    Dictionary<string, string> sortedWindDiction = LocationToIntToString(InfoSnowPoint);
-                    fileStationDataView(dataGridSnow, tableST, colName, sortedWindDiction, "SnowTable");
-         
-                    //WindTable = sortedWindDiction;
-                    SnowTable.AcceptChanges();
-
-                    xF.addWayPointNode(xmlFilePath + "\\setting.xml", "SnowPoints", sortedWindDiction);
                 }
+                catch (System.Exception ee)
+                {
+                    MessageBox.Show("处理雪点数据时发生错误" + ee.ToString(), "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                
             }
             else if(selectNode.Contains("地震"))
             {
                 //不支持变更
-                if (false)
+                if (true)
                 {
-                    if (MessageBox.Show("确认要保存地震仪列表么", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
-                    {
 
+                    try
+                    {
+                        if (MessageBox.Show("确认要保存地震仪列表么", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                        {
+
+                            System.Data.DataTable EarthT = tableST.Tables["EarthTable"];
+                            int rowNum = 1;
+                            //检查数据格式
+                            foreach (var item in EarthTable.Rows)
+                            {
+                                DataRow rowItem = (DataRow)item;
+                                string location = rowItem.ItemArray[0].ToString().ToUpper().Replace(" ", "");
+                                rowItem[0] = location;
+
+                                string name = rowItem.ItemArray[1].ToString();
+                                if (name == "")
+                                {
+                                    name = "地震仪";
+                                    rowItem[1] = name;
+                                }
+                                else if (name == "地震仪,地震仪")
+                                {
+                                    name = "地震仪";
+                                    rowItem[1] = name;
+                                }
+                                PFunction pF = new PFunction();
+
+                                //名字可以为空，里程不能为空
+                                if (location != "")
+                                {
+                                    if (!pF.isExMatch(location, @"^([A-Z]+)(\d+)\+(\d{0,4})$")) //里程格式
+                                    {
+                                        MessageBox.Show("里程：" + location + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        return;
+                                    }
+                                    if (!pF.isExMatch(name, @"^([\u4e00-\u9fa5]*)\d*$"))  //
+                                    {
+                                        MessageBox.Show("名称：" + name + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        return;
+                                    }
+                                    if (!InfoRainPoint.ContainsKey(location))
+                                    {
+                                        InfoRainPoint.Add(location, name + ",地震仪"); //添加到字典
+
+                                    }
+                                }
+                                else
+                                {
+
+                                    MessageBox.Show("第" + rowNum + "行数据里程数为空", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    return;
+                                }
+                                rowNum++;
+
+                            }
+
+                            Dictionary<string, string> tempD = new Dictionary<string, string>();
+                            foreach (KeyValuePair<string, string> pair in InfoEarthPoint)
+                            {
+                                string key = pair.Key;
+
+                                List<string> listLoc = new List<string>();
+                                PFunction pF = new PFunction();
+                                pF.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+
+                                double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+
+                                string value = pair.Value;
+                                if (!value.Contains("" + distance))
+                                {
+                                    value = pair.Value + "," + distance;
+                                }
+                                //InfoWindPoint.Remove(key);
+                                tempD.Add(key, value);
+                            }
+
+                            InfoEarthPoint.Clear();
+                            InfoEarthPoint = LocationToIntToString(tempD);
+
+
+                            dataGridearth.DataSource = null; //清空
+                                                             //RainTable.sor
+                            fileStationDataView(dataGridearth, tableST, colName, InfoEarthPoint, "EarthTable");
+
+                            //WindTable = sortedWindDiction;
+                            EarthTable.AcceptChanges();
+
+                            xF.supprimWayPoint(xmlFilePath + "\\setting.xml", "EarthPointLists", ""); //移除EarthPointLists下所有子节点
+                            xF.addWayPointNode(xmlFilePath + "\\setting.xml", "EarthPointLists", "EarthPoints", InfoEarthPoint);
+
+                        }
                     }
+                    catch (System.Exception ee)
+                    {
+                        MessageBox.Show("处理地震点数据时发生错误" + ee.ToString(), "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    
                 }
 
             }
@@ -3905,7 +4120,7 @@ namespace AutoDraw
             foreach (var pair in SortNumdic)
             {
                 string[] location = pair.Value.ToString().Split(new char[] { ',' });
-                Sortdic.Add(location[0], location[1] + "," + location[2]);
+                Sortdic.Add(location[0], location[1] + "," + location[2] + "," + location[3]);
             }
 
             return Sortdic;
@@ -3975,7 +4190,7 @@ namespace AutoDraw
                 XmlFunction XF = new XmlFunction();
 
                 #region 读取数据
-                Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPoint");
+                Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists");
                 Dictionary<string, string> STstationPoint = new Dictionary<string, string>();
                 Dictionary<string, string> RailstationPoint = new Dictionary<string, string>();
                 foreach (var par in origStation)
@@ -3989,9 +4204,10 @@ namespace AutoDraw
                         RailstationPoint.Add(par.Key, par.Value);
                     }
                 }
-                Dictionary<string, string> windPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPoints");
-                Dictionary<string, string> rainPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPoints");
-                Dictionary<string, string> snowPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPoints");
+                Dictionary<string, string> windPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPointLists");
+                Dictionary<string, string> rainPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists");
+                Dictionary<string, string> snowPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPointLists");
+                Dictionary<string, string> earthPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "EarthPointLists");
                 #endregion
 
                 #region 生成二维数组
@@ -4012,7 +4228,7 @@ namespace AutoDraw
                 int S_w = 0;
                 int S_h = 0;
 
-                //填充雨点
+                //填充风点
                 foreach (var Sstation in STstationPoint)
                 {
                     W_w = 0;
@@ -4048,14 +4264,15 @@ namespace AutoDraw
                     S_h++;
                 }
                 #endregion
+
                 List<string> WindToStation = findNear(tableWindLengt);//找到
                 List<string> RainToStation = findNear(tableRainLengt);
                 List<string> SnowToStation = findNear(tableSnowLengt);
 
-                List<string> stationToEqui = new List<string>();
-                List<string> SEWpair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);
-                List<string> SERpair = StationToEquipInfo(RainToStation, STstationPoint, rainPoint);//合并雨点信息
-                List<string> SESpair = StationToEquipInfo(SnowToStation, STstationPoint, snowPoint);//合并雪点信息
+                List<string> stationToEqui = new List<string>(); //各设备离最近所亭列表
+                List<string> SEWpair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);//生成各个风点最近站点、所亭列表
+                List<string> SERpair = StationToEquipInfo(RainToStation, STstationPoint, rainPoint);//生成各个雨点最近站点、所亭列表
+                List<string> SESpair = StationToEquipInfo(SnowToStation, STstationPoint, snowPoint);//生成各个雪点最近站点、所亭列表
 
                 List<string> connectionDict = new List<string>();
                 foreach (var a in SEWpair)
@@ -4138,7 +4355,7 @@ namespace AutoDraw
         }
 
         /// <summary>
-        /// 将二维数组中每个设备对应的距离最近的几张的index转换为字典项
+        /// 将二维数组中每个设备对应的距离最近的站点、所亭的index转换为字典项
         /// </summary>
         /// <param name="a"></param>
         /// <param name="lengthInfo">站点至监控点的距离</param>
@@ -4251,6 +4468,61 @@ namespace AutoDraw
         {
             MessageBox.Show("发生错误" + e.Exception.ToString().Split(new char[] { ' ' })[1], "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
+        }
+
+        private void tabControl1_Click(object sender, EventArgs e)
+        {
+            if (tabControl1.SelectedTab.Text.ToString() == "地震")
+            {
+                string Type = "";
+                string Name = "";
+                string Location = "";
+
+                XmlFunction xF = new XmlFunction();
+                Dictionary<string, string> loadInfor = new Dictionary<string, string>();
+
+                loadInfor = xF.loadWayPoint(xmlFilePath + "\\setting.xml", "EarthPointLists");
+                foreach (KeyValuePair<string,string> infor in loadInfor)
+                {
+                    string a = infor.Value;
+                    if (infor.Value.Contains("牵引变电所")) //如果添加有牵引变电所
+                    {
+                        if (InfoEarthPoint.Count != 0 && !InfoEarthPoint.ContainsKey(infor.Key)) //如果不为空且不重复
+                        {
+                            InfoEarthPoint.Add(infor.Key, infor.Value); //添加到字典中
+
+                        }
+                        else if (InfoEarthPoint.Count != 0 && InfoEarthPoint.ContainsKey(infor.Key)) //如果不为空且重复
+                        {
+                            InfoEarthPoint.Remove(infor.Key); //删除既有项，
+                            InfoEarthPoint.Add(infor.Key, infor.Value); //数据添加到字典中，防止重复
+                        }
+                        else if(InfoEarthPoint.Count == 0)
+                        {
+                            InfoEarthPoint.Add(infor.Key, infor.Value); //添加到字典中
+                        }
+
+
+                    }
+                }
+
+                string licheng = "";
+                Dictionary<double,string> tempDict = LocationToInt(InfoEarthPoint, out licheng); //排序
+                InfoEarthPoint.Clear();
+                foreach (KeyValuePair<double, string> pair in tempDict) 
+                {
+                    InfoEarthPoint.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pair.Value);
+
+                    //string name = pair.Value.Split(new char[] { ',' })[0];
+                    //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
+                    //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
+                }
+
+
+                dataGridearth.DataSource = "";
+
+                fileStationDataView(dataGridearth, tableST, colName, InfoEarthPoint, "EarthTable");
+            }
         }
     }
 }

@@ -16,7 +16,7 @@ namespace AutoDraw
         /// </summary>
         /// <param name="xmlFile">文件地址</param>
         /// <param name="infoStation">字典</param>
-        public void addWayPointNode(string xmlFile, string nodeName, Dictionary<string, string> infoStation)
+        public void addWayPointNode(string xmlFile,string parentNodeName, string nodeName, Dictionary<string, string> infoStation)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
@@ -25,7 +25,7 @@ namespace AutoDraw
             {
                 XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
                 XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
-                XmlNode stationRoot = subroot.SelectSingleNode(nodeName);//查找<StationPoint> 
+                XmlNode stationRoot = subroot.SelectSingleNode(parentNodeName);//查找<StationPointLists> 
                 foreach (var item in infoStation)
                 {
                     if (!hasElement(stationRoot, item.Key.ToUpper()))//loadedDic.ContainsKey(item.Key))
@@ -62,10 +62,10 @@ namespace AutoDraw
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
-            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<WayPoints> 
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
             XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
 
-            XmlNode subStationRoot = subroot.SelectSingleNode(nodeName);//查找<StationPoint>  
+            XmlNode subStationRoot = subroot.SelectSingleNode(nodeName);//查找<StationPoints>  
             if (subStationRoot.HasChildNodes && subStationRoot != null)
             {
                 XmlNodeList nodeList = subStationRoot.ChildNodes;//获取FatherNode节点的所有子节点   
@@ -131,9 +131,9 @@ namespace AutoDraw
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
-            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<WayPoints> 
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
             XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
-            XmlNode wypointRoot = subroot.SelectSingleNode("StationPoint");//查找<StationPoint> 
+            XmlNode wypointRoot = subroot.SelectSingleNode("StationPointLists");//查找<StationPoint> 
 
             
             foreach (XmlNode xn in wypointRoot.ChildNodes)
@@ -177,9 +177,9 @@ namespace AutoDraw
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
-            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<WayPoints> 
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
             XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
-            XmlNode wypointRoot = subroot.SelectSingleNode("StationPoint");//查找<StationPoint> 
+            XmlNode wypointRoot = subroot.SelectSingleNode("StationPointLists");//查找<StationPoint> 
 
             foreach (XmlNode xn in wypointRoot.ChildNodes)
             {
@@ -196,6 +196,28 @@ namespace AutoDraw
             xmlDoc.Save(xmlFile);  
         }
 
+        /// <summary>
+        /// 删除制定项
+        /// </summary>
+        /// <param name="xmlFile"></param>
+        /// <param name="parentNode"></param>
+        /// <param name="NodeName"></param>
+        public void supprimWayPoint(string xmlFile, string parentNode, string NodeName)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
+            XmlNode wypointRoot = subroot.SelectSingleNode(parentNode);//查找<StationPoint> 
+
+            if (wypointRoot != null)
+            {
+                wypointRoot.RemoveAll();
+            }
+
+
+            xmlDoc.Save(xmlFile);
+        }
 
         #region 连接情况信息
         /// <summary>
