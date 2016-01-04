@@ -4187,6 +4187,7 @@ namespace AutoDraw
             if (listView1.Items.Count!=0)
             {
 
+
                 XmlFunction XF = new XmlFunction();
 
                 #region 读取数据
