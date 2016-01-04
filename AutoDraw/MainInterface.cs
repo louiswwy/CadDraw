@@ -1340,7 +1340,24 @@ namespace AutoDraw
                 InfoStation.Clear();
                 foreach (KeyValuePair<double, string> pair in tempDict)
                 {
-                    InfoStation.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pair.Value);
+                    string[] p_Values = pair.Value.Split(new char[] { ',' });
+
+                    string values = "";
+
+                    for (int a = 0; a < p_Values.Length - 1; a++)
+                    {
+                        if (a == 0)
+                        {
+                            values = p_Values[a];
+                        }
+                        else
+                        {
+
+                            values = values + "," + p_Values[a];
+                        }
+                    }
+
+                    InfoStation.Add(p_Values[p_Values.Length - 1], values);
 
                     //string name = pair.Value.Split(new char[] { ',' })[0];
                     //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
@@ -2217,7 +2234,24 @@ namespace AutoDraw
                                     InfoStation.Clear();
                                     foreach (KeyValuePair<double, string> pair in tempDict)
                                     {
-                                        InfoStation.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pair.Value);
+                                        string[] p_Values = pair.Value.Split(new char[] { ',' });
+
+                                        string values = "";
+
+                                        for (int a = 0; a < p_Values.Length - 1; a++)
+                                        {
+                                            if (a == 0)
+                                            {
+                                                values = p_Values[a];
+                                            }
+                                            else
+                                            {
+
+                                                values = values + "," + p_Values[a];
+                                            }
+                                        }
+
+                                        InfoStation.Add(p_Values[p_Values.Length - 1], values);
 
                                         //string name = pair.Value.Split(new char[] { ',' })[0];
                                         //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
@@ -2346,9 +2380,23 @@ namespace AutoDraw
                         InfoStation.Clear();
                         foreach (KeyValuePair<double, string> pair in tempDict)
                         {
-                            string[] listString = pair.Value.Split(new char[] { ',' });
-                            string pairValue = listString[0] + "," + listString[1] + "," + pair.Key;
-                            InfoStation.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pairValue);
+                            string[] p_Values = pair.Value.Split(new char[] { ',' });
+
+                            string values = "";
+
+                            for (int a = 0; a < p_Values.Length - 1; a++)
+                            {
+                                if (a == 0)
+                                {
+                                    values = p_Values[a];
+                                }
+                                else
+                                {
+
+                                    values = values + "," + p_Values[a];
+                                }
+                            }
+                            InfoStation.Add(p_Values[p_Values.Length - 1], values);
 
                             //string name = pair.Value.Split(new char[] { ',' })[0];
                             //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
@@ -2562,12 +2610,16 @@ namespace AutoDraw
             rootQY.Text = "牵引变电所";
             treeVIewToRefresh.Nodes.Add(rootQY);
 
+            TreeNode rootFQ = new TreeNode();  //添加牵引变电所
+            rootFQ.Text = "分区所";
+            treeVIewToRefresh.Nodes.Add(rootFQ);
             //rootQY.Nodes.Add(rootQY);
             //InfoStation=InfoStation.
             int numS = 0;
             int numJ = 0;
             int numA = 0;
             int numQ = 0;
+            int numF = 0;
             foreach (var item in InfoStation)
             {
                 if (NoL==true)
@@ -2595,15 +2647,20 @@ namespace AutoDraw
                         rootTeleTower.Nodes.Add(nameNode);
                         numJ++;
                     }
-                    if (item.Value.Split(new char[] { ',' })[1] == "AT所")
+                    else if (item.Value.Split(new char[] { ',' })[1] == "AT所")
                     {
                         rootAT.Nodes.Add(nameNode);
                         numA++;
                     }
-                    if (item.Value.Split(new char[] { ',' })[1] == "牵引变电所")
+                    else if (item.Value.Split(new char[] { ',' })[1] == "牵引变电所")
                     {
                         rootQY.Nodes.Add(nameNode);
                         numQ++;
+                    }
+                    else if (item.Value.Split(new char[] { ',' })[1] == "分区所")
+                    {
+                        rootFQ.Nodes.Add(nameNode);
+                        numF++;
                     }
                 }
                 else
@@ -2628,6 +2685,7 @@ namespace AutoDraw
             rootTeleTower.Text = rootTeleTower.Text + " 共有：" + numJ + "个";
             rootAT.Text = rootAT.Text + " 共有：" + numA + "个";
             rootQY.Text = rootQY.Text + " 共有：" + numQ + "个";
+            rootFQ.Text = rootFQ.Text + " 共有：" + numF + "个";
         }
 
         private void 删除ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -4050,7 +4108,7 @@ namespace AutoDraw
                 pF.isExMatch(wayPoint.Key,@"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
 
                 double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
-                distanceWP.Add(distance, wayPoint.Value);
+                distanceWP.Add(distance, wayPoint.Value + "," + wayPoint.Key);
             }
             Dictionary<double, string> Sortdic = DictonarySort(distanceWP);
             return Sortdic;
@@ -4071,13 +4129,13 @@ namespace AutoDraw
                 List<string> listLoc = new List<string>();
                 double distance;
                 string[] a=wayPoint.Key.Split(new char[] { '-' });
-                if (wayPoint.Key.Split(new char[] { '-' }).Length == 1)
+                if (wayPoint.Key.Split(new char[] { '-' }).Length == 1) //格式为dk1+1
                 {
                     pF.isExMatch(wayPoint.Key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
 
                     distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
                 }
-                else
+                else//格式为dk1+1-dk1+2
                 {
                     pF.isExMatch(wayPoint.Key.Split(new char[] { '-' })[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
 
@@ -4089,7 +4147,7 @@ namespace AutoDraw
                     //distance = distance + "-" + distance2;
                 }
 
-                distanceWP.Add(distance, wayPoint.Value);
+                distanceWP.Add(distance, wayPoint.Value + "," + wayPoint.Key);  //并没有用的样子
                 licheng = listLoc[0];
             }
             Dictionary<double, string> Sortdic = DictonarySort(distanceWP);
@@ -4486,7 +4544,7 @@ namespace AutoDraw
                 foreach (KeyValuePair<string,string> infor in loadInfor)
                 {
                     string a = infor.Value;
-                    if (infor.Value.Contains("牵引变电所")) //如果添加有牵引变电所
+                    if (true)//infor.Value.Contains("牵引变电所")) //如果添加有牵引变电所
                     {
                         if (InfoEarthPoint.Count != 0 && !InfoEarthPoint.ContainsKey(infor.Key)) //如果不为空且不重复
                         {
@@ -4505,6 +4563,10 @@ namespace AutoDraw
 
 
                     }
+                    else //如果EarthPoints表中的项包含非牵引变电项
+                    {
+
+                    }
                 }
 
                 string licheng = "";
@@ -4512,7 +4574,25 @@ namespace AutoDraw
                 InfoEarthPoint.Clear();
                 foreach (KeyValuePair<double, string> pair in tempDict) 
                 {
-                    InfoEarthPoint.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pair.Value);
+                    string[] p_Values = pair.Value.Split(new char[] { ',' });
+
+                    string values = "";
+
+                    for (int a = 0; a < p_Values.Length - 1; a++)
+                    {
+                        if (a == 0)
+                        {
+                            values = p_Values[a];
+                        }
+                        else
+                        {
+
+                            values = values + "," + p_Values[a];
+                        }
+                    }
+
+                    //
+                    InfoEarthPoint.Add(p_Values[p_Values.Length - 1], values);
 
                     //string name = pair.Value.Split(new char[] { ',' })[0];
                     //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
