@@ -268,11 +268,11 @@ namespace AutoDraw
             xmlDoc.Load(xmlFile);
 
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
-            XmlNode subroot = root.SelectSingleNode("Connections");//查找<Connection> 
+            XmlNode subroot = root.SelectSingleNode("Connection");//查找<Connection> 
 
             if (subroot == null)
             {
-                subroot = xmlDoc.CreateElement("Connections"); //添加
+                subroot = xmlDoc.CreateElement("Connection"); //添加
                 root.AppendChild(subroot);
             }
             else
