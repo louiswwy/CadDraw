@@ -1320,6 +1320,23 @@ namespace AutoDraw
                     refreshTreeview(treeView1, InfoStation, true);  //刷新treeView1
 
                 }
+
+                stTable.Clear();
+                Dictionary<double, string> tempDict = new Dictionary<double, string>();
+
+                string licheng = "";
+                tempDict = LocationToInt(InfoStation, out licheng);
+                InfoStation.Clear();
+                foreach (KeyValuePair<double, string> pair in tempDict)
+                {
+                    InfoStation.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pair.Value);
+
+                    //string name = pair.Value.Split(new char[] { ',' })[0];
+                    //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
+                    //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
+                }
+
+
                 fileStationDataView(dataGridStation, colName, InfoStation, "StationTable");         //填充车站datagridView
                 fileStationDataView(dataGridWind, tableST, colName, InfoWindPoint, "WindTable");         //填充风点datagridView
                 fileStationDataView(dataGridRain, tableST, colName, InfoRainPoint, "RainTable");             //填充雨点datagridView
@@ -2105,7 +2122,7 @@ namespace AutoDraw
                                 MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                 return;
                             }
-                            else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})-([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
+                            else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() != "桥梁") //如果里程不符合规范
                             {
                                 MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                 return;
@@ -2126,6 +2143,11 @@ namespace AutoDraw
                                     {
                                         if (temp.Name == "tempText")
                                         {
+                                            if (!pF.isExMatch(temp.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
+                                            {
+                                                MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
+                                                return;
+                                            }
                                             locationPart2 = temp.Text.ToString().ToUpper().Replace(" ", "");
                                         }
                                     }
@@ -2148,20 +2170,44 @@ namespace AutoDraw
                                 List<string> colName = new List<string>();
                                 
 
-                                #region wayPoint写入xml
+                               
                                 if (InfoStation.Count > 0)
                                 {
+                                    #region 读写xml-wayPoint
                                     XmlFunction xF = new XmlFunction();
 
                                     xF.addWayPointNode(xmlFilePath + "\\setting.xml", "StationPoint", InfoStation);
 
                                     Dictionary<string, string> loadedInfor = xF.loadWayPoint(xmlFilePath + "\\setting.xml","StationPoint");
-                                    fileStationDataView(dataGridStation, colName, loadedInfor, "StationTable"); //填充datagridView 
+                                    #endregion
+
+                                    //
+                                    stTable.Clear();
+                                    Dictionary<double, string> tempDict = new Dictionary<double, string>();
+
+                                    string licheng = "";
+                                    tempDict = LocationToInt(loadedInfor, out licheng);
+                                    InfoStation.Clear();
+                                    foreach (KeyValuePair<double, string> pair in tempDict)
+                                    {
+                                        InfoStation.Add(licheng + Math.Floor(pair.Key / 1000) + "+" + pair.Key % 1000, pair.Value);
+
+                                        //string name = pair.Value.Split(new char[] { ',' })[0];
+                                        //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
+                                        //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
+                                    }
+
+
+                                    dataGridStation.DataSource = "";
+
+                                    //dataGridStation(st)
+                                    fileStationDataView(dataGridStation, colName, InfoStation, "StationTable");
+                                    //fileStationDataView(dataGridStation, colName, loadedInfor, "StationTable"); //填充datagridView 
 
                                     treeView1.Nodes.Clear();
                                     refreshTreeview(treeView1, loadedInfor, true);
                                 }
-                                #endregion
+                                
                             }
                             else
                             {
@@ -2945,6 +2991,7 @@ namespace AutoDraw
             DataGridView componant = (DataGridView)comp;
             System.Data.DataTable a = tableST.Tables["StationTable"];
             //stTable.Clear();
+
             foreach (var station in dictionyToFill)
             {
                 if (station.Value.ToString().Contains("所") || station.Value.ToString().Contains("站"))
@@ -3807,9 +3854,26 @@ namespace AutoDraw
             {
                 PFunction pF = new PFunction();
                 List<string> listLoc = new List<string>();
-                pF.isExMatch(wayPoint.Key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+                double distance;
+                string[] a=wayPoint.Key.Split(new char[] { '-' });
+                if (wayPoint.Key.Split(new char[] { '-' }).Length == 1)
+                {
+                    pF.isExMatch(wayPoint.Key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
 
-                double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+                    distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+                }
+                else
+                {
+                    pF.isExMatch(wayPoint.Key.Split(new char[] { '-' })[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+
+                    distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+
+                    pF.isExMatch(wayPoint.Key.Split(new char[] { '-' })[1], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+
+                    double distance2= Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+                    //distance = distance + "-" + distance2;
+                }
+
                 distanceWP.Add(distance, wayPoint.Value);
                 licheng = listLoc[0];
             }

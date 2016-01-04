@@ -76,7 +76,18 @@ namespace AutoDraw
                     XmlElement xe = (XmlElement)item;
                     string key = xe.GetAttribute("location");
                     List<string> outList = new List<string>();
-                    pf.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out outList);
+
+                    if(key.Split(new char[] { ',' }).Length == 0)
+                    {
+
+                        pf.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out outList);
+                    }
+                    else
+                    {
+
+                        pf.isExMatch(key.Split(new char[] { '-' })[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out outList);
+                    }
+                    
                     Int32 DistNum = System.Math.Abs(Int32.Parse(outList[1]) * 1000 + Int32.Parse(outList[2]));
 
                     XmlNode nameNode = xe.SelectSingleNode("PName");//查找<PName> 
