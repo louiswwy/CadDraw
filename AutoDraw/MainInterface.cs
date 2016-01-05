@@ -2205,7 +2205,7 @@ namespace AutoDraw
                                     XmlFunction xF = new XmlFunction();
 
                                     xF.addWayPointNode(xmlFilePath + "\\setting.xml", "StationPointLists", "StationPoints", InfoStation);
-                                    if (sType.Contains("牵引变电所")) //如果是牵引变电所则写入
+                                    if (sType.Contains("牵引变电所")|| sType.Contains("AT所")|| sType.Contains("分区所")) //如果是牵引变电所、分区所、AT所则默认安装地震仪，写入信息
                                     {
                                         PFunction pf = new PFunction();
                                         List<string> listLoc = new List<string>();
@@ -3621,7 +3621,7 @@ namespace AutoDraw
         {
             if (false)
             {
-                if (dataGridStation.CurrentRow != null) //如果选中项不为空
+                if(dataGridStation.CurrentRow != null) //如果选中项不为空
                 {
                     int nRow = dataGridStation.CurrentRow.Index; //选中行
 
@@ -4236,6 +4236,32 @@ namespace AutoDraw
         }
 
         /// <summary>
+        /// 根据加入的规则筛选站点信息
+        /// </summary>
+        /// <param name="originStationDictionary"></param>
+        /// <returns></returns>
+        public Dictionary<string, string> applyRule(Dictionary<string, string> originStationDictionary)
+        {
+            Dictionary<string, string> sortedDictionary = new Dictionary<string, string>();
+
+            //添加规则读取
+            //
+
+            foreach(KeyValuePair<string,string> ValuePair in originStationDictionary)
+            {
+                //
+                //添加
+                //
+
+                if (ValuePair.Key != "" && !ValuePair.Value.ToString().Replace(" ", "").Contains(""))
+                {
+                    sortedDictionary.Add(ValuePair.Key, ValuePair.Value);
+                }
+            }
+            return sortedDictionary;
+        }
+
+        /// <summary>
         /// 自动生成连接
         /// </summary>
         /// <param name="sender"></param>
@@ -4263,6 +4289,8 @@ namespace AutoDraw
                         RailstationPoint.Add(par.Key, par.Value);
                     }
                 }
+                origStation = applyRule(origStation); //根据新增规则筛选站点
+
                 Dictionary<string, string> windPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPointLists");
                 Dictionary<string, string> rainPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists");
                 Dictionary<string, string> snowPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPointLists");
@@ -4270,11 +4298,11 @@ namespace AutoDraw
                 #endregion
 
                 #region 生成二维数组
-                int tWith = STstationPoint.Count();
+                int stationNum = STstationPoint.Count();
 
-                int[,] tableWindLengt = new int[windPoint.Count, tWith]; //生成风距离表
-                int[,] tableRainLengt = new int[rainPoint.Count, tWith]; //生成雨距离表
-                int[,] tableSnowLengt = new int[snowPoint.Count, tWith]; //生成雪距离表
+                int[,] tableWindLengt = new int[windPoint.Count, stationNum]; //生成风距离表
+                int[,] tableRainLengt = new int[rainPoint.Count, stationNum]; //生成雨距离表
+                int[,] tableSnowLengt = new int[snowPoint.Count, stationNum]; //生成雪距离表
 
                 //填充风距离表
                 int W_w = 0;
@@ -4533,9 +4561,9 @@ namespace AutoDraw
         {
             if (tabControl1.SelectedTab.Text.ToString() == "地震")
             {
-                string Type = "";
-                string Name = "";
-                string Location = "";
+                //string Type = "";
+                //string Name = "";
+                //string Location = "";
 
                 XmlFunction xF = new XmlFunction();
                 Dictionary<string, string> loadInfor = new Dictionary<string, string>();
