@@ -65,6 +65,13 @@ namespace AutoDraw
         System.Data.DataTable EarthTable;
         Dictionary<string, string> InfoEarthPoint = new Dictionary<string, string>();
 
+        /// <summary>
+        /// 线缆
+        /// </summary>
+        List<string> ListFournniseur = new List<string>();
+        Dictionary<string, string> LineTypeInfo = new Dictionary<string, string>();
+
+
         public MainInterface()
         {
             InitializeComponent();
@@ -80,173 +87,129 @@ namespace AutoDraw
         {
             XmlFunction xF = new XmlFunction();
             List<string> projetInfor;
-            if (xF.readProjrtInfo(xmlFilePath + "\\setting.xml") != null)
+
+            projetInfor = xF.readProjrtInfo(xmlFilePath + "\\setting.xml");
+            DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
+
+            //创建字体
+            ObjectId fontStyleId = createFont();
+            //检查图块
+            checkBlock(true, fontStyleId); //检查图块
+
+            int[] dictChecked = new int[connectionDict.Count]; //生成一个数组，用来记录已经遍历过的字典项
+            List<string> CheckList = new List<string>();
+
+            string stationBeDraw;
+            List<string> equipeBeDraw;
+            List<string> equipement = new List<string>(); //当前所亭连接的防灾设备
+            
+            //绘图原点
+            Point2d insertOriginSignlePoint = new Point2d(0, 0);
+
+            //绘图次数
+            int drawRound = 0;
+
+            List<string> StationList = new List<string>();
+            foreach(var a in connectionDict)
             {
-                if (xF.readProjrtInfo(xmlFilePath + "\\setting.xml")[0] != "?")
+                StationList.Add(a.Split(new char[] { '-' })[0]);
+            }
+
+            List<string>  Stations= StationList.Union(StationList).ToList();  //去除重复项
+
+            List<string> unCheckConnection = new List<string>();
+
+            foreach (var _station in Stations) //当为真的时候一直
+            {
+                stationBeDraw = _station;
+                equipeBeDraw = new List<string>();
+
+                //以所亭信息为准合并同类项
+                foreach (var item in connectionDict)
                 {
-                    projetInfor = xF.readProjrtInfo(xmlFilePath + "\\setting.xml");
-                    DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
-
-                    //创建字体
-                    ObjectId fontStyleId = createFont();
-                    //检查图块
-                    checkBlock(true, fontStyleId); //检查图块
-
-                    int[] dictChecked=new int[connectionDict.Count]; //生成一个数组，用来记录已经遍历过的字典项
-                    List<string> CheckList = new List<string>();
-
-                    List<string> equipeBeDraw;
-                    List<string> equipement = new List<string>(); //当前所亭连接的防灾设备
-
-                    int count=0;
-                    int rollBack = 0;
-
-                    //绘图原点
-                    Point2d insertOriginSignlePoint = new Point2d(0, 0);
-                    //绘图次数
-                    int drawRound = 0;
-                    while (count < connectionDict.Count) //当为真的时候一直
+                    if (item.Contains(_station))
                     {
-                        equipeBeDraw = new List<string>();
-
-                        //以所亭信息为准合并同类项
-                        foreach (var item in connectionDict)
-                        {
-                            //如果不包含则添加
-                            if (CheckList.Count == 0 && rollBack == 0)
-                            {
-                                CheckList.Add(item.Split(new char[] { '-' })[0]);
-                                equipeBeDraw.Add(item.Split(new char[] { '-' })[1]);
-                                count++;
-                                rollBack++;
-                                continue;
-                            }
-                            else if (CheckList.Count != 0 && rollBack == 0 && !CheckList.Contains(item.Split(new char[] { '-' })[1])) //循环回来
-                            {
-                                CheckList.Add(item.Split(new char[] { '-' })[0]);
-                                equipeBeDraw.Add(item.Split(new char[] { '-' })[1]);
-                                count++;
-                                continue;
-                            }
-
-                            if (CheckList.Contains(item.Split(new char[] { '-' })[0]))
-                            {
-                                //CheckList.Add(item.Split(new char[] { '-' })[0]);
-                                equipeBeDraw.Add(item.Split(new char[] { '-' })[1]);
-                                count++;
-                                rollBack++;
-                                continue;
-                            }
-                        }
-
-                        rollBack = 0; //归0， 当程序画完一个基站的图后， 再次添加
-
-
-                        ///确认本张图的绘图位置
-                        Point2d insertSignlePoint = new Point2d(insertOriginSignlePoint.X + drawRound * 450, insertOriginSignlePoint.Y);
-                        drawRound++;
-
-                        foreach (var SignalStation in dictRailStation)
-                        {
-
-                        }
-                        #region 找到所亭的左右两侧的点
-                        //由最后的一个CheckList中的站点信息，与监测点信息作比较
-                        //Dictionary<string, string> a = new Dictionary<string, string>();
-                        //a.Add(connectionDict[0].Split(new char[] { '-' })[0], connectionDict[0].Split(new char[] { '-' })[1]);
-                        //dictRailStation.Add(connectionDict[0].Split(new char[] { '-' })[0], connectionDict[0].Split(new char[] { '-' })[1]);
-                        int leftSide = -1;
-                        int rightSide = -1;
-                        int current = 0;
-                        
-                        //确定基站在哪个区间内
-                        foreach (var stat in dictRailStation)
-                        {
-                            //Point2d insertSignlePoint = new Point2d(insertOriginSignlePoint.X + round * 450, insertOriginSignlePoint.Y);
-                            int dis = int.Parse(stat.Value.ToString().Split(new char[] { ',' })[2]);
-                            string[] y = CheckList[CheckList.Count - 1].ToString().Split(new char[] { ',' });
-                            int equ = int.Parse(CheckList[CheckList.Count - 1].ToString().Split(new char[] { ',' })[3]);
-
-                            if (equ <= dis)
-                            {
-                                rightSide = current + 1;
-                                leftSide = current - 1;
-                                break;
-                            }
-                            current++;
-                        }
-
-                        if (rightSide == -1 && leftSide == -1) //如果两个数的值都为0，则说明设备里程比所有站点都大
-                        {
-                            leftSide = dictRailStation.Count - 1;
-                            rightSide = -1;
-                        }
-                        else if (rightSide == -1 && leftSide != -1)
-                        {
-
-                        }
-
-                        current = 0;
-                        List<string> leftStation = new List<string>();
-                        List<string> RighStation = new List<string>();
-                        foreach (var stat in dictRailStation)
-                        {
-                            if (current == rightSide)
-                            {
-                                RighStation.Add(stat.Key.ToString());
-                                RighStation.Add(stat.Value.ToString().Split(new char[] { ',' })[0]);
-                            }
-                            else if (current == leftSide)
-                            {
-                                leftStation.Add(stat.Key.ToString());
-                                leftStation.Add(stat.Value.ToString().Split(new char[] { ',' })[0]);
-                            }
-                            current++;
-                        }
-
-                        List<string> leftRightStation = new List<string>();
-                        if (RighStation.Count == 0)
-                        {
-                            leftRightStation.Add(null);
-                            leftRightStation.Add(null);
-                        }
-                        if (leftStation.Count >= 2)
-                        {
-
-                            leftRightStation.Add(leftStation[0]);
-                            leftRightStation.Add(leftStation[1]);
-                        }
-                        #endregion
-
-                        //foreach()
-                        drawSinglePicture(insertSignlePoint, fontStyleId, projetInfor, CheckList[CheckList.Count - 1], leftRightStation, equipeBeDraw);//db, trans, 
+                        equipeBeDraw.Add(item.Split(new char[] { '-' })[1]); //将绘制的设备列表
 
                     }
 
-                    //插入块
+                }
 
-                    m_DocumentLock.Dispose();
-                }
-                else
+                ///确认本张图的绘图位置
+                Point2d insertSignlePoint = new Point2d(insertOriginSignlePoint.X + drawRound * 450, insertOriginSignlePoint.Y);
+                drawRound++;
+
+                #region 找到所亭的左右两侧的点
+
+                string[] a = stationBeDraw.ToString().Split(new char[] { ',' });
+
+                int STLocation = int.Parse(stationBeDraw.ToString().Split(new char[] { ',' })[3]); //所亭里程
+
+                List<string> stationList = new List<string>(); //站点信息List表
+                //确定基站在哪个区间内，从后向前比较
+                foreach (var stat in dictRailStation)
                 {
-                    MessageBox.Show("请先设置图纸名称。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    stationList.Add(stat.Key + "," + stat.Value); //dictionary -> list
                 }
+
+                string leftStation = ""; //左侧站点
+                string RighStation = ""; //右侧站点
+
+
+                for (int _rsCount = 0; _rsCount < stationList.Count; _rsCount++)
+                {
+                    if (STLocation < int.Parse(stationList[_rsCount].Split(new char[] { ',' })[3])) //当所亭所在里程比当前站点小时
+                    {
+                        RighStation = stationList[_rsCount];//右侧站点等于该车站
+
+                        if (_rsCount > 0) //当_rsCount大于0时，说明左侧还有车站
+                        {
+                            leftStation = stationList[_rsCount - 1];// 左侧车站为列表中前一个车站
+                            break;
+                        }
+                    }
+                    else if (STLocation > int.Parse(stationList[_rsCount].Split(new char[] { ',' })[3]) && _rsCount == stationList.Count - 1) //当基站里程比最远车站还要大时
+                    {
+                        RighStation = "";
+                        leftStation = stationList[_rsCount];
+                        break;
+                    }
+
+
+                }
+
+
+                List<string> leftRightStation = new List<string>();
+
+
+                leftRightStation.Add(leftStation);
+                leftRightStation.Add(RighStation);
+
+                #endregion
+
+                //foreach()
+                drawSinglePicture(insertSignlePoint, fontStyleId, projetInfor, stationBeDraw, leftRightStation, equipeBeDraw);//db, trans, 
+
             }
-            else
-            {
-                MessageBox.Show("读取错误,请确认配置文件是否存在。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+
+            //插入块
+
+            m_DocumentLock.Dispose();
+
+
+
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="insertSignlePoint"></param>
-        /// <param name="fontStyleId"></param>
+        /// <param name="insertSignlePoint">插入点</param>
+        /// <param name="fontStyleId">字型id</param>
         /// <param name="projetInfo">项目信息</param>
-        /// <param name="DAStation">相对于基站的左右站点</param>
-        /// <param name="N_Equipment">监测点信息</param>
-        public void drawSinglePicture(Point2d insertSignlePoint, ObjectId fontStyleId, List<string> projetInfo, string CommucationCenter, List<string> DAStation, List<string> N_Equipment)
+        /// <param name="CommucationCenter">基站、所亭</param>
+        /// <param name="LeftRightStation">相对于基站的左右车站</param>
+        /// <param name="N_Equipment">防灾设备清单</param>
+        public void drawSinglePicture(Point2d insertSignlePoint, ObjectId fontStyleId, List<string> projetInfo, string CommucationCenter, List<string> LeftRightStation, List<string> N_Equipment)
         {
             Point2d outerStartPoint = insertSignlePoint;
             Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
@@ -339,37 +302,38 @@ namespace AutoDraw
                     #region  车站标
 
                     PFunction pf = new PFunction();
-                    int departStation = -1;
-                    int arriveStation = -1;
+                    int departStation = 0;
+                    int arriveStation = 0;
 
-                    if (DAStation[0] != null)
+                    if (LeftRightStation[0] != "")
                     {
                         Dictionary<string, string> attArrive = new Dictionary<string, string>();
-                        attArrive.Add("站名", DAStation[1]);
-                        attArrive.Add("里程", DAStation[0]);
+                       
+                        attArrive.Add("站名", LeftRightStation[0].Split(new char[] { ',' })[1]);
+                        attArrive.Add("里程", LeftRightStation[0].Split(new char[] { ',' })[0]);
                         spaceId.InsertBlockReference("0", "到达站站点标示", new Point3d(innerStartPoint.X + 175 + 196, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attArrive);
                         //换算成距离
-                        List<string> temp = new List<string>();
-                        pf.isExMatch(DAStation[2], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out temp);
-                        departStation = Int32.Parse(temp[1]) * 1000 + Int32.Parse(temp[2]);
+                        //List<string> temp = new List<string>();
+                        //pf.isExMatch(LeftRightStation[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out temp);
+                        departStation = Int32.Parse(LeftRightStation[0].Split(new char[] { ',' })[3]);
                     }
 
-                    if (DAStation[3] != null)
+                    if (LeftRightStation[1] != "")
                     {
                         Dictionary<string, string> attdepart = new Dictionary<string, string>();
-                        attdepart.Add("站名", DAStation[3]);
-                        attdepart.Add("里程", DAStation[2]);
+                        attdepart.Add("站名", LeftRightStation[1].Split(new char[] { ',' })[1]);
+                        attdepart.Add("里程", LeftRightStation[1].Split(new char[] { ',' })[0]);
                         spaceId.InsertBlockReference("0", "始发站站点标示", new Point3d(innerStartPoint.X + 175-8.21, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attdepart);
                         //换算成距离
-                        List<string> temp = new List<string>();
-                        pf.isExMatch(DAStation[2], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out temp);
-                        arriveStation = System.Math.Abs(Int32.Parse(temp[1]) * 1000 + Int32.Parse(temp[2]));
+                        //List<string> temp = new List<string>();
+                        //pf.isExMatch(LeftRightStation[1], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out temp);
+                        arriveStation = Int32.Parse(LeftRightStation[1].Split(new char[] { ',' })[3]);
                     }
 
                     string textDistance = " ";
                     if (departStation != -1 && arriveStation != -1) //
                     {
-                        textDistance = System.Math.Abs(departStation - arriveStation).ToString();
+                        textDistance = Math.Abs(departStation - arriveStation).ToString();
                     }
                     DBText DistanceText = (DBText)insertText(textDistance, new Point3d(innerStartPoint.X + 168 + (362.7 - 168) / 2, innerStartPoint.Y + 363, 0), fontStyleId);
                     db2.AddToModelSpace(DistanceText);
@@ -382,6 +346,7 @@ namespace AutoDraw
                     //绘图起始点
                     Point3d equipeInsertPoint = new Point3d(innerStartPoint.X + 175, innerStartPoint.Y + 220, 0);
                     int numInsert = 0;
+
                     //每一个都插入一次
                     bool stationInsertion = false;
 
@@ -1277,11 +1242,11 @@ namespace AutoDraw
             #region 从xml文件中读取wayPoint点
             if (xmlFilePath != null)
             {
-                XmlFunction xf = new XmlFunction();
-                InfoStation = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists");
-                InfoWindPoint = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPointLists");
-                InfoRainPoint = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists");
-                InfoSnowPoint = xf.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPointLists");
+                XmlFunction Xf = new XmlFunction();
+                InfoStation = Xf.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists");
+                InfoWindPoint = Xf.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPointLists");
+                InfoRainPoint = Xf.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists");
+                InfoSnowPoint = Xf.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPointLists");
 
                 #region 给各个dataGridView指定datasource
                 if (tableST == null)
@@ -1378,6 +1343,13 @@ namespace AutoDraw
             #region 添加线型
             Form_LineType fmL = new Form_LineType(xmlFilePath+"\\setting.xml");
             fmL.defautLineType(xmlFilePath + "\\setting.xml");
+            #endregion
+
+            #region 读取线型
+            XmlFunction xf = new XmlFunction();
+            Dictionary<string, string> defautLineList = new Dictionary<string, string>();
+            
+            LineTypeInfo = xf.loadLineType(xmlFilePath+"\\setting.xml"); //读取的项
             #endregion
 
             /*
@@ -1693,7 +1665,19 @@ namespace AutoDraw
                     BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
                     // 循环遍历块表中的块表记录
                     //int i=0;
-                    foreach (ObjectId blockTableId in bt)
+
+                    foreach (string d in Directory.GetFileSystemEntries(path))
+                    {
+                        if (File.Exists(d))
+                        {
+                            FileInfo fi = new FileInfo(d);
+                            if (fi.Attributes.ToString().IndexOf("ReadOnly") != -1)
+                                fi.Attributes = FileAttributes.Normal;
+                            File.Delete(d);//直接删除其中的文件  
+                        }
+                    }
+
+                        foreach (ObjectId blockTableId in bt)
                     {
                         // 打开 块表 记录对象
                         BlockTableRecord btRecord = (BlockTableRecord)trans.GetObject(blockTableId, OpenMode.ForRead);
@@ -1712,7 +1696,11 @@ namespace AutoDraw
 
                             if (!getFileName(path).Contains(btRecord.Name.ToString()))
                             {
-                                preview.Save(path + "\\" + btRecord.Name + ".bmp"); // 保存块预览图案
+                                if (!btRecord.Name.ToString().Contains("图例"))
+                                {
+                                    preview.Save(path + "\\" + btRecord.Name + ".bmp"); // 保存块预览图案 
+
+                                }
 
                             }
                             else
@@ -2139,7 +2127,7 @@ namespace AutoDraw
                         if (TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.Text.ToString().Replace(" ","") != "")
                         {
                             PFunction pF=new PFunction();
-                            if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //如果不是汉字
+                            if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)$")) //如果不是汉字
                             {
                                 MessageBox.Show("站名： '" + T_SName.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                 return;
@@ -2296,7 +2284,7 @@ namespace AutoDraw
                     #region 修改字典信息
 
                     PFunction pF = new PFunction();
-                    if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //如果不是汉字
+                    if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //如果不是汉字
                     {
                         MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                         return;
@@ -2769,7 +2757,7 @@ namespace AutoDraw
             PFunction pF = new PFunction();
             foreach (TreeNode childNode in selectedNode.Nodes)
             {
-                if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$") || childNode.Text.ToString().Replace(" ", "").Contains("AT所")) //汉字
+                if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)") || childNode.Text.ToString().Replace(" ", "").Contains("AT所")) //汉字
                 {
                     if (childNode.Text.ToString().Replace(" ", "").Contains("AT所") || childNode.Text.ToString().Replace(" ", "").Contains("牵引变电所") || childNode.Text.ToString().Replace(" ", "").Contains("车站") || childNode.Text.ToString().Replace(" ", "").Contains("基站") || childNode.Text.ToString().Replace(" ", "").Contains("桥梁"))
                     {
@@ -2786,7 +2774,7 @@ namespace AutoDraw
                 } 
             }
 
-            if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$"))
+            if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
             {
                 if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
                 {
@@ -2938,7 +2926,7 @@ namespace AutoDraw
                 {
                     foreach (TreeNode childNode in selectedNode.Nodes)
                     {
-                        if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //汉字
+                        if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
                         {
                             if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
                             {
@@ -2954,7 +2942,7 @@ namespace AutoDraw
                             T_SLocation.Text = childNode.Text.ToString();
                         }
                     }
-                    if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$"))
+                    if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
                     {
                         if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
                         {
@@ -2969,7 +2957,7 @@ namespace AutoDraw
                 {
                     foreach (TreeNode childNode in selectedNode.Parent.Nodes)
                     {
-                        if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //汉字
+                        if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
                         {
                             if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
                             {
@@ -2985,7 +2973,7 @@ namespace AutoDraw
                             T_SLocation.Text = childNode.Text.ToString();
                         }
                     }
-                    if (pF.isExMatch(selectedNode.Parent.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$"))
+                    if (pF.isExMatch(selectedNode.Parent.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
                     {
                         if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
                         {
@@ -3407,7 +3395,7 @@ namespace AutoDraw
                                     MessageBox.Show("数据：" + location + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     return;
                                 }
-                                if (!pF.isExMatch(name, @"^([\u4e00-\u9fa5]*)$"))  //
+                                if (!pF.isExMatch(name, @"^((\d*)\#*[\u4e00-\u9fa5]*)"))  //
                                 {
                                     MessageBox.Show("数据：" + name + "不符合规范", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     return;
@@ -3742,7 +3730,7 @@ namespace AutoDraw
                     if (textBox1.Text.ToString() != "" && C_equipeType.SelectedItem.ToString() != "" && C_Line.SelectedItem.ToString() != "" && C_equipeType.SelectedItem.ToString() != null && C_Line.SelectedItem.ToString() != null)
                     {
                         PFunction pF = new PFunction();
-                        if (!pF.isExMatch(textBox1.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)$")) //如果不是汉字
+                        if (!pF.isExMatch(textBox1.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //如果不是汉字
                         {
                             MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "格式不符合规范。");
                             return;
@@ -4271,11 +4259,22 @@ namespace AutoDraw
             if (listView1.Items.Count!=0)
             {
 
+                if (comboFournisseur.SelectedItem == "")
+                {
+                    MessageBox.Show("请选择设备供应商！", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
                 XmlFunction XF = new XmlFunction();
 
-                #region 读取数据
-                Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists");
+                if (XF.readProjrtInfo(xmlFilePath + "\\setting.xml") == null || XF.readProjrtInfo(xmlFilePath + "\\setting.xml")[0] == "?")
+                {
+                    MessageBox.Show("请先设置图纸名称。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    return;
+                }
+                    #region 读取数据
+                    Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists");
                 Dictionary<string, string> STstationPoint = new Dictionary<string, string>();
                 Dictionary<string, string> RailstationPoint = new Dictionary<string, string>();
                 foreach (var par in origStation)
@@ -4315,81 +4314,99 @@ namespace AutoDraw
                 int S_w = 0;
                 int S_h = 0;
 
-                //填充风点
+                //填充风点,计算风点与站点间距
                 foreach (var Sstation in STstationPoint)
                 {
                     W_w = 0;
                     foreach (var wind in windPoint)
                     {
-                        tableWindLengt[W_w, W_h] = System.Math.Abs(int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(wind.Value.ToString().Split(new char[] { ',' })[2]));
+                        tableWindLengt[W_w, W_h] = (int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(wind.Value.ToString().Split(new char[] { ',' })[2]));
                         W_w++;
                     }
                     W_h++;
                 }
 
-                //填充雨距离表
+                //填充雨距离表,计算雨点与站点间距
                 foreach (var Sstation in STstationPoint)
                 {
                     R_w = 0;
                     foreach (var rain in rainPoint)
                     {
-                        tableRainLengt[R_w, R_h] = System.Math.Abs(int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(rain.Value.ToString().Split(new char[] { ',' })[2]));
+                        tableRainLengt[R_w, R_h] = (int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(rain.Value.ToString().Split(new char[] { ',' })[2]));
                         R_w++;
                     }
                     R_h++;
                 }
 
-                //填充雪距离表
+                //填充雪距离表,计算雪点与站点间距
                 foreach (var Sstation in STstationPoint)
                 {
                     S_w = 0;
                     foreach (var snow in snowPoint)
                     {
-                        tableSnowLengt[S_w, S_h] = System.Math.Abs(int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(snow.Value.ToString().Split(new char[] { ',' })[2]));
+                        tableSnowLengt[S_w, S_h] = (int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(snow.Value.ToString().Split(new char[] { ',' })[2]));
                         S_w++;
                     }
                     S_h++;
                 }
                 #endregion
 
-                List<string> WindToStation = findNear(tableWindLengt);//找到
-                List<string> RainToStation = findNear(tableRainLengt);
-                List<string> SnowToStation = findNear(tableSnowLengt);
+                List<string> WindToStation = findNearestStation(tableWindLengt);//找到离每个风点最近的基站、所亭
+                List<string> RainToStation = findNearestStation(tableRainLengt);//找到离每个雨点最近的基站、所亭
+                List<string> SnowToStation = findNearestStation(tableSnowLengt);//找到离每个雪点最近的基站、所亭
 
-                List<string> stationToEqui = new List<string>(); //各设备离最近所亭列表
-                List<string> SEWpair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);//生成各个风点最近站点、所亭列表
-                List<string> SERpair = StationToEquipInfo(RainToStation, STstationPoint, rainPoint);//生成各个雨点最近站点、所亭列表
-                List<string> SESpair = StationToEquipInfo(SnowToStation, STstationPoint, snowPoint);//生成各个雪点最近站点、所亭列表
+                List<string> Station_Equi_List = new List<string>(); //各设备离最近所亭列表
+                List<string> SEWindPair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);//生成各个风点最近站点、所亭列表
+                List<string> SERainPair = StationToEquipInfo(RainToStation, STstationPoint, rainPoint);//生成各个雨点最近站点、所亭列表
+                List<string> SESnowPair = StationToEquipInfo(SnowToStation, STstationPoint, snowPoint);//生成各个雪点最近站点、所亭列表
 
                 List<string> connectionDict = new List<string>();
-                foreach (var a in SEWpair)
+
+                //汇总风、雨、雪设备的‘站点_设备'表
+                foreach (var wind in SEWindPair)
                 {
-                    stationToEqui.Add(a);
+                    Station_Equi_List.Add(wind);
                 }
-                foreach (var a in SERpair)
+                foreach (var rain in SERainPair)
                 {
-                    stationToEqui.Add(a);
+                    Station_Equi_List.Add(rain);
                 }
-                foreach (var a in SESpair)
+                foreach (var snow in SESnowPair)
                 {
-                    stationToEqui.Add(a);
+                    Station_Equi_List.Add(snow);
                 }
 
                 //写入连接情况
-                XmlFunction xF = new XmlFunction();
-                xF.removeConnection(xmlFilePath + "\\setting.xml"); //删除所有connection节点
+                //XmlFunction xF = new XmlFunction();
+                XF.removeConnection(xmlFilePath + "\\setting.xml"); //删除所有connection节点
 
                 selectedWayPoint.Nodes.Clear(); //清空点
-                foreach (var sTe in stationToEqui)
+
+                #region 读取线缆规则类型
+                LineTypeInfo = XF.loadLineType(xmlFilePath + "\\setting.xml"); //读取线缆类型表
+
+                Dictionary<string, string> LineByFournisseur = new Dictionary<string, string>();
+                foreach(KeyValuePair<string,string> linelist in LineTypeInfo)
+                {
+                    if (linelist.Value.Contains(comboFournisseur.SelectedItem.ToString()))  //根据下拉框选择的设备商名字筛选线型规则
+                    { 
+                        LineByFournisseur.Add(linelist.Key, linelist.Value);
+                    }
+                }
+                #endregion
+
+
+
+                foreach (var _station_Equipe in Station_Equi_List)
                 {
 
                     #region 写入连接信息
-                    string station = sTe.Split(new char[] { '_' })[0];
-                    string equipe = sTe.Split(new char[] { '_' })[1];
+                    string station = _station_Equipe.Split(new char[] { '_' })[0];
+                    string equipe = _station_Equipe.Split(new char[] { '_' })[1];
 
                     connectionDict.Add(station + "-" + equipe);
 
-                    xF.createConnectionXml(xmlFilePath + "\\setting.xml", station, equipe);
+                    XF.createConnectionXml(xmlFilePath + "\\setting.xml", LineByFournisseur, station, equipe);
                     #endregion
 
 
@@ -4432,7 +4449,7 @@ namespace AutoDraw
                     #endregion
                 }
                 //
-                //windPoint 
+                //绘图。传递RailstationPoint站点信息用户绘制车站标，传递connectionDict连接信息绘制设备、线缆
                 DrawPicture(RailstationPoint, connectionDict); 
             }
             else
@@ -4442,22 +4459,25 @@ namespace AutoDraw
         }
 
         /// <summary>
-        /// 将二维数组中每个设备对应的距离最近的站点、所亭的index转换为字典项
+        /// 将二维数组中每个设备对应的距离最近的站点、所亭的index转换为对应的项
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="lengthInfo">站点至监控点的距离</param>
-        public List<string> StationToEquipInfo(List<string> lengthInfo, Dictionary<string, string> stationDict, Dictionary<string, string> equipeDict)
+        /// <param name="EquipeStationPair">设备及离其最近的站点对在各自字典中的序号index</param>
+        /// <param name="stationDict">筛选过的车站字典表</param>
+        /// <param name="equipeDict">设备字典表</param>
+        /// <returns>站点信息_设备信息</returns>
+        public List<string> StationToEquipInfo(List<string> EquipeStationPair, Dictionary<string, string> stationDict, Dictionary<string, string> equipeDict)
         {
             List<string> stationEquipePair = new List<string>();
-            foreach (var str in lengthInfo)//WindToStation)
+            foreach (var singalPair in EquipeStationPair)//WindToStation)
             {
-                string[] temp = str.Split(new char[] { '-' });
-                string equiIndex = temp[0];
-                string stationIdex = temp[1];
+                string equipeIndex = singalPair.Split(new char[] { '-' })[0]; //设备编号
+                string stationIdex = singalPair.Split(new char[] { '-' })[1]; //站点编号
 
                 string stationInfo = "";
                 string equipeInfo = "";
                 //for (int a = 0; a < stationPoint.Count; a++)
+
+                //序号对应的站点信息
                 int a = 0;
                 foreach (var station in stationDict)
                 {
@@ -4468,10 +4488,12 @@ namespace AutoDraw
                     }
                     a++;
                 }
+
+                //序号对应的设备信息
                 int b = 0;
                 foreach (var equipe in equipeDict)
                 {
-                    if (b.ToString() == equiIndex)
+                    if (b.ToString() == equipeIndex)
                     {
                         equipeInfo = equipe.Key + "," + equipe.Value;
                         break;
@@ -4486,30 +4508,30 @@ namespace AutoDraw
 
 
         /// <summary>
-        /// 找到离横坐标对应的监控点最近的基站、所亭
+        /// 找到离横坐标（防灾设备）对应的监控点最近的基站、所亭
         /// </summary>
         /// <param name="tableDistance"></param>
         /// <returns></returns>
-        public List<string> findNear(int[,] tableDistance)
+        public List<string> findNearestStation(int[,] tableDistance)
         {
             List<string> connectStation = new List<string>();
 
             string rowIndex = ""; //横向
             string colIndex = ""; //纵向
-            for (int nW = 0; nW < tableDistance.GetLength(0); nW++)
+            for (int nW = 0; nW < tableDistance.GetLength(0); nW++) //横向
             {
                 int distance = 0;
-                for (int nH = 0; nH < tableDistance.GetLength(1); nH++)
+                for (int nH = 0; nH < tableDistance.GetLength(1); nH++)  //纵向
                 {
                     if (nH == 0)
                     {
-                        distance = tableDistance[nW, nH];
+                        distance = Math.Abs(tableDistance[nW, nH]);
                         rowIndex = "" + nW;
                         colIndex = "" + nH;
                     }
-                    if (distance > tableDistance[nW, nH])
+                    if (distance > Math.Abs(tableDistance[nW, nH]))
                     {
-                        distance = tableDistance[nW, nH];
+                        distance = Math.Abs(tableDistance[nW, nH]);
                         rowIndex = "" + nW;
                         colIndex = "" + nH;
                     }
@@ -4631,6 +4653,41 @@ namespace AutoDraw
                 dataGridearth.DataSource = "";
 
                 fileStationDataView(dataGridearth, tableST, colName, InfoEarthPoint, "EarthTable");
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            /*XmlFunction xf = new XmlFunction();
+            LineTypeInfo = xf.loadLineType(xmlFilePath + "\\setting.xml");
+
+            ListFournniseur = new List<string>();
+            foreach(KeyValuePair<string,string> a in LineTypeInfo)
+            {
+                string fournisseur = a.Value.Split(new char[] { ',' })[4];
+                if (!ListFournniseur.Contains(fournisseur))
+                {
+                    comboFournisseur.Items.Add(fournisseur);
+                }
+            }*/
+        }
+
+        private void comboFournisseur_Click(object sender, EventArgs e)
+        {
+            XmlFunction xf = new XmlFunction();
+            LineTypeInfo = xf.loadLineType(xmlFilePath + "\\setting.xml");
+
+            ListFournniseur = new List<string>();
+            comboFournisseur.Items.Clear();
+
+            foreach (KeyValuePair<string, string> a in LineTypeInfo)
+            {
+                string fournisseur = a.Value.Split(new char[] { ',' })[4];
+                if (!ListFournniseur.Contains(fournisseur))
+                {
+                    comboFournisseur.Items.Add(fournisseur);
+                    ListFournniseur.Add(fournisseur);
+                }
             }
         }
     }

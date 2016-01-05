@@ -66,38 +66,45 @@ namespace AutoDraw
             XmlNode subroot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
 
             XmlNode subStationRoot = subroot.SelectSingleNode(nodeName);//查找<StationPoints>  
-            if (subStationRoot.HasChildNodes && subStationRoot != null)
+            if (subStationRoot != null)
             {
-                XmlNodeList nodeList = subStationRoot.ChildNodes;//获取FatherNode节点的所有子节点   
-                PFunction pf = new PFunction();
-
-                foreach (var item in nodeList)
+                if (subStationRoot.HasChildNodes)
                 {
-                    XmlElement xe = (XmlElement)item;
-                    string key = xe.GetAttribute("location");
-                    List<string> outList = new List<string>();
+                    XmlNodeList nodeList = subStationRoot.ChildNodes;//获取FatherNode节点的所有子节点   
+                    PFunction pf = new PFunction();
 
-                    if(key.Split(new char[] { ',' }).Length == 0)
+                    foreach (var item in nodeList)
                     {
+                        XmlElement xe = (XmlElement)item;
+                        string key = xe.GetAttribute("location");
+                        List<string> outList = new List<string>();
 
-                        pf.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out outList);
+                        if (key.Split(new char[] { ',' }).Length == 0)
+                        {
+
+                            pf.isExMatch(key, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out outList);
+                        }
+                        else
+                        {
+
+                            pf.isExMatch(key.Split(new char[] { '-' })[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out outList);
+                        }
+
+                        Int32 DistNum = System.Math.Abs(Int32.Parse(outList[1]) * 1000 + Int32.Parse(outList[2]));
+
+                        XmlNode nameNode = xe.SelectSingleNode("PName");//查找<PName> 
+                        XmlNode typeNode = xe.SelectSingleNode("PType");//查找<PType> 
+
+                        string name = nameNode.InnerText;
+                        string type = typeNode.InnerText;
+
+                        inforStation.Add(key.ToUpper(), name + "," + type + "," + DistNum);
                     }
-                    else
-                    {
-
-                        pf.isExMatch(key.Split(new char[] { '-' })[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out outList);
-                    }
-                    
-                    Int32 DistNum = System.Math.Abs(Int32.Parse(outList[1]) * 1000 + Int32.Parse(outList[2]));
-
-                    XmlNode nameNode = xe.SelectSingleNode("PName");//查找<PName> 
-                    XmlNode typeNode = xe.SelectSingleNode("PType");//查找<PType> 
-
-                    string name = nameNode.InnerText;
-                    string type = typeNode.InnerText;
-
-                    inforStation.Add(key.ToUpper(), name + "," + type + "," + DistNum);
                 }
+            }
+            else
+            {
+
             }
 
             return inforStation;
@@ -224,9 +231,9 @@ namespace AutoDraw
         /// 向xml文件写入设备连接信息
         /// </summary>
         /// <param name="xmlFile">文件地址</param>
-        /// <param name="selectGrid">选中所亭项</param>
-        /// <param name="selectBlock">选中的块图案</param>
-        public void createConnectionXml(string xmlFile, string selectGrid, string selectBlocks)
+        /// <param name="selectStation">选中所亭项</param>
+        /// <param name="selectEquipement">选中的块图案</param>
+        public void createConnectionXml(string xmlFile,Dictionary<string,string> lineTypeList, string selectStation, string selectEquipement)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
@@ -241,21 +248,61 @@ namespace AutoDraw
             }
             XmlElement xe1 = xmlDoc.CreateElement("Pair");//创建一个<Pair>节点 
 
-            xe1.SetAttribute("location", selectGrid.Split(new char[] { ',' })[0]);//设置该节点location属性 
-            xe1.SetAttribute("name", selectGrid.Split(new char[] { ',' })[1]);//设置该节点name属性 
+            string stationLocation = selectStation.Split(new char[] { ',' })[0];
+            string stationName = selectStation.Split(new char[] { ',' })[1];
+
+            string equipementLocation = selectEquipement.Split(new char[] { ',' })[0];
+            string equipementName = selectEquipement.Split(new char[] { ',' })[1];
+
+            //站点的里程
+            PFunction pF = new PFunction();
+            List<string> StationlistDistance = new List<string>();
+            pF.isExMatch(stationLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out StationlistDistance);
+            int StationLocation = Int32.Parse(StationlistDistance[1]) * 1000 + Int32.Parse(StationlistDistance[2]);
+
+            //设备的里程
+            List<string> EquipementlistDistance = new List<string>();
+            pF.isExMatch(equipementLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out EquipementlistDistance);
+            int EquipementLocation = Int32.Parse(EquipementlistDistance[1]) * 1000 + Int32.Parse(EquipementlistDistance[2]);
+
+            int distance = Math.Abs(StationLocation - EquipementLocation);
+            //设备与站点间的间距
+
+            XmlElement subXmlStation = xmlDoc.CreateElement("Station");//创建一个<Station>节点 
+            subXmlStation.SetAttribute("Stationlocation", stationLocation);
+            subXmlStation.SetAttribute("StationType", selectStation.Split(new char[] { ',' })[2]);
+            subXmlStation.InnerText = stationName;
+
+            XmlElement subXmlEquipe = xmlDoc.CreateElement("Equipement");//创建一个<Equipement>节点 
+            subXmlEquipe.SetAttribute("Equipelocation", equipementLocation);
+            subXmlEquipe.SetAttribute("EquipeType", selectEquipement.Split(new char[] { ',' })[2]);
+            subXmlEquipe.InnerText = equipementName;
+
+            XmlElement subXmlLine = xmlDoc.CreateElement("Line");//创建一个<Line>节点 
+            //按规则选择线型  distance
+
+            string selectLineType = ""; //选中的线型
+            foreach (KeyValuePair<string,string> lineInfo in lineTypeList)
+            {
+                int minDis = int.Parse(lineInfo.Value.Split(new char[] { ',' })[5]);
+                int maxDis = int.Parse(lineInfo.Value.Split(new char[] { ',' })[6]);
+                if (minDis < distance && distance < maxDis)
+                {
+                    selectLineType = lineInfo.Key + "-" + lineInfo.Value;   //如果设备离站点距离在线型适用范围内
+                    break;  //则跳出
+                }
+            }
 
 
-            XmlElement subXml1 = xmlDoc.CreateElement("equipement");//创建一个<equipement>节点 
-            subXml1.SetAttribute("location", selectBlocks.Split(new char[] { ',' })[0]);
+            subXmlLine.SetAttribute("distance", (StationLocation - EquipementLocation).ToString());//设置该节点distance属性，
+            //subXmlLine.SetAttribute("LineName",)
+            subXmlLine.InnerText= selectLineType.Split(new char[] { '-' })[0];//
+            
 
+            xe1.AppendChild(subXmlStation);
+            xe1.AppendChild(subXmlEquipe);
+            xe1.AppendChild(subXmlLine);
 
-            subXml1.SetAttribute("line", "SPTYWPL,23,28芯");//selectBlocks.Split(new char[] { '-' })[2]);
-
-            subXml1.SetAttribute("Length", selectBlocks.Split(new char[] { ',' })[3]);
-            subXml1.InnerText = selectBlocks.Split(new char[] { ',' })[1]; 
-
-            xe1.AppendChild(subXml1);
-           
 
             subroot.AppendChild(xe1);
             xmlDoc.Save(xmlFile);
@@ -326,7 +373,7 @@ namespace AutoDraw
                     XmlElement childNode = xmlDoc.CreateElement("Line");//创建一个<Line>节点  
                     childNode.SetAttribute("Type", name);//设置该节点 线缆类型 名字属性 
                     childNode.SetAttribute("Short", sx);//设置该节点 缩写 属性 
-                    childNode.SetAttribute("num1", num);//设置该节点 第一个数量 属性 
+                    childNode.SetAttribute("LineType", num);//设置该节点 类型 属性（铠装） 
                     childNode.SetAttribute("numXin", numX);//设置该节点 芯数 属性 
                     childNode.SetAttribute("fournisseur", fournisseur);//设置该节点 芯数 属性 
                     childNode.SetAttribute("minDistance", minDis);//设置该节点 芯数 属性 
@@ -417,14 +464,14 @@ namespace AutoDraw
                             XmlElement childElement = (XmlElement)childNode;
                             string type = childElement.GetAttribute("Type");
                             string Short = childElement.GetAttribute("Short");
-                            string num1 = childElement.GetAttribute("num1");
+                            string num1 = childElement.GetAttribute("LineType");
                             string num2 = childElement.GetAttribute("numXin");
                             string fourni = childElement.GetAttribute("fournisseur");
                             string minD = childElement.GetAttribute("minDistance");
                             string maxD = childElement.GetAttribute("maxDistance");
                             string fullName = childElement.InnerText;
 
-                            retuneValue.Add(fullName, type + "," + Short + "," + num1 + "," + num2 + "," + fourni + "," + minD + "," + maxD);
+                            retuneValue.Add(fullName, type + "," + Short + "," + num1 + "," + num2 + "," + fourni + "," + minD + "," + maxD);//
                         }
                     }
                 }

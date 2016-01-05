@@ -24,15 +24,7 @@ namespace AutoDraw
         {
             InitializeComponent();
             XmlFilePath = xmlFile;
-
-            /*NandT = new List<string>();
-
-            NandT.Add("敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,8芯");
-            NandT.Add("敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,12芯");
-            NandT.Add("敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,16芯");
-            NandT.Add("敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,21芯");
-            NandT.Add("敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,28芯");
-            NandT.Add("敷设铝护套信号电缆,PTYL,23,12芯");*/
+            
 
 
         }
@@ -89,7 +81,19 @@ namespace AutoDraw
                             newDicNandT = defautLineList;
                         }
 
-                        fileDataView(newDicNandT);
+                        //在下拉框中填充设备商名称
+                        List<string> FournisseurList = new List<string>();
+                        foreach(KeyValuePair<string,string> lineInfo in newDicNandT)
+                        {
+                            string fournisseur = lineInfo.Value.Split(new char[] { ',' })[4];
+                            if (!FournisseurList.Contains(fournisseur))
+                            {
+                                FournisseurList.Add(fournisseur);
+                                comboFournisseur.Items.Add(fournisseur);
+                            }
+                        }
+
+                        //fileDataView(newDicNandT);
                         //dataGridView1.Columns[0].ReadOnly = true;  //只读
                     }
                     else
@@ -296,6 +300,25 @@ namespace AutoDraw
         }
 
 
+
+        private void Form_LineType_Resize(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void comboFournisseur_Click(object sender, EventArgs e)
+        {
+            if (comboFournisseur.SelectedText.ToString() != "")
+            {
+                Dictionary<string, string> LineInfoByFournisseur = new Dictionary<string, string>();
+                foreach(KeyValuePair<string,string> pair in newDicNandT)
+                {
+                    LineInfoByFournisseur.Add(pair.Key, pair.Value);
+                }
+                //根据设备商名称
+                fileDataView(LineInfoByFournisseur);
+            }
+        }
     }
 }
 

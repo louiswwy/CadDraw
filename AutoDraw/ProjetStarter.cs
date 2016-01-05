@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.Windows;
 
 [assembly: ExtensionApplication(typeof(AutoDraw.InitProject))]
 [assembly: CommandClass(typeof(AutoDraw.ProjetStarter))]
@@ -29,7 +25,7 @@ namespace AutoDraw
                 }
                 catch (System.Exception ee)
                 {
-
+                    Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage("发生错误！请联系维护人员！\n" + ee.ToString());
                 }
                 //Application.ShowModalDialog(form);  //显示非模态对话框 
 
@@ -73,6 +69,7 @@ namespace AutoDraw
         }*/
 
         public void Terminate()
+
         {
 
         }
