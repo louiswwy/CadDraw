@@ -338,6 +338,7 @@ namespace AutoDraw
 
         #endregion
 
+
         #region 线缆部分
         /// <summary>
         /// 写入线缆类型
@@ -486,18 +487,6 @@ namespace AutoDraw
 
         #endregion
 
-        #region 连接情况
-
-        /*public void createXmlConnection(string xmlFile)
-        {
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(xmlFile);
-
-
-            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
-            XmlNode xe1 = root.SelectSingleNode("Connection");//查找<Connection> 
-        }*/
-        #endregion
 
         #region 规则部分
         public void writeRule(string xmlPath, string Nequipe)

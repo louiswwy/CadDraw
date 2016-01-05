@@ -205,10 +205,10 @@ namespace AutoDraw
 
             //
             Polyline BigRectangle = new Polyline(4);
-            BigRectangle.AddVertexAt(0, new Point2d(insertPoint.X + 23, insertPoint.Y), 0, 0.1, 0.1);
-            BigRectangle.AddVertexAt(1, new Point2d(insertPoint.X + 23 + 225, insertPoint.Y), 0, 0.1, 0.1);
-            BigRectangle.AddVertexAt(2, new Point2d(insertPoint.X + 23 + 225, insertPoint.Y - 7), 0, 0.1, 0.1);
-            BigRectangle.AddVertexAt(3, new Point2d(insertPoint.X + 23, insertPoint.Y - 7), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(0, new Point2d(insertPoint.X + 30, insertPoint.Y), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(1, new Point2d(insertPoint.X + 30 + 218, insertPoint.Y), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(2, new Point2d(insertPoint.X + 30 + 218, insertPoint.Y - 7), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(3, new Point2d(insertPoint.X + 30, insertPoint.Y - 7), 0, 0.1, 0.1);
             BigRectangle.Closed = true;
             acBlkTblRec.AppendEntity(BigRectangle);
             trans.AddNewlyCreatedDBObject(BigRectangle, true);

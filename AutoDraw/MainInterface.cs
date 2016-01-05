@@ -83,6 +83,11 @@ namespace AutoDraw
             //DrawPicture();
         }
 
+        /// <summary>
+        /// 绘制防灾设备电缆径路图
+        /// </summary>
+        /// <param name="dictRailStation">基站、所亭表</param>
+        /// <param name="connectionDict">‘基站-防灾设备’连接情况</param>
         public void DrawPicture(Dictionary<string,string> dictRailStation, List<string> connectionDict)
         {
             XmlFunction xF = new XmlFunction();
@@ -115,7 +120,7 @@ namespace AutoDraw
                 StationList.Add(a.Split(new char[] { '-' })[0]);
             }
 
-            List<string>  Stations= StationList.Union(StationList).ToList();  //去除重复项
+            List<string>  Stations= StationList.Union(StationList).ToList();  //去除重复项 得到无重复的基站、所亭的列表
 
             List<string> unCheckConnection = new List<string>();
 
@@ -130,12 +135,11 @@ namespace AutoDraw
                     if (item.Contains(_station))
                     {
                         equipeBeDraw.Add(item.Split(new char[] { '-' })[1]); //将绘制的设备列表
-
                     }
 
                 }
 
-                ///确认本张图的绘图位置
+                ///确认本张图的绘图起点位置 （左下角）
                 Point2d insertSignlePoint = new Point2d(insertOriginSignlePoint.X + drawRound * 450, insertOriginSignlePoint.Y);
                 drawRound++;
 
@@ -175,33 +179,25 @@ namespace AutoDraw
                         break;
                     }
 
-
                 }
 
-
                 List<string> leftRightStation = new List<string>();
-
 
                 leftRightStation.Add(leftStation);
                 leftRightStation.Add(RighStation);
 
                 #endregion
 
-                //foreach()
-                drawSinglePicture(insertSignlePoint, fontStyleId, projetInfor, stationBeDraw, leftRightStation, equipeBeDraw);//db, trans, 
+                drawSingleStationPicture(insertSignlePoint, fontStyleId, projetInfor, stationBeDraw, leftRightStation, equipeBeDraw, connectionDict);//绘制单基站
 
             }
 
-            //插入块
-
             m_DocumentLock.Dispose();
-
-
 
         }
 
         /// <summary>
-        /// 
+        /// 绘制单个基站的防灾设备径路示意图图纸
         /// </summary>
         /// <param name="insertSignlePoint">插入点</param>
         /// <param name="fontStyleId">字型id</param>
@@ -209,7 +205,7 @@ namespace AutoDraw
         /// <param name="CommucationCenter">基站、所亭</param>
         /// <param name="LeftRightStation">相对于基站的左右车站</param>
         /// <param name="N_Equipment">防灾设备清单</param>
-        public void drawSinglePicture(Point2d insertSignlePoint, ObjectId fontStyleId, List<string> projetInfo, string CommucationCenter, List<string> LeftRightStation, List<string> N_Equipment)
+        public void drawSingleStationPicture(Point2d insertSignlePoint, ObjectId fontStyleId, List<string> projetInfo, string CommucationCenter, List<string> LeftRightStation, List<string> N_Equipment, List<string> connectionDict)
         {
             Point2d outerStartPoint = insertSignlePoint;
             Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
@@ -217,10 +213,11 @@ namespace AutoDraw
             Point2d innerStartPoint = new Point2d(outerStartPoint.X + 25, outerStartPoint.Y + 5);
             Point2d innerEndPoint = new Point2d(outerEndPoint.X - 5, outerEndPoint.Y - 5);
             Database db1 = HostApplicationServices.WorkingDatabase;
+
+            #region 绘制背景图，图框、图表
             using (Transaction trans1 = db1.TransactionManager.StartTransaction())
             {
                 //单个图框的范围
-
                 try
                 {
                     #region 绘制图框
@@ -230,14 +227,26 @@ namespace AutoDraw
                     rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
                     #endregion
 
-                    #region 图表
+                    #region 图表 （暂时未完成）
                     //绘制工程数量表 innerStartPoint
                     Point2d tableInsertPoint = new Point2d(innerStartPoint.X, innerEndPoint.Y);
-                    Entity[] NumbEngineTable = createNumberTable("工程数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y), fontStyleId);
-                    //绘制设备数量表
-                    Entity[] NumbEqipeTable = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), fontStyleId);
-                    #endregion
 
+                    List<string> GongChenTable = new List<string>();
+                    GongChenTable.Add("Bolt,SPTYWPL23-16B芯,m,2445,");
+                    GongChenTable.Add("Tile,SPTYWPL23-16B芯,m,2445,");
+                    GongChenTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
+                    GongChenTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
+                    Entity[] NumbEngineTable = createNumberTable("工程数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y), fontStyleId, GongChenTable);
+
+                    //绘制设备数量表
+                    List<string> SheBeiTable = new List<string>();
+                    SheBeiTable.Add("Bolt,SPTYWPL23-16B芯,m,2445,");
+                    SheBeiTable.Add("Tile,SPTYWPL23-16B芯,m,2445,");
+                    SheBeiTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
+                    SheBeiTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
+                    Entity[] NumbEqipeTable = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), fontStyleId, SheBeiTable);
+                    #endregion
+                    
                     #region 绘制通信、信号电缆槽示意图
                     drawFunction df = new drawFunction();
                     Entity[] backgoundEntity = df.drawBackGround(db1, trans1, new Point2d(innerStartPoint.X, innerEndPoint.Y), fontStyleId);
@@ -257,7 +266,7 @@ namespace AutoDraw
                     trans1.Abort();
                 }
             }
-
+            #endregion
 
             Database db2 = HostApplicationServices.WorkingDatabase;
             using (Transaction trans2 = db2.TransactionManager.StartTransaction())
@@ -309,38 +318,36 @@ namespace AutoDraw
                     {
                         Dictionary<string, string> attArrive = new Dictionary<string, string>();
                        
-                        attArrive.Add("站名", LeftRightStation[0].Split(new char[] { ',' })[1]);
-                        attArrive.Add("里程", LeftRightStation[0].Split(new char[] { ',' })[0]);
-                        spaceId.InsertBlockReference("0", "到达站站点标示", new Point3d(innerStartPoint.X + 175 + 196, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attArrive);
+                        attArrive.Add("站名", LeftRightStation[1].Split(new char[] { ',' })[1]);
+                        attArrive.Add("里程", LeftRightStation[1].Split(new char[] { ',' })[0]);
+                        spaceId.InsertBlockReference("0", "到达站站点标示", new Point3d(innerStartPoint.X + 175 + 188, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attArrive);
+
                         //换算成距离
-                        //List<string> temp = new List<string>();
-                        //pf.isExMatch(LeftRightStation[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out temp);
                         departStation = Int32.Parse(LeftRightStation[0].Split(new char[] { ',' })[3]);
                     }
 
                     if (LeftRightStation[1] != "")
                     {
                         Dictionary<string, string> attdepart = new Dictionary<string, string>();
-                        attdepart.Add("站名", LeftRightStation[1].Split(new char[] { ',' })[1]);
-                        attdepart.Add("里程", LeftRightStation[1].Split(new char[] { ',' })[0]);
+                        attdepart.Add("站名", LeftRightStation[0].Split(new char[] { ',' })[1]);
+                        attdepart.Add("里程", LeftRightStation[0].Split(new char[] { ',' })[0]);
                         spaceId.InsertBlockReference("0", "始发站站点标示", new Point3d(innerStartPoint.X + 175-8.21, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attdepart);
+
                         //换算成距离
-                        //List<string> temp = new List<string>();
-                        //pf.isExMatch(LeftRightStation[1], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out temp);
                         arriveStation = Int32.Parse(LeftRightStation[1].Split(new char[] { ',' })[3]);
                     }
 
                     string textDistance = " ";
-                    if (departStation != -1 && arriveStation != -1) //
+                    if (departStation != 0 && arriveStation != 0) //
                     {
                         textDistance = Math.Abs(departStation - arriveStation).ToString();
                     }
-                    DBText DistanceText = (DBText)insertText(textDistance, new Point3d(innerStartPoint.X + 168 + (362.7 - 168) / 2, innerStartPoint.Y + 363, 0), fontStyleId);
+                    DBText DistanceText = (DBText)insertText(textDistance, new Point3d(innerStartPoint.X + 264, innerStartPoint.Y + 240, 0), fontStyleId);
                     db2.AddToModelSpace(DistanceText);
 
                     #endregion
 
-                    #region 设备标
+                    #region 设备标志
                     //跟据图块数量决定每个块的间距   innerStartPoint.X + 168+, innerStartPoint.Y + 363, 0)
                     int marginEqui = 210 / (N_Equipment.Count + 1);
                     //绘图起始点
@@ -486,11 +493,7 @@ namespace AutoDraw
         public Polyline[] drawMutiLine(List<Point3d> registPoint, Point3d stationPoint, Point3d ChaoDao,ObjectId lineType)
         {
             Polyline[] mLines = new Polyline[registPoint.Count];
-
-
-            List<Point3d> equipePoint;
-            double minLength=0;
-
+            
             int num = 0;
             foreach (Point3d equipe in registPoint)
             {
@@ -567,7 +570,15 @@ namespace AutoDraw
 
         }
 
-        public Entity[] createNumberTable(string stringTableName, Point2d insertPoint, ObjectId styleId)//Database db,Point2d insertPoint,Dictionary<string, string> ItemNumber)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stringTableName">表格名字</param>
+        /// <param name="insertPoint">插入点</param>
+        /// <param name="styleId">文字样式</param>
+        /// <param name="tableContent"></param>
+        /// <returns></returns>
+        public Entity[] createNumberTable(string stringTableName, Point2d insertPoint, ObjectId styleId, List<string> tableContent)//Database db,Point2d insertPoint,Dictionary<string, string> ItemNumber)
         {
             Entity[] tableAndname = new Entity[2];
 
@@ -586,20 +597,17 @@ namespace AutoDraw
             #endregion
 
             #region 表格
-            int tabCol = 6; //暂定
+            int tabCol = 6; //表格含6列
 
             Table tb = new Table();
-            
+
             tb.NumRows = 10;
 
             tb.NumColumns = tabCol;
 
             tb.SetRowHeight(6);
 
-            /* //cad2008
-            tb.SetColumnWidth(15);
-             */
-            //cad2010
+            //设置表格列宽 （cad2010)            
             tb.Columns[0].Width = 10;
             tb.Columns[1].Width = 27;
             tb.Columns[2].Width = 27;
@@ -614,6 +622,7 @@ namespace AutoDraw
 
             // of our table contents
 
+            //清空
             string[,] str = new string[10, 6];
 
             for (int i = 0; i < 10; i++)
@@ -639,29 +648,15 @@ namespace AutoDraw
             str[7, 0] = "7";
             str[8, 0] = "8";
 
-            str[2, 1] = "Bolt";
-            str[2, 2] = "SPTYWPL23-16B芯 ";
-            str[2, 3] = "m";
-            str[2, 4] = "2445";
-            str[2, 5] = "";
+            for (int row = 2; row < tableContent.Count; row++)
+            {
+                for (int col = 1; col < tableContent[tableContent.Count - 2].Split(new char[] { ',' }).Length; col++)
+                {
+                    str[row, col] = tableContent[tableContent.Count - 2].Split(new char[] { ',' })[col - 1];
+                }
+            }
 
-            str[3, 1] = "Tile";
-            str[3, 2] = "SPTYWPL23-16B芯 ";
-            str[3, 3] = "m";
-            str[3, 4] = "2445";
-            str[3, 5] = "";
-
-            str[4, 1] = "Kean";
-            str[4, 2] = "SPTYWPL23-16B芯  ";
-            str[4, 3] = "m";
-            str[4, 4] = "2445";
-            str[4, 5] = "";
-
-            str[5, 1] = "Kean";
-            str[5, 2] = "SPTYWPL23-16B芯 ";
-            str[5, 3] = "m";
-            str[5, 4] = "2445";
-            str[5, 5] = "";
+            
 
             // Use a nested loop to add and format each cell
             for (int i = 0; i < 10; i++)
@@ -3793,26 +3788,7 @@ namespace AutoDraw
                 MessageBox.Show("没有选中所亭。");
             }
 
-            /*XmlFunction xf = new XmlFunction();
-            
-            List<string> equipeNode = new List<string>();
 
-            foreach (TreeNode node in selectedWayPoint.Nodes)
-            {
-                if (node.Level == 0)
-                {
-                    string SuoTing = node.Name.ToString().ToUpper().Replace(" ", "");
-
-                    string equipeInfor = "";
-                    foreach(TreeNode childNode in node.Nodes)
-                    {
-                        equipeInfor += childNode.Name.ToString() + ","; //里程，名称，数量
-                        
-                    }
-                    equipeNode.Add(equipeInfor);
-                }
-            }
-            xf.createConnectionXml(xmlFilePath, selectDataGrid, equipeNode);*/
         }
 
         /// <summary>
@@ -3995,10 +3971,10 @@ namespace AutoDraw
                         ListEquipe.Add(location + "-" + num + "-" + line + "-" + name);
 
                     }
-                    //xF.createConnectionXml(xmlFilePath + "\\setting.xml", STInfo, ListEquipe);
+                    
                 } 
             }
-            //xF.createConnectionXml()
+
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -4406,11 +4382,12 @@ namespace AutoDraw
 
                     connectionDict.Add(station + "-" + equipe);
 
+                    //写入‘基站-设备’的连接信息。
                     XF.createConnectionXml(xmlFilePath + "\\setting.xml", LineByFournisseur, station, equipe);
                     #endregion
 
 
-                    #region
+                    #region 该控件已隐藏。功能暂时废弃
                     TreeNode root = new TreeNode();
                     root.Text = (station.Split(new char[] { ',' })[0] + "," + station.Split(new char[] { ',' })[1]);
                     bool isduplicate = false;
@@ -4445,11 +4422,12 @@ namespace AutoDraw
                         root.Nodes.Add(equipeRoot);
                     }
 
-                    //selectedWayPoint.Nodes
                     #endregion
                 }
-                //
-                //绘图。传递RailstationPoint站点信息用户绘制车站标，传递connectionDict连接信息绘制设备、线缆
+                //绘制系统图
+
+
+                //绘制电缆径路示意图。传递RailstationPoint站点信息用户绘制车站标，传递connectionDict连接信息绘制设备、线缆
                 DrawPicture(RailstationPoint, connectionDict); 
             }
             else
