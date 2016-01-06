@@ -380,33 +380,50 @@ namespace AutoDraw
                     Dictionary<string, ClassStruct.KeyPoint> drawComponent = new Dictionary<string, ClassStruct.KeyPoint>();
 
                     //比较设备和基站的里程大小
-                    List<int> lichengList = new List<int>();
-                    lichengList.Add(StationToBeDraw.distance);
-                    foreach(var a in N_Equipment)
+                    List<KeyValuePair<int, string>> lstorder=new List<KeyValuePair<int, string>>();
+                    Dictionary<string, int> lichengList = new Dictionary<string, int>();
+                    try
                     {
-                        lichengList.Add(a.distance);
+                        lichengList.Add(StationToBeDraw.distance + "," + StationToBeDraw.type, StationToBeDraw.distance);
+                        foreach (var a in N_Equipment)
+                        {
+                            lichengList.Add(a.distance + "," + a.type, a.distance);
+                        }
+                        lichengList.OrderBy(c => c.Value).ToList();
+                    }
+                    catch (System.Exception ee)
+                    {
+                        MessageBox.Show("" + ee.ToString());
+                        throw;
                     }
 
                     //对list排序
-                    lichengList.Sort();
-
+                    //var result = from pair in lichengList orderby pair.Key select pair;
+                    //List<KeyValuePair<int, string>> lstorder = lichengList.OrderBy(c => c.Key).ToList();
                     int numInsert = 0; //以绘制几个图形
+                    foreach(var a in lichengList)
+                    {
+                        string aa = a.Key.ToString().Split(new char[] { ',' })[1];
 
+                        lstorder.Add(new KeyValuePair<int, string>(a.Value, aa));
+                    }
                     
                     //根据设备、基站里程绘图
-                    foreach (int LiCheng in lichengList)
+                    foreach (KeyValuePair<int,string> LiCheng_Type in lstorder)
                     {
-                        if (StationToBeDraw.distance == LiCheng) //绘制基站
+                        if (StationToBeDraw.distance == LiCheng_Type.Key&& StationToBeDraw.type == LiCheng_Type.Value) //绘制基站
                         {
                             string stationName = transforBlockName(StationToBeDraw.type);
 
+                            //DBText equipeText1 = (DBText)insertText(StationToBeDraw.location + " " + StationToBeDraw.name, new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y, 0), fontStyleId);
+                            //db2.AddToModelSpace(equipeText1);
                             spaceId.InsertBlockReference("0", stationName, new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y, 0), new Scale3d(1), 0); //插入车站标
 
                             spaceId.InsertBlockReference("0", "监控单元_G", new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y + 2, 0), new Scale3d(1), 0); //插入监控单元图块
 
                             registStationInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y + 2, 0); //记录插入点用于画线
 
-                            DBText equipeText = (DBText)insertText(StationToBeDraw.location + " " + StationToBeDraw.name, new Point3d(innerStartPoint.X + 146 + (218 / (N_Equipment.Count + 1)) * numInsert, innerStartPoint.Y + 89 + 7.5 / 2, 0), fontStyleId);
+                            DBText equipeText = (DBText)insertText(StationToBeDraw.location + " " + StationToBeDraw.name, new Point3d(innerStartPoint.X + 146 + (218 / (N_Equipment.Count + 1)) * numInsert + 20, innerStartPoint.Y + 89 + 7.5 / 2, 0), 3, TextHorizontalMode.TextLeft, fontStyleId);
                             db2.AddToModelSpace(equipeText);
 
                             numInsert++;
@@ -416,7 +433,7 @@ namespace AutoDraw
                         {
                             foreach(var equipe in N_Equipment)
                             {
-                                if (equipe.distance == LiCheng)//绘制设备
+                                if (equipe.distance == LiCheng_Type.Key&& equipe.type == LiCheng_Type.Value)//绘制设备
                                 {
                                     //插入接触网杆
                                     spaceId.InsertBlockReference("0", "接触网杆_g", new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y +40, 0), new Scale3d(1), 0);
@@ -439,7 +456,7 @@ namespace AutoDraw
 
 
                                     //加入设备文字信息
-                                    DBText equipeText = (DBText)insertText(equipe.name + " " + equipe.location, new Point3d(innerStartPoint.X + 146 + (218 / (N_Equipment.Count + 1)) * numInsert, innerStartPoint.Y + 89 - 7.5 / 2, 0), fontStyleId);
+                                    DBText equipeText = (DBText)insertText(equipe.name + " " + equipe.location, new Point3d(innerStartPoint.X + 146 + (218 / (N_Equipment.Count + 1)) * numInsert, innerStartPoint.Y + 89 - 7.5 / 2, 0), 3, TextHorizontalMode.TextLeft, fontStyleId);
                                     db2.AddToModelSpace(equipeText);
 
 
@@ -466,6 +483,7 @@ namespace AutoDraw
                                     }
 
                                     numInsert++;//画一次图，增加一次
+                                    break;
                                 }
                             }
                         }
@@ -550,11 +568,9 @@ namespace AutoDraw
                     DrawName.Width = 80;
                     DrawName.TextStyleId = fontStyleId;
                     DrawName.Contents = DrawNameString.ToString();
-                    DrawName.HorizontalMode = TextHorizontalMode.TextCenter;
+                    DrawName.Attachment = AttachmentPoint.MiddleCenter; //居中？
 
-                    text1.HorizontalMode = TextHorizontalMode.TextCenter;
-                    text1.VerticalMode = TextVerticalMode.TextVerticalMid;
-                    text1.AlignmentPoint = text1.Position;
+                    
                     //acBlkTblRec.AppendEntity(acMText);
                     db2.AddToModelSpace(acMText, DrawName); //插入文字
                     #endregion
@@ -677,6 +693,19 @@ namespace AutoDraw
             equipeText.Height = 4.5;
             equipeText.TextString = text;
             equipeText.HorizontalMode = TextHorizontalMode.TextCenter;
+            equipeText.VerticalMode = TextVerticalMode.TextVerticalMid;
+            equipeText.AlignmentPoint = equipeText.Position;
+            equipeText.WidthFactor = 0.7;
+            equipeText.TextStyleId = fontStyleId;
+            return equipeText;
+        }
+        public Entity insertText(string text, Point3d insertPoint, double textHeight, TextHorizontalMode ALigneMode, ObjectId fontStyleId)
+        {
+            DBText equipeText = new DBText();
+            equipeText.Position = insertPoint;
+            equipeText.Height = textHeight;
+            equipeText.TextString = text;
+            equipeText.HorizontalMode = ALigneMode;
             equipeText.VerticalMode = TextVerticalMode.TextVerticalMid;
             equipeText.AlignmentPoint = equipeText.Position;
             equipeText.WidthFactor = 0.7;
