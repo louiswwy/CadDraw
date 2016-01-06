@@ -233,7 +233,7 @@ namespace AutoDraw
         /// <param name="xmlFile">文件地址</param>
         /// <param name="selectStation">选中所亭项</param>
         /// <param name="selectEquipement">选中的块图案</param>
-        public void createConnectionXml(string xmlFile,Dictionary<string,string> lineTypeList, string selectStation, string selectEquipement)
+        public List<ClassStruct.ConnectionAndLine> createConnectionXml(string xmlFile, List<ClassStruct.LineType> lineTypeList, List<string> StationEquipePairList)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
@@ -243,70 +243,92 @@ namespace AutoDraw
 
             if (subroot == null)
             {
-                subroot = xmlDoc.CreateElement("Connections"); //添加
+                subroot = xmlDoc.CreateElement("Connections"); //添加Connections节点
                 root.AppendChild(subroot);
             }
-            XmlElement xe1 = xmlDoc.CreateElement("Pair");//创建一个<Pair>节点 
 
-            string stationLocation = selectStation.Split(new char[] { ',' })[0];
-            string stationName = selectStation.Split(new char[] { ',' })[1];
+            List<ClassStruct.ConnectionAndLine> Station_Equipe_Line_List = new List<ClassStruct.ConnectionAndLine>();
 
-            string equipementLocation = selectEquipement.Split(new char[] { ',' })[0];
-            string equipementName = selectEquipement.Split(new char[] { ',' })[1];
-
-            //站点的里程
-            PFunction pF = new PFunction();
-            List<string> StationlistDistance = new List<string>();
-            pF.isExMatch(stationLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out StationlistDistance);
-            int StationLocation = Int32.Parse(StationlistDistance[1]) * 1000 + Int32.Parse(StationlistDistance[2]);
-
-            //设备的里程
-            List<string> EquipementlistDistance = new List<string>();
-            pF.isExMatch(equipementLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out EquipementlistDistance);
-            int EquipementLocation = Int32.Parse(EquipementlistDistance[1]) * 1000 + Int32.Parse(EquipementlistDistance[2]);
-
-            int distance = Math.Abs(StationLocation - EquipementLocation);
-            //设备与站点间的间距
-
-            XmlElement subXmlStation = xmlDoc.CreateElement("Station");//创建一个<Station>节点 
-            subXmlStation.SetAttribute("Stationlocation", stationLocation);
-            subXmlStation.SetAttribute("StationType", selectStation.Split(new char[] { ',' })[2]);
-            subXmlStation.InnerText = stationName;
-
-            XmlElement subXmlEquipe = xmlDoc.CreateElement("Equipement");//创建一个<Equipement>节点 
-            subXmlEquipe.SetAttribute("Equipelocation", equipementLocation);
-            subXmlEquipe.SetAttribute("EquipeType", selectEquipement.Split(new char[] { ',' })[2]);
-            subXmlEquipe.InnerText = equipementName;
-
-            XmlElement subXmlLine = xmlDoc.CreateElement("Line");//创建一个<Line>节点 
-            //按规则选择线型  distance
-
-            string selectLineType = ""; //选中的线型
-            foreach (KeyValuePair<string,string> lineInfo in lineTypeList)
+            foreach (string StationEquipePair in StationEquipePairList) //循环
             {
-                int minDis = int.Parse(lineInfo.Value.Split(new char[] { ',' })[5]);
-                int maxDis = int.Parse(lineInfo.Value.Split(new char[] { ',' })[6]);
-                if (minDis < distance && distance < maxDis)
+
+                XmlElement xe1 = xmlDoc.CreateElement("Pair");//创建一个<Pair>节点 
+
+
+                string station = StationEquipePair.Split(new char[] { '_' })[0];
+                string equipe = StationEquipePair.Split(new char[] { '_' })[1];
+                 
+                ClassStruct.StationPoint stationInfor = new ClassStruct.StationPoint(station.Split(new char[] { ',' })[0], station.Split(new char[] { ',' })[1], station.Split(new char[] { ',' })[2], int.Parse(station.Split(new char[] { ',' })[3]));
+                //生成自定义 设备信息类
+                ClassStruct.EquipePoint equipeInfor = new ClassStruct.EquipePoint(equipe.Split(new char[] { ',' })[0], equipe.Split(new char[] { ',' })[1], equipe.Split(new char[] { ',' })[2], int.Parse(equipe.Split(new char[] { ',' })[3]));
+
+                //站点的里程
+                int stationLocation = stationInfor.distance;
+
+                //设备的里程
+                int equipementLocation = equipeInfor.distance;
+
+                //设备与基站、所亭间的距离
+                int distance = Math.Abs(stationLocation - equipementLocation);
+
+                if (distance == 0)
                 {
-                    selectLineType = lineInfo.Key + "-" + lineInfo.Value;   //如果设备离站点距离在线型适用范围内
-                    break;  //则跳出
+                    distance = 100;
                 }
+                else
+                {
+                    distance = Convert.ToInt32(Math.Round(distance * 1.2));
+                }
+                
+                //站点节点
+                XmlElement subXmlStation = xmlDoc.CreateElement("Station");//创建一个<Station>节点 
+                subXmlStation.SetAttribute("Stationlocation", stationInfor.location);
+                subXmlStation.SetAttribute("StationType", stationInfor.type);
+                subXmlStation.InnerText = stationInfor.name;
+
+                //设备节点
+                XmlElement subXmlEquipe = xmlDoc.CreateElement("Equipement");//创建一个<Equipement>节点 
+                subXmlEquipe.SetAttribute("Equipelocation", equipeInfor.location);
+                subXmlEquipe.SetAttribute("EquipeType", equipeInfor.type);
+                subXmlEquipe.InnerText = equipeInfor.name;
+
+                //线型子节点
+                XmlElement subXmlLine = xmlDoc.CreateElement("Line");//创建一个<Line>节点 
+
+                ClassStruct.LineInfor LineInformation;
+                //按规则选择线型  distance
+                string selectLineType = ""; //选中的线型
+                foreach (ClassStruct.LineType lineInfo in lineTypeList)
+                {
+                    int minDis = Convert.ToInt32(lineInfo.minLength);
+                    int maxDis = Convert.ToInt32(lineInfo.maxLength);
+                    if (minDis <= distance && distance < maxDis)
+                    {
+                        selectLineType = lineInfo.name;   //如果设备离站点距离在线型适用范围内
+
+                        LineInformation = new ClassStruct.LineInfor(lineInfo.shortfor, lineInfo.name, lineInfo.fournisseurName, lineInfo.lineType, lineInfo.lineXin, lineInfo.maxLength, lineInfo.minLength, distance);
+
+                        ClassStruct.ConnectionAndLine StationEquipeLine = new ClassStruct.ConnectionAndLine(stationInfor, equipeInfor, LineInformation);
+                        Station_Equipe_Line_List.Add(StationEquipeLine);
+                        break;  //则跳出
+                    }
+                }
+                
+                subXmlLine.SetAttribute("distance", distance.ToString());//设置该节点distance属性，
+                                                                                                       //subXmlLine.SetAttribute("LineName",)
+                subXmlLine.InnerText = selectLineType;//
+
+                xe1.AppendChild(subXmlStation);
+                xe1.AppendChild(subXmlEquipe);
+                xe1.AppendChild(subXmlLine);
+
+                subroot.AppendChild(xe1);
             }
 
 
-            subXmlLine.SetAttribute("distance", (StationLocation - EquipementLocation).ToString());//设置该节点distance属性，
-            //subXmlLine.SetAttribute("LineName",)
-            subXmlLine.InnerText= selectLineType.Split(new char[] { '-' })[0];//
             
-
-            xe1.AppendChild(subXmlStation);
-            xe1.AppendChild(subXmlEquipe);
-            xe1.AppendChild(subXmlLine);
-
-
-            subroot.AppendChild(xe1);
             xmlDoc.Save(xmlFile);
-
+            return Station_Equipe_Line_List;
         }
 
         public void removeConnection(string xmlFile)
@@ -548,7 +570,7 @@ namespace AutoDraw
 
 
             //检查值是否重复
-            bool isDupli = false;
+
             foreach (XmlElement subEle in subroot.ChildNodes)
             {
                 subroot.RemoveChild(subEle);

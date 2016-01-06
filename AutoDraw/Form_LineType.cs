@@ -32,7 +32,7 @@ namespace AutoDraw
         public Dictionary<string, string> defautLineType(string xmlfile)
         {
             DicNandT = new Dictionary<string, string>();
-            DicNandT.Add("SPTYWPL23 8芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,8芯,defaut,100,1000");
+            DicNandT.Add("SPTYWPL23 8芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,8芯,defaut,0,1000");
             DicNandT.Add("SPTYWPL23 12芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,12芯,defaut,1000,2000");
             DicNandT.Add("SPTYWPL23 16芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,16芯,defaut,2000,4000");
             DicNandT.Add("SPTYWPL23 21芯", "敷设内屏蔽铝护套数字信号电缆,SPTYWPL,23,21芯,defaut,4000,6000");
