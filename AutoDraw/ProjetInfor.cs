@@ -21,14 +21,14 @@ namespace AutoDraw
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (textBox1.Text.ToString() != "" && textBox2.Text.ToString() != "") //不为空时
+            if (textBox1.Text.ToString() != "" && textBox2.Text.ToString() != "" && textBox3.Text.ToString() != "" && textBox4.Text.ToString() != "") //不为空时
             {
                 XmlFunction xF = new XmlFunction();
                 try
                 {
                     if (MessageBox.Show("项目名称:" + textBox1.Text.ToString().Replace(" ", ""), "\n图   号" + textBox2.Text.ToString().Replace(" ", "") + "\n确认保存?", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                     {
-                        xF.writeProjrtInfo(xmlDicPath + "\\setting.xml", textBox1.Text.ToString().Replace(" ", ""), textBox2.Text.ToString().Replace(" ", ""), textBox3.Text.ToString().Replace(" ", ""));
+                        xF.writeProjrtInfo(xmlDicPath + "\\setting.xml", textBox1.Text.ToString().Replace(" ", ""), textBox2.Text.ToString().Replace(" ", ""), textBox3.Text.ToString().Replace(" ", ""), textBox4.Text.ToString().Replace(" ", ""));
                         toolStripStatusLabel1.Text = "项目名称:" + textBox1.Text.ToString().Replace(" ", "") + "已保存.";
 
                     }

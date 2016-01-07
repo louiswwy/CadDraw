@@ -82,10 +82,10 @@ namespace AutoDraw
             //绘制图形背景。图形分为4个部分，左上的两个数量表、又上的标志、左下的说明与图例、右下的图签
             //线槽
             Point3d insertLineTable1 = new Point3d(insertPoint.X + 116, insertPoint.Y - 119, 0);
-            List<Entity> Fibre1 = drawDoubleFibre(db, trans, insertLineTable1, fontID);
+            List<Entity> Fibre1 = drawDoubleFibre(db, trans, insertLineTable1, fontID, true);
 
             Point3d insertLineTable2 = new Point3d(insertPoint.X + 116, insertPoint.Y - 176, 0);
-            List<Entity> Fibre2 = drawDoubleFibre(db, trans, insertLineTable2, fontID);
+            List<Entity> Fibre2 = drawDoubleFibre(db, trans, insertLineTable2, fontID, false);
 
             //右上方图表
             Point3d insertUpRightTable = new Point3d(insertPoint.X + 116, insertPoint.Y - 8, 0);
@@ -205,10 +205,10 @@ namespace AutoDraw
 
             //
             Polyline BigRectangle = new Polyline(4);
-            BigRectangle.AddVertexAt(0, new Point2d(insertPoint.X + 30, insertPoint.Y), 0, 0.1, 0.1);
-            BigRectangle.AddVertexAt(1, new Point2d(insertPoint.X + 30 + 218, insertPoint.Y), 0, 0.1, 0.1);
-            BigRectangle.AddVertexAt(2, new Point2d(insertPoint.X + 30 + 218, insertPoint.Y - 7), 0, 0.1, 0.1);
-            BigRectangle.AddVertexAt(3, new Point2d(insertPoint.X + 30, insertPoint.Y - 7), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(0, new Point2d(insertPoint.X + 25, insertPoint.Y), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(1, new Point2d(insertPoint.X + 25 + 223, insertPoint.Y), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(2, new Point2d(insertPoint.X + 25 + 223, insertPoint.Y - 7), 0, 0.1, 0.1);
+            BigRectangle.AddVertexAt(3, new Point2d(insertPoint.X + 25, insertPoint.Y - 7), 0, 0.1, 0.1);
             BigRectangle.Closed = true;
             acBlkTblRec.AppendEntity(BigRectangle);
             trans.AddNewlyCreatedDBObject(BigRectangle, true);
@@ -456,7 +456,7 @@ namespace AutoDraw
         /// <param name="db"></param>
         /// <param name="trans"></param>
         /// <param name="insertPoint"></param>
-        public List<Entity> drawDoubleFibre(Database db, Transaction trans, Point3d insertPoint,ObjectId fontId)
+        public List<Entity> drawDoubleFibre(Database db, Transaction trans, Point3d insertPoint,ObjectId fontId,bool LeftOrRight)
         {
             Polyline pHorizonline1 = new Polyline();
             pHorizonline1.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y), new Point2d(insertPoint.X + 248, insertPoint.Y));
@@ -465,23 +465,35 @@ namespace AutoDraw
             Polyline pHorizonline3 = new Polyline();
             pHorizonline3.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y - 8.4), new Point2d(insertPoint.X + 248, insertPoint.Y - 8.4));
 
-            DBText TFibreName1 = new DBText();
-            TFibreName1.TextString = "信号电缆槽";
-            TFibreName1.Height = 3;
-            TFibreName1.TextStyleId = fontId;
-            TFibreName1.WidthFactor = 0.7;
-            TFibreName1.VerticalMode = TextVerticalMode.TextVerticalMid;
-            TFibreName1.HorizontalMode = TextHorizontalMode.TextLeft;
-            TFibreName1.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 2.1, 0);
 
-            DBText TFibreName2 = new DBText();
-            TFibreName2.TextString = "通信电缆槽";
-            TFibreName2.Height = 3;
-            TFibreName2.TextStyleId = fontId;
-            TFibreName2.WidthFactor = 0.7;
-            TFibreName2.VerticalMode = TextVerticalMode.TextVerticalMid;
-            TFibreName2.HorizontalMode = TextHorizontalMode.TextLeft;
-            TFibreName2.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 6.3, 0);
+                DBText TFibreName1 = new DBText();
+                TFibreName1.TextString = "信号电缆槽";
+                TFibreName1.Height = 3;
+                TFibreName1.TextStyleId = fontId;
+                TFibreName1.WidthFactor = 0.7;
+                TFibreName1.VerticalMode = TextVerticalMode.TextVerticalMid;
+                TFibreName1.HorizontalMode = TextHorizontalMode.TextLeft;
+                
+
+                DBText TFibreName2 = new DBText();
+                TFibreName2.TextString = "通信电缆槽";
+                TFibreName2.Height = 3;
+                TFibreName2.TextStyleId = fontId;
+                TFibreName2.WidthFactor = 0.7;
+                TFibreName2.VerticalMode = TextVerticalMode.TextVerticalMid;
+                TFibreName2.HorizontalMode = TextHorizontalMode.TextLeft;
+                
+            if (LeftOrRight == true)
+            {
+                TFibreName1.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 2.1, 0);
+                TFibreName2.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 6.3, 0);
+            }
+            else
+            {
+                TFibreName2.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 2.1, 0);
+                TFibreName1.AlignmentPoint = new Point3d(insertPoint.X, insertPoint.Y - 6.3, 0);
+
+            }
 
             List<Entity> lineEntity = new List<Entity>();
             lineEntity.Add(TFibreName1);

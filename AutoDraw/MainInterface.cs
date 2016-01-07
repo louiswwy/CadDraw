@@ -195,7 +195,7 @@ namespace AutoDraw
 
                 #endregion
 
-                drawSingleStationPicture(insertSignlePoint, fontStyleId, projetInfor, stationBeDraw, leftRightStation, equipeBeDraw, List_ConnectionAndLine);// connectionDict);//绘制单基站
+                drawSingleStationPicture(insertSignlePoint, fontStyleId, projetInfor, stationBeDraw, leftRightStation, equipeBeDraw, List_ConnectionAndLine, drawRound);// connectionDict);//绘制单基站
 
             }
 
@@ -212,7 +212,7 @@ namespace AutoDraw
         /// <param name="StationToBeDraw">基站、所亭</param>
         /// <param name="LeftRightStation">相对于基站的左右车站</param>
         /// <param name="N_Equipment">防灾设备清单</param>
-        public void drawSingleStationPicture(Point2d insertSignlePoint, ObjectId fontStyleId, List<string> projetInfo, ClassStruct.StationPoint StationToBeDraw, List<string> LeftRightStation, List<ClassStruct.EquipePoint> N_Equipment, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine)//List<string> connectionDict)
+        public void drawSingleStationPicture(Point2d insertSignlePoint, ObjectId fontStyleId, List<string> projetInfo, ClassStruct.StationPoint StationToBeDraw, List<string> LeftRightStation, List<ClassStruct.EquipePoint> N_Equipment, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine,int drawNum)//List<string> connectionDict)
         {
             Point2d outerStartPoint = insertSignlePoint;
             Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
@@ -285,12 +285,20 @@ namespace AutoDraw
                     //插入图签
                     #region 添加图签
 
-
+                    string pictureNum = "";
+                    if (drawNum < 10)
+                    {
+                        pictureNum = "0" + drawNum;
+                    }
+                    else
+                    {
+                        pictureNum = "" + drawNum;
+                    }
                     //块属性的字典对象
                     //图签块
                     Dictionary<string, string> attTQ = new Dictionary<string, string>();
                     attTQ.Add("项目名称", projetInfo[0]);
-                    attTQ.Add("图纸名称", projetInfo[1] + "-" + projetInfo[2] + "-01");
+                    attTQ.Add("图纸名称", projetInfo[1] + "-" + projetInfo[2] + "-"+ pictureNum);
                     attTQ.Add("图纸比例", "1：100");
                     attTQ.Add("绘制日期", System.DateTime.Now.Year + "." + System.DateTime.Now.Month);
                     attTQ.Add("页数", "第1张，共1张");
@@ -298,7 +306,10 @@ namespace AutoDraw
 
                     #region 轨道图标
                     Dictionary<string, string> attGD = new Dictionary<string, string>();
-                    attGD.Add("上行/下行线", projetInfo[1] + "上行/下行线");
+                    attGD.Add("上行/下行线", projetInfo[3] + "下行线");
+
+                    Dictionary<string, string> attGD2 = new Dictionary<string, string>();
+                    attGD2.Add("上行/下行线", projetInfo[3] + "上行线");
                     #endregion
 
                     BlockTable acBlkTbl = trans2.GetObject(db2.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -310,7 +321,7 @@ namespace AutoDraw
                     spaceId.InsertBlockReference("0", "三级图签", new Point3d(innerStartPoint.X + 390, innerStartPoint.Y, 0), new Scale3d(1), 0, attTQ);
 
                     spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 137.2, 0), new Scale3d(1), 0, attGD);
-                    spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 159.2, 0), new Scale3d(1), 0, attGD);
+                    spaceId.InsertBlockReference("0", "铁轨_Length_248", new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 159.2, 0), new Scale3d(1), 0, attGD2);
                     spaceId.InsertBlockReference("0", "图例", new Point3d(innerStartPoint.X + 5.5, innerStartPoint.Y + 57, 0), new Scale3d(1), 0);
 
 
@@ -345,12 +356,22 @@ namespace AutoDraw
                     }
 
                     string textDistance = " ";
-                    if (departStation != 0 && arriveStation != 0) //
+                    //if (departStation != 0 && arriveStation != 0) //
                     {
                         textDistance = Math.Abs(departStation - arriveStation).ToString();
                     }
-                    DBText DistanceText = (DBText)insertText(textDistance, new Point3d(innerStartPoint.X + 264, innerStartPoint.Y + 240, 0), fontStyleId);
-                    db2.AddToModelSpace(DistanceText);
+                    //站间里程
+                    //DBText DistanceText = (DBText)insertText(textDistance, new Point3d(innerStartPoint.X + 264, innerStartPoint.Y + 240, 0), fontStyleId);
+                    //db2.AddToModelSpace(DistanceText);
+                    
+                    AlignedDimension dimAlignedStations = new AlignedDimension();
+                    dimAlignedStations.XLine1Point = new Point3d(innerStartPoint.X + 175 + 188, innerStartPoint.Y + 238 + 4, 0);
+                    dimAlignedStations.XLine2Point = new Point3d(innerStartPoint.X + 175 - 8.21, innerStartPoint.Y + 238 + 4, 0);
+                    dimAlignedStations.DimLinePoint = GeTools.MidPoint(new Point3d(innerStartPoint.X + 175 + 188, innerStartPoint.Y + 238 + 4, 0), new Point3d(innerStartPoint.X + 175 - 8.21, innerStartPoint.Y + 238 + 4, 0)).PolarPoint(0, 10);
+                    //dimAlignedStations.te
+                    dimAlignedStations.DimensionText = Math.Round(Convert.ToDouble(textDistance) / 1000, 1).ToString() + "km";
+                    db2.AddToModelSpace(dimAlignedStations);
+
 
                     #endregion
 
@@ -374,6 +395,9 @@ namespace AutoDraw
 
                     List<Point3d> registBoxInsertPoint = new List<Point3d>();  //记录控制箱插入点用于画线
                     List<List<Point3d>> registEquipeInsertPoint = new List<List<Point3d>>();  //记录设备插入点用于画线
+
+                    List<Point3d> registGouChaoInsertPoint = new List<Point3d>();  //记录设备插入点用于画线
+
                     Point3d registStationInsertPoint = new Point3d();          ///记录插入点用于画线
 
 
@@ -408,6 +432,8 @@ namespace AutoDraw
                         lstorder.Add(new KeyValuePair<int, string>(a.Value, aa));
                     }
                     
+                    
+
                     //根据设备、基站里程绘图
                     foreach (KeyValuePair<int,string> LiCheng_Type in lstorder)
                     {
@@ -423,6 +449,8 @@ namespace AutoDraw
 
                             registStationInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y + 2, 0); //记录插入点用于画线
 
+                            registGouChaoInsertPoint.Add(new Point3d(equipeInsertPoint.X + marginEqui * numInsert + 1, equipeInsertPoint.Y, 0));  //绘制两条红线用于表示基站至信号电缆槽的挖沟
+                            registGouChaoInsertPoint.Add(new Point3d(equipeInsertPoint.X + marginEqui * numInsert - 1, equipeInsertPoint.Y, 0));  //绘制两条红线用于表示基站至信号电缆槽的挖沟
                             DBText equipeText = (DBText)insertText(StationToBeDraw.location + " " + StationToBeDraw.name, new Point3d(innerStartPoint.X + 146 + (218 / (N_Equipment.Count + 1)) * numInsert + 20, innerStartPoint.Y + 89 + 7.5 / 2, 0), 3, TextHorizontalMode.TextLeft, fontStyleId);
                             db2.AddToModelSpace(equipeText);
 
@@ -440,8 +468,11 @@ namespace AutoDraw
                                     //插入防灾控制箱
                                     spaceId.InsertBlockReference("0", "防灾控制箱_G", new Point3d(equipeInsertPoint.X + 1.4 + marginEqui * numInsert, equipeInsertPoint.Y + 40 - 23.4, 0), new Scale3d(1), 0);
 
-                                    //记录插入点
+                                    //记录防灾控制箱插入点插入点
                                     registBoxInsertPoint.Add(new Point3d(equipeInsertPoint.X + 2.8 + marginEqui * numInsert, equipeInsertPoint.Y + 40 - 23.4 - 0.9, 0));
+
+                                    registGouChaoInsertPoint.Add(new Point3d(equipeInsertPoint.X + marginEqui * numInsert + 1, equipeInsertPoint.Y + 0.5, 0));  //绘制两条红线用于表示接触网杆至信号电缆槽的挖沟
+                                    registGouChaoInsertPoint.Add(new Point3d(equipeInsertPoint.X + marginEqui * numInsert - 1, equipeInsertPoint.Y + 0.5, 0));  //绘制两条红线用于表示接触网杆至信号电缆槽的挖沟
 
                                     string blockName = transforBlockName(equipe.name);
                                     if (!blockName.Contains("速计"))
@@ -454,10 +485,44 @@ namespace AutoDraw
                                         spaceId.InsertBlockReference("0", blockName, new Point3d(equipeInsertPoint.X + marginEqui * numInsert - 8.2, equipeInsertPoint.Y + 40 + 1, 0), new Scale3d(1), 0);
                                     }
 
+                                    //插入文字‘防灾控制箱’
+                                    DBText ControlBoxText = (DBText)insertText("防灾控制箱", new Point3d(equipeInsertPoint.X + 1.4 + marginEqui * numInsert + 2, equipeInsertPoint.Y + 40 - 23.4 + 4, 0), 3, TextHorizontalMode.TextLeft, fontStyleId);
 
-                                    //加入设备文字信息
+
+                                    //于下方表格中添加入设备文字信息
                                     DBText equipeText = (DBText)insertText(equipe.name + " " + equipe.location, new Point3d(innerStartPoint.X + 146 + (218 / (N_Equipment.Count + 1)) * numInsert, innerStartPoint.Y + 89 - 7.5 / 2, 0), 3, TextHorizontalMode.TextLeft, fontStyleId);
-                                    db2.AddToModelSpace(equipeText);
+                                    db2.AddToModelSpace(equipeText, ControlBoxText);
+
+                                    //添加文字，显示设备至监控单元线型、长度
+                                    StringBuilder lineText = new StringBuilder();
+                                    ClassStruct.LineInfor selectedLine = new ClassStruct.LineInfor();
+                                    foreach(var a in List_ConnectionAndLine)
+                                    {
+                                        if (a.station.name == StationToBeDraw.name && a.station.location == StationToBeDraw.location && a.station.type == StationToBeDraw.type && a.equipe.name == equipe.name && a.equipe.location == equipe.location && a.equipe.type == equipe.type)
+                                        {
+                                            selectedLine = a.line;
+                                        }
+                                    }
+
+                                    lineText.Append(blockName + "至" + StationToBeDraw.type + "防灾监控单元" + System.Environment.NewLine + TextTools.StackText(selectedLine.shortfor, "", selectedLine.lineType.ToString(), StackType.Tolerance, 0.5) + "-" + selectedLine.lineXin + "-" + selectedLine.lineLength + "m");
+
+                                    MText LineType_Length = new MText();
+                                    LineType_Length.Location = new Point3d(equipeInsertPoint.X + marginEqui * numInsert - 35, equipeInsertPoint.Y - 60 + 35.4, 0);
+                                    LineType_Length.Width = 50;
+                                    LineType_Length.TextHeight = 2;
+                                    LineType_Length.TextStyleId = fontStyleId;
+                                    LineType_Length.Contents = lineText.ToString();
+                                    LineType_Length.Attachment = AttachmentPoint.MiddleLeft;
+                                    db2.AddToModelSpace(LineType_Length); //添加线缆类型、线缆长度的说明
+
+                                    List<Point3d> listP = new List<Point3d>();
+                                    Point3d endP = new Point3d(equipeInsertPoint.X + 1.4 + marginEqui * numInsert - 6, equipeInsertPoint.Y + 40 - 23.4 - 41.5, 0);
+                                    listP.Add(endP);
+                                    listP.Add(new Point3d(endP.X - 32.5, endP.Y, 0));
+                                    listP.Add(new Point3d(endP.X - 32.5, endP.Y + 11, 0));
+                                    Polyline[] mlineText = drawMutiLine(listP, 0.05, Autodesk.AutoCAD.Colors.Color.FromRgb(255, 255, 255));
+                                    db2.AddToModelSpace(mlineText); //添加标注线
+
 
 
                                     //记录由防灾设备箱-防灾设备的点
@@ -466,12 +531,14 @@ namespace AutoDraw
                                     oneLine.Add(new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y + 40 - 23.4 + 2, 0)); //拐点
                                     oneLine.Add(new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y + 40 - 2, 0)); //拐点
 
-                                    if (!blockName.Contains("速计"))//如果名称中不包含”速计“
+
+                                    //记录从防灾控制箱至防灾设备的电缆示意图
+                                    if (!blockName.Contains("速计"))//如果名称中不包含”速计“ ，除风速计以外都只有一个设备
                                     {
                                         oneLine.Add(new Point3d(equipeInsertPoint.X + 8.2 + marginEqui * numInsert, equipeInsertPoint.Y + 40 + 1, 0)); //设备点1
                                         registEquipeInsertPoint.Add(oneLine);
                                     }
-                                    else
+                                    else  //风速计需要上两个
                                     {
                                         List<Point3d> twoLine = new List<Point3d>();
                                         twoLine.AddRange(oneLine); 
@@ -488,58 +555,8 @@ namespace AutoDraw
                             }
                         }
                     }
-                    /*foreach (ClassStruct.EquipePoint equipeName in N_Equipment)
-                    {
-
-                        //equipeInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y, 0);
-
-                        string[] centerInfor=StationToBeDraw.Split(new char[]{','});
-                        int centerLocation = int.Parse(centerInfor[centerInfor.Count() - 1]);
-
-                        string[] equipeInfor=equipeName.Split(new char[]{','});
-                        int equipeLocation = int.Parse(equipeInfor[equipeInfor.Count() - 1]);
-                        */
-                    /*if (equipeLocation < centerLocation)  //当监控点里程比站点里程小时。
-                    {
-                        //插入设备
-
-                    }
-                    else  //当监控点里程比站点里程大时。  equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40, 0
-                    { 
-                        //插入站点
-                        string stationName = transforBlockName(centerInfor[2]);
-                        spaceId.InsertBlockReference("0", stationName, new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40, 0), new Scale3d(1), 0);
-
-                        spaceId.InsertBlockReference("0", "监控单元_G", new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40 + 5, 0), new Scale3d(1), 0);
-                        registStationInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40 + 5, 0);
-
-                        DBText equipeText = (DBText)insertText(centerInfor[0] + " " + centerInfor[1], new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40 + 5 - 83 - 7.75, 0), fontStyleId);
-                        db2.AddToModelSpace(equipeText);
-
-                        stationInsertion = true;
-                        numInsert++;
-                        //插入设备
-                        equipeInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y - 40, 0);
-                        string blockName = transforBlockName(equipeInfor[2]);
-                        spaceId.InsertBlockReference("0", blockName, equipeInsertPoint, new Scale3d(1), 0);
-                        spaceId.InsertBlockReference("0", "接触网杆_g", new Point3d(equipeInsertPoint.X - 8.2 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 39.7 + 79, 0), new Scale3d(1), 0);
-                        spaceId.InsertBlockReference("0", "防灾控制箱_G", new Point3d(equipeInsertPoint.X - 6.8 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 23.4 + 40, 0), new Scale3d(1), 0);
-                        registEquipeInsertPoint.Add(new Point3d(equipeInsertPoint.X - 6.8 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 23.4 + 40, 0));
-
-                        //加入设备文字信息
-                        DBText equipeText2 = (DBText)insertText(equipeInfor[0] + " " + equipeInfor[1], new Point3d(equipeInsertPoint.X - 8.2 + marginEqui * numInsert, equipeInsertPoint.Y - 40 - 39.7 + 79 - 82.8752 - 15 - 35.67, 0), fontStyleId);
-                        db2.AddToModelSpace(equipeText2);
-                    }
-
-                }*/
-                    //如果在循环中没有添加基站、所亭
-
-
-
 
                     #endregion
-
-
 
                     #region 添加MText，绘制说明
 
@@ -549,7 +566,7 @@ namespace AutoDraw
 
                     if (StationToBeDraw.type.Contains("牵引"))
                     {
-                        Shuoming.Append("3.电气化所亭内地震子系统的工程数量详见电气化所亭防灾安全监控系统设备平面布置图。");
+                        Shuoming.Append(System.Environment.NewLine + "3.电气化所亭内地震子系统的工程数量详见电气化所亭防灾安全监控系统设备平面布置图。");
                     }
                     // Create a multiline text object
                     MText acMText = new MText();
@@ -578,11 +595,7 @@ namespace AutoDraw
                     #region 绘制多段线，表示线缆走向。同时绘制线缆名字
 
                     #endregion
-                    //LineWeight defautLineWeight = new LineWeight();
-                    //defautLineWeight.
-                    //db2.Celweight = new LineWeight(20);
                     db2.LineWeightDisplay = true;
-
 
                     LinetypeTable acLinTbl = trans2.GetObject(db2.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
 
@@ -590,13 +603,16 @@ namespace AutoDraw
                     {
                         ObjectId loneTypeId = acLinTbl["DASH"];
 
-                        Polyline[] mLines = drawMutiLine(registBoxInsertPoint, registStationInsertPoint, new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 123 + 2.1, 0), loneTypeId); //监控单元-接触网杆
+                        Polyline[] mLines = drawMutiLine(registBoxInsertPoint, registStationInsertPoint, new Point3d(innerStartPoint.X + 116, innerEndPoint.Y - 123 + 1.1, 0), loneTypeId); //监控单元-接触网杆
 
+                        Autodesk.AutoCAD.Colors.Color lineColor = Autodesk.AutoCAD.Colors.Color.FromRgb(255, 0, 0);// 红色
+
+                        Polyline[] mLinesGou =  drawMutiLine(registGouChaoInsertPoint, new Point3d(innerStartPoint.X+116, innerStartPoint.Y+167,0), 0.05,  lineColor); //站点-电缆沟
                         //防灾控制箱-设备 
                         Polyline[] mLines2 = drawMutiLine(registEquipeInsertPoint);
                         db2.AddToModelSpace(mLines);
                         db2.AddToModelSpace(mLines2);
-
+                        db2.AddToModelSpace(mLinesGou);
 
                     }
                     else
@@ -650,6 +666,33 @@ namespace AutoDraw
 
             return mLines;
         }
+
+        public Polyline[] drawMutiLine(List<Point3d> registEquipeInsertPoint,double lineWidth, Autodesk.AutoCAD.Colors.Color linecolor)
+        {
+            Polyline[] mLines = new Polyline[1];
+            int num = 0;
+
+            Polyline pl = new Polyline();
+            int node = 0;
+            foreach (Point3d point in registEquipeInsertPoint)
+            {
+                pl.AddVertexAt(node, new Point2d(point.X, point.Y), 0, lineWidth, lineWidth);
+                node++;
+            }
+
+            //.Color=Autodesk.AutoCAD.Colors.Color                
+            pl.LinetypeScale = 20;
+            pl.Color = linecolor;
+            pl.LineWeight = LineWeight.LineWeight025;//(LineWeight)20;
+            mLines[num] = pl;
+            num++;
+
+
+
+            return mLines;
+        }
+
+
         /// <summary>
         /// 绘制由监控终端经由槽道至防灾控制箱的电缆示意图
         /// </summary>
@@ -669,12 +712,37 @@ namespace AutoDraw
                 Point3d vect2 = new Point3d(equipe.X, ChaoDao.Y + 1, 0);       //设备下方与槽道的交点
 
                 Polyline pl = new Polyline();
-                pl.AddVertexAt(0, new Point2d(stationPoint.X, stationPoint.Y), 0, 0.75, 0.75);
-                pl.AddVertexAt(1, new Point2d(vect1.X, vect1.Y), 0, 0.75, 0.75);
-                pl.AddVertexAt(2, new Point2d(vect2.X, vect2.Y), 0, 0.75, 0.75);
-                pl.AddVertexAt(3, new Point2d(equipe.X, equipe.Y), 0, 0.75, 0.75);
+                pl.AddVertexAt(0, new Point2d(stationPoint.X, stationPoint.Y), 0, 0.75, 0.75); //点1：车站
+                pl.AddVertexAt(1, new Point2d(vect1.X, vect1.Y), 0, 0.75, 0.75);               //点2：车站下
+                pl.AddVertexAt(2, new Point2d(vect2.X - 2.79, vect2.Y), 0, 0.75, 0.75);           //点3：设备下
+                pl.AddVertexAt(3, new Point2d(equipe.X - 2.79, equipe.Y - 1), 0, 0.75, 0.75);     //点4：设备旁                
+                pl.AddVertexAt(4, new Point2d(equipe.X, equipe.Y), 0, 0.75, 0.75);             //点5：设备旁
                 pl.Color = Autodesk.AutoCAD.Colors.Color.FromRgb(127, 255, 127);
                 pl.LinetypeId = lineType;
+                pl.LinetypeScale = 20;
+                pl.LineWeight = LineWeight.LineWeight025;//(LineWeight)20;
+                mLines[num] = pl;
+                num++;
+            }
+
+
+
+            return mLines;
+        }
+
+        public Polyline[] drawMutiLine(List<Point3d> registEquipePoint, Point3d ChaoDao, double lineWidth, Autodesk.AutoCAD.Colors.Color lineColor)
+        {
+            Polyline[] mLines = new Polyline[registEquipePoint.Count];
+
+            int num = 0;
+            foreach (Point3d equipe in registEquipePoint)
+            {
+                Point3d vect2 = new Point3d(equipe.X, ChaoDao.Y + 1, 0);       //设备下方与槽道的交点
+
+                Polyline pl = new Polyline();
+                pl.AddVertexAt(0, new Point2d(equipe.X, equipe.Y), 0, lineWidth, lineWidth);
+                pl.AddVertexAt(1, new Point2d(vect2.X, vect2.Y), 0, lineWidth, lineWidth);
+                pl.Color = lineColor;
                 pl.LinetypeScale = 20;
                 pl.LineWeight = LineWeight.LineWeight025;//(LineWeight)20;
                 mLines[num] = pl;
@@ -2672,6 +2740,7 @@ namespace AutoDraw
             CreateNode(xmlDoc, node1, "ProjetName","?");
             CreateNode(xmlDoc, node1, "PictureName", "?");
             CreateNode(xmlDoc, node1, "ChapterName", "?");
+            CreateNode(xmlDoc, node1, "ProjectShortName", "?");
 
             XmlNode WayPointNode = CreateNode(xmlDoc, root, "WayPoints", ""); //所亭
             CreateNode(xmlDoc, WayPointNode, "StationPointLists", ""); //所亭

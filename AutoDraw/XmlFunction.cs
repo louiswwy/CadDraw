@@ -600,7 +600,7 @@ namespace AutoDraw
 
 
         #region 项目信息
-        public void writeProjrtInfo(string xmlPath, string proName, string PictureName,string NumChapter)
+        public void writeProjrtInfo(string xmlPath, string proName, string PictureName, string NumChapter, string ProjetShortName)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
@@ -617,8 +617,11 @@ namespace AutoDraw
             XmlNode subrootCName = subroot.SelectSingleNode("ChapterName");//查找<ChapterName> 
             subrootCName.InnerText = NumChapter;
 
+            XmlNode subrootCShort = subroot.SelectSingleNode("ProjectShortName");//查找<ChapterName> 
+            subrootCShort.InnerText = ProjetShortName;
+
             xmlDoc.Save(xmlPath);
-            
+
         }
 
         public List<string> readProjrtInfo(string xmlPath)//, string proName, string PictureName,string NumChapter)
@@ -641,9 +644,13 @@ namespace AutoDraw
                 XmlNode subrootCName = subroot.SelectSingleNode("ChapterName");//查找<ChapterName> 
                 string NumChapter = subrootCName.InnerText;
 
+                XmlNode subrootPShort = subroot.SelectSingleNode("ProjectShortName");//查找<ChapterName> 
+                string NumPShort = subrootPShort.InnerText;
+
                 projectInfo.Add(proName);
                 projectInfo.Add(PictureName);
                 projectInfo.Add(NumChapter);
+                projectInfo.Add(NumPShort);
                 return projectInfo;
             }
             catch (Exception ee)

@@ -35,10 +35,12 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -77,7 +79,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(31, 131);
+            this.button1.Location = new System.Drawing.Point(29, 158);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(92, 23);
             this.button1.TabIndex = 4;
@@ -87,7 +89,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(173, 130);
+            this.button2.Location = new System.Drawing.Point(171, 157);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(90, 24);
             this.button2.TabIndex = 5;
@@ -97,6 +99,8 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.label4);
+            this.panel1.Controls.Add(this.textBox4);
             this.panel1.Controls.Add(this.statusStrip1);
             this.panel1.Controls.Add(this.textBox3);
             this.panel1.Controls.Add(this.label3);
@@ -109,8 +113,24 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(297, 176);
+            this.panel1.Size = new System.Drawing.Size(297, 206);
             this.panel1.TabIndex = 6;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 184);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(297, 22);
+            this.statusStrip1.TabIndex = 7;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(131, 17);
+            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
             // textBox3
             // 
@@ -128,30 +148,30 @@
             this.label3.TabIndex = 6;
             this.label3.Text = "单    元";
             // 
-            // statusStrip1
+            // textBox4
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 154);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(297, 22);
-            this.statusStrip1.TabIndex = 7;
-            this.statusStrip1.Text = "statusStrip1";
+            this.textBox4.Location = new System.Drawing.Point(62, 122);
+            this.textBox4.Name = "textBox4";
+            this.textBox4.Size = new System.Drawing.Size(223, 21);
+            this.textBox4.TabIndex = 8;
             // 
-            // toolStripStatusLabel1
+            // label4
             // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(131, 17);
-            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 125);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(53, 12);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "阶    段";
             // 
             // ProjetInfor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(297, 176);
+            this.ClientSize = new System.Drawing.Size(297, 206);
             this.Controls.Add(this.panel1);
-            this.MaximumSize = new System.Drawing.Size(313, 215);
-            this.MinimumSize = new System.Drawing.Size(313, 215);
+            this.MaximumSize = new System.Drawing.Size(313, 245);
+            this.MinimumSize = new System.Drawing.Size(313, 245);
             this.Name = "ProjetInfor";
             this.Text = "项目信息";
             this.Load += new System.EventHandler(this.ProjetInfor_Load);
@@ -176,5 +196,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox textBox4;
     }
 }

@@ -177,6 +177,7 @@ namespace AutoDraw
                 }
             }
 
+            public LineType() { }
             public LineType(string ShortName, string LineName, string FournisseurName, double LineType, string LineXin, double MinDistance, double MaxDistance)
             {
                 _short = ShortName;
@@ -204,6 +205,9 @@ namespace AutoDraw
                     this._lineLength = value;
                 }
             }
+
+            public LineInfor() : base() { }
+
             public LineInfor(string ShortName, string LineName, string FournisseurName, double LineType, string LineXin, double MinDistance, double MaxDistance, double LengthLine) : base(ShortName, LineName, FournisseurName, LineType, LineXin, MinDistance, MaxDistance)
             {
                 _lineLength = LengthLine;
