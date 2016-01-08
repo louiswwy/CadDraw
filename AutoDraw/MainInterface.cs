@@ -234,25 +234,7 @@ namespace AutoDraw
                     rectangleInnerLayer.CreateNewRectangle(innerStartPoint, innerEndPoint, 0, 1, 1);
                     #endregion
 
-                    #region 图表 （暂时未完成）
-                    //绘制工程数量表 innerStartPoint
-                    Point2d tableInsertPoint = new Point2d(innerStartPoint.X, innerEndPoint.Y);
 
-                    List<string> GongChenTable = new List<string>();
-                    GongChenTable.Add("Bolt,SPTYWPL23-16B芯,m,2445,");
-                    GongChenTable.Add("Tile,SPTYWPL23-16B芯,m,2445,");
-                    GongChenTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
-                    GongChenTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
-                    Entity[] NumbEngineTable = createNumberTable("工程数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y), fontStyleId, GongChenTable);
-
-                    //绘制设备数量表
-                    List<string> SheBeiTable = new List<string>();
-                    SheBeiTable.Add("Bolt,SPTYWPL23-16B芯,m,2445,");
-                    SheBeiTable.Add("Tile,SPTYWPL23-16B芯,m,2445,");
-                    SheBeiTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
-                    SheBeiTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
-                    Entity[] NumbEqipeTable = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), fontStyleId, SheBeiTable);
-                    #endregion
                     
                     #region 绘制通信、信号电缆槽示意图
                     drawFunction df = new drawFunction();
@@ -262,8 +244,6 @@ namespace AutoDraw
                     //添加图内、外框
                     db1.AddToCurrentSpace(rectangleInnerLayer, rectangleOuterLayer); //框
                     db1.AddToCurrentSpace(backgoundEntity); //背景块
-                    db1.AddToCurrentSpace(NumbEngineTable); //添加工程数量表
-                    db1.AddToCurrentSpace(NumbEqipeTable); //添加设备数量表
                     trans1.Commit();
                 }
                 catch (System.Exception ee)
@@ -381,14 +361,6 @@ namespace AutoDraw
                     //绘图起始点
                     Point3d equipeInsertPoint = new Point3d(innerStartPoint.X + 170, innerStartPoint.Y + 180, 0);
 
-                    #region 工程数量
-                    int Num_DiXian = N_Equipment.Count * 10;  //地线
-                    int Num_ChenDuan = N_Equipment.Count * 2; //电缆成端
-                    int Num_GangGuan = 100;                   //钢管防护
-                    int Num_Gou = 40;                         //0.8电缆沟
-                    int Num_Chao = N_Equipment.Count * 10;    //电缆槽
-
-                    #endregion
 
                     //每一个都插入一次
                     bool stationInsertion = false;
@@ -431,8 +403,9 @@ namespace AutoDraw
 
                         lstorder.Add(new KeyValuePair<int, string>(a.Value, aa));
                     }
-                    
-                    
+
+
+                    Dictionary<string, double> LineLength = new Dictionary<string, double>();//本张图中使用的线缆类型及
 
                     //根据设备、基站里程绘图
                     foreach (KeyValuePair<int,string> LiCheng_Type in lstorder)
@@ -489,10 +462,14 @@ namespace AutoDraw
                                     DBText ControlBoxText = (DBText)insertText("防灾控制箱", new Point3d(equipeInsertPoint.X + 1.4 + marginEqui * numInsert + 2, equipeInsertPoint.Y + 40 - 23.4 + 4, 0), 3, TextHorizontalMode.TextLeft, fontStyleId);
 
 
+                                    #region 文字：设备名称，线缆类型，方向及长度
+                                    #region 设备名字
                                     //于下方表格中添加入设备文字信息
                                     DBText equipeText = (DBText)insertText(equipe.name + " " + equipe.location, new Point3d(innerStartPoint.X + 146 + (218 / (N_Equipment.Count + 1)) * numInsert, innerStartPoint.Y + 89 - 7.5 / 2, 0), 3, TextHorizontalMode.TextLeft, fontStyleId);
                                     db2.AddToModelSpace(equipeText, ControlBoxText);
+                                    #endregion
 
+                                    #region 设备至监控单元线缆类型，方向及长度，及标注
                                     //添加文字，显示设备至监控单元线型、长度
                                     StringBuilder lineText = new StringBuilder();
                                     ClassStruct.LineInfor selectedLine = new ClassStruct.LineInfor();
@@ -515,6 +492,8 @@ namespace AutoDraw
                                     LineType_Length.Attachment = AttachmentPoint.MiddleLeft;
                                     db2.AddToModelSpace(LineType_Length); //添加线缆类型、线缆长度的说明
 
+
+
                                     List<Point3d> listP = new List<Point3d>();
                                     Point3d endP = new Point3d(equipeInsertPoint.X + 1.4 + marginEqui * numInsert - 6, equipeInsertPoint.Y + 40 - 23.4 - 41.5, 0);
                                     listP.Add(endP);
@@ -522,8 +501,36 @@ namespace AutoDraw
                                     listP.Add(new Point3d(endP.X - 32.5, endP.Y + 11, 0));
                                     Polyline[] mlineText = drawMutiLine(listP, 0.05, Autodesk.AutoCAD.Colors.Color.FromRgb(255, 255, 255));
                                     db2.AddToModelSpace(mlineText); //添加标注线
+                                    #endregion
+                                    #endregion
 
+                                    #region
+                                    if (LineLength.Count == 0)
+                                    {
+                                        LineLength.Add(selectedLine.name, selectedLine.lineLength);
+                                    }
+                                    else
+                                    {
+                                        int count = 0;
+                                        //foreach (KeyValuePair<string, double> line in LineLength)
+                                        {
+                                            if (!LineLength.Keys.Contains(selectedLine.name))
+                                            {
+                                                LineLength.Add(selectedLine.name, selectedLine.lineLength);
 
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                //LineLength.Add(name, length + selectedLine.lineLength);
+                                                LineLength[selectedLine.name] = LineLength[selectedLine.name] + selectedLine.lineLength;
+
+                                                break;
+
+                                            }
+                                        }
+                                    }
+                                    #endregion
 
                                     //记录由防灾设备箱-防灾设备的点
                                     List<Point3d> oneLine = new List<Point3d>();
@@ -555,6 +562,46 @@ namespace AutoDraw
                             }
                         }
                     }
+
+                    #region 工程数量
+                    int Num_DiXian = N_Equipment.Count * 10;  //地线
+                    int Num_ChenDuan = N_Equipment.Count * 2; //电缆成端
+                    int Num_GangGuan = 100;                   //钢管防护
+                    int Num_Gou = 40;                         //0.8电缆沟
+                    int Num_Chao = N_Equipment.Count * 10;    //100*50电缆槽
+                                                              //LineLength
+
+                    #region 图表 （暂时未完成）
+                    //绘制工程数量表 innerStartPoint
+                    Point2d tableInsertPoint = new Point2d(innerStartPoint.X, innerEndPoint.Y);
+
+                    List<string> GongChenTable = new List<string>();
+                    GongChenTable.Add("挖填光、电缆沟,沟深0.8米,m," + Num_Gou + ", ");
+                    GongChenTable.Add("挖填光、电缆槽,100X50,m," + Num_Chao + ", ");
+                    GongChenTable.Add("钢管防护,50,m," + Num_GangGuan + ", ");
+                    GongChenTable.Add("编焊电缆成端,,个," + Num_ChenDuan + ", ");
+                    foreach (KeyValuePair<string, double> line in LineLength)
+                    {
+                        GongChenTable.Add("敷设信号电缆," + line.Key + ",米," + line.Value + ", ");
+                    }
+
+
+
+                    Entity[] NumbEngineTable = createNumberTable("工程数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y), fontStyleId, GongChenTable);
+
+                    //绘制设备数量表
+                    List<string> SheBeiTable = new List<string>();
+                    SheBeiTable.Add("Bolt,SPTYWPL23-16B芯,m,2445,");
+                    SheBeiTable.Add("Tile,SPTYWPL23-16B芯,m,2445,");
+                    SheBeiTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
+                    SheBeiTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
+                    Entity[] NumbEqipeTable = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), fontStyleId, SheBeiTable);
+                    #endregion
+
+
+                    db2.AddToCurrentSpace(NumbEngineTable); //添加工程数量表
+                    db2.AddToCurrentSpace(NumbEqipeTable); //添加设备数量表
+                    #endregion
 
                     #endregion
 
