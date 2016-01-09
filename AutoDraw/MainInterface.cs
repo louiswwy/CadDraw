@@ -591,10 +591,14 @@ namespace AutoDraw
 
                     //绘制设备数量表
                     List<string> SheBeiTable = new List<string>();
-                    SheBeiTable.Add("Bolt,SPTYWPL23-16B芯,m,2445,");
-                    SheBeiTable.Add("Tile,SPTYWPL23-16B芯,m,2445,");
-                    SheBeiTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
-                    SheBeiTable.Add("Kean,SPTYWPL23-16B芯,m,2445,");
+
+                    SheBeiTable.Add("光、电缆槽,100X50,m," + Num_Chao + ", ");
+                    SheBeiTable.Add("钢管,50,m," + Num_GangGuan + ", ");
+                    SheBeiTable.Add("电缆成端,,个," + Num_ChenDuan + ", ");
+                    foreach (KeyValuePair<string, double> line in LineLength)
+                    {
+                        SheBeiTable.Add("信号电缆," + line.Key + ",米," + line.Value + ", ");
+                    }
                     Entity[] NumbEqipeTable = createNumberTable("设备数量表", new Point2d(tableInsertPoint.X, tableInsertPoint.Y - 90), fontStyleId, SheBeiTable);
                     #endregion
 
@@ -949,11 +953,11 @@ namespace AutoDraw
             str[7, 0] = "7";
             str[8, 0] = "8";
 
-            for (int row = 2; row < tableContent.Count; row++)
+            for (int row = 1; row < tableContent.Count + 1; row++)
             {
-                for (int col = 1; col < tableContent[tableContent.Count - 2].Split(new char[] { ',' }).Length; col++)
+                for (int col = 1; col < tableContent[1].Split(new char[] { ',' }).Length + 1; col++)
                 {
-                    str[row, col] = tableContent[tableContent.Count - 2].Split(new char[] { ',' })[col - 1];
+                    str[row, col] = tableContent[row - 1].Split(new char[] { ',' })[col - 1];
                 }
             }
 
