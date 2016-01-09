@@ -271,14 +271,18 @@ namespace AutoDraw
                 //设备与基站、所亭间的距离
                 int distance = Math.Abs(stationLocation - equipementLocation);
 
-                if (distance == 0)
+                if (stationInfor.type != "")
                 {
-                    distance = 100;
+                    if (distance == 0)
+                    {
+                        distance = 100;
+                    }
+                    else
+                    {
+                        distance = Convert.ToInt32(Math.Round(distance * 1.2));
+                    }
                 }
-                else
-                {
-                    distance = Convert.ToInt32(Math.Round(distance * 1.2));
-                }
+
                 
                 //站点节点
                 XmlElement subXmlStation = xmlDoc.CreateElement("Station");//创建一个<Station>节点 

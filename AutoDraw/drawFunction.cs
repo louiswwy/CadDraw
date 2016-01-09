@@ -118,13 +118,13 @@ namespace AutoDraw
         #endregion
 
         #region 生成图块
-        public bool CheckBlock( ObjectId fontId)//Database db, Transaction trans,
+        public bool CheckBlock(ObjectId fontId)//Database db, Transaction trans,
         {
             bool allCheck = false;
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
-                
+
 
                 try
                 {
@@ -157,6 +157,11 @@ namespace AutoDraw
                     {
                         CreateRailWayMark(db, trans, insertPoint, fontId);//, "XX上行线/下行线");
                     }
+
+                    if (!bt.Has("系统_站点"))
+                    {
+                        CreateSysytemBlock(db, trans, insertPoint, fontId);//绘制系统图需要的图块
+                    }
                     bt.DowngradeOpen();
                     trans.Commit();
                 }
@@ -169,6 +174,132 @@ namespace AutoDraw
             return allCheck;
         }
 
+        /// <summary>
+        /// 生成一个用于绘制系统图的图块
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="trans"></param>
+        /// <param name="insertPoint"></param>
+        /// <param name="FontId"></param>
+        /// <returns></returns>
+        public bool CreateSysytemBlock(Database db, Transaction trans, Point3d insertPoint, ObjectId FontId)
+        {
+            bool a = true;
+            // Open the Block table for read
+            BlockTable acBlkTbl = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+            // Open the Block table record Model space for write
+            BlockTableRecord acBlkTblRec = new BlockTableRecord();
+            acBlkTbl.UpgradeOpen();
+            acBlkTbl.Add(acBlkTblRec);
+            acBlkTblRec.Name = "系统_站点";
+
+            Point2d LeftUpPoint = new Point2d(insertPoint.X - 7.5, insertPoint.Y); //外侧方框左上角
+
+            Point2d rightDownPoint = new Point2d(insertPoint.X + 7.5, insertPoint.Y - 32);//外侧方框右下角
+
+            Point3d cicleCentre = new Point3d(insertPoint.X, insertPoint.Y - 3.37, 0);//椭圆圆心
+
+            Point2d SULeftUp = new Point2d(cicleCentre.X - 2.73, cicleCentre.Y - 19.82); //监控终端图块左上
+
+            #region 绘制图形
+            //方框
+
+            LinetypeTable acLinTbl = trans.GetObject(db.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+
+            if (acLinTbl.Has("DASH") == true)
+            {
+                ObjectId loneTypeId = acLinTbl["DASH"]; //dash线型
+
+                #region 外框
+                Polyline BigRectangle = new Polyline(4);
+                BigRectangle.AddVertexAt(0, LeftUpPoint, 0, 0.1, 0.1);
+                BigRectangle.AddVertexAt(1, new Point2d(rightDownPoint.X, LeftUpPoint.Y), 0, 0.1, 0.1);
+                BigRectangle.AddVertexAt(2, rightDownPoint, 0, 0.1, 0.1);
+                BigRectangle.AddVertexAt(3, new Point2d(LeftUpPoint.X, rightDownPoint.Y), 0, 0.1, 0.1);
+                BigRectangle.LinetypeScale = 20;
+                BigRectangle.Closed = true;
+                BigRectangle.LinetypeId= loneTypeId;
+                acBlkTblRec.AppendEntity(BigRectangle);
+                trans.AddNewlyCreatedDBObject(BigRectangle, true);
+                #endregion
+
+                #region 监控单元图块
+                Polyline mLinesSU = new Polyline(4);
+                mLinesSU.AddVertexAt(0, SULeftUp, 0, 0.5, 0.5);
+                mLinesSU.AddVertexAt(1, new Point2d(SULeftUp.X + 5.46, SULeftUp.Y), 0, 0.5, 0.5);
+                mLinesSU.AddVertexAt(2, new Point2d(SULeftUp.X + 5.46, SULeftUp.Y - 7.67), 0, 0.5, 0.5);
+                mLinesSU.AddVertexAt(3, new Point2d(SULeftUp.X, SULeftUp.Y - 7.67), 0, 0.5, 0.5);
+                mLinesSU.Closed = true;
+                mLinesSU.Color = Autodesk.AutoCAD.Colors.Color.FromRgb(0, 255, 255);
+                acBlkTblRec.AppendEntity(mLinesSU);
+                trans.AddNewlyCreatedDBObject(mLinesSU, true);
+
+                //文字SU
+                DBText ControlBoxText = (DBText)insertText("SU", new Point3d(SULeftUp.X + 2.73, SULeftUp.Y - 3.83, 0), 3, TextHorizontalMode.TextCenter, FontId);
+                acBlkTblRec.AppendEntity(ControlBoxText);
+                trans.AddNewlyCreatedDBObject(ControlBoxText, true);
+                #endregion
+
+                #region 直线
+                Polyline Line = new Polyline();
+                Line.CreatePolyline(new Point2d(cicleCentre.X, cicleCentre.Y - 2.49), new Point2d(cicleCentre.X, cicleCentre.Y - 19.82));
+                acBlkTblRec.AppendEntity(Line);
+                trans.AddNewlyCreatedDBObject(Line, true);
+                #endregion
+
+                #region 椭圆
+
+                Ellipse ChuanShu = new Ellipse(cicleCentre, Vector3d.ZAxis, new Vector3d(6.51, 0, 0), 0.4, 0, 2 * Math.PI);
+                acBlkTblRec.AppendEntity(ChuanShu);
+                trans.AddNewlyCreatedDBObject(ChuanShu, true);
+
+                //文字SDH
+                DBText ChuanShuText = (DBText)insertText("SDH (MSTP)", new Point3d(cicleCentre.X, cicleCentre.Y, 0), 2, TextHorizontalMode.TextCenter, FontId);
+                acBlkTblRec.AppendEntity(ChuanShuText);
+                trans.AddNewlyCreatedDBObject(ChuanShuText, true);
+                #endregion
+
+            }
+            else
+            {
+                //MessageBox.Show("错误！缺少线型！");
+            }
+            #endregion
+
+            #region 添加块属性
+            AttributeDefinition stationName = new AttributeDefinition(Point3d.Origin, "xx站", "站点名称", "输入站点名称：", FontId);
+            stationName.TextStyleId = FontId;
+            stationName.WidthFactor = 0.7;
+            stationName.Height = 3;//文字高度
+            stationName.HorizontalMode = TextHorizontalMode.TextRight;
+            stationName.VerticalMode = TextVerticalMode.TextVerticalMid;
+            stationName.Invisible = false;
+            stationName.AlignmentPoint = new Point3d(LeftUpPoint.X - 4, LeftUpPoint.Y, 0);
+            stationName.Rotation = 90 * Math.PI / 180;
+            acBlkTblRec.AppendEntity(stationName);
+            trans.AddNewlyCreatedDBObject(stationName, true);
+
+
+            AttributeDefinition stationType = new AttributeDefinition(Point3d.Origin, "????+???", "站点里程", "输入站点里程：", FontId);
+            stationType.TextStyleId = FontId;
+            stationType.WidthFactor = 0.7;
+            stationType.Height = 3;//文字高度
+            stationType.HorizontalMode = TextHorizontalMode.TextLeft;
+            stationType.VerticalMode = TextVerticalMode.TextVerticalMid;
+            stationType.Invisible = false;
+            stationType.AlignmentPoint = new Point3d(LeftUpPoint.X - 4, rightDownPoint.Y, 0);
+            stationType.Rotation = 90 * Math.PI / 180;
+            acBlkTblRec.AppendEntity(stationType);
+            trans.AddNewlyCreatedDBObject(stationType, true);
+
+            #endregion
+            db.TransactionManager.AddNewlyCreatedDBObject(acBlkTblRec, true);
+            acBlkTblRec.DowngradeOpen();
+
+            return a;
+
+        }
         //如果不存在则添加铁轨标识
         private void CreateRailWayMark(Database db, Transaction trans, Point3d insertPoint,ObjectId FontId)//, string RailWayDirection)
         {
@@ -657,6 +788,34 @@ namespace AutoDraw
             returnEntity.Add(TStationLocation) ;
 
             return returnEntity;
+        }
+
+        public Entity insertText(string text, Point3d insertPoint, ObjectId fontStyleId)
+        {
+            DBText equipeText = new DBText();
+            equipeText.Position = insertPoint;
+            equipeText.Height = 4.5;
+            equipeText.TextString = text;
+            equipeText.HorizontalMode = TextHorizontalMode.TextCenter;
+            equipeText.VerticalMode = TextVerticalMode.TextVerticalMid;
+            equipeText.AlignmentPoint = equipeText.Position;
+            equipeText.WidthFactor = 0.7;
+            equipeText.TextStyleId = fontStyleId;
+            return equipeText;
+        }
+
+        public Entity insertText(string text, Point3d insertPoint, double textHeight, TextHorizontalMode ALigneMode, ObjectId fontStyleId)
+        {
+            DBText equipeText = new DBText();
+            equipeText.Position = insertPoint;
+            equipeText.Height = textHeight;
+            equipeText.TextString = text;
+            equipeText.HorizontalMode = ALigneMode;
+            equipeText.VerticalMode = TextVerticalMode.TextVerticalMid;
+            equipeText.AlignmentPoint = equipeText.Position;
+            equipeText.WidthFactor = 0.7;
+            equipeText.TextStyleId = fontStyleId;
+            return equipeText;
         }
 
 
