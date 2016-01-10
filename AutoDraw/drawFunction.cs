@@ -160,7 +160,7 @@ namespace AutoDraw
 
                     if (!bt.Has("系统_站点"))
                     {
-                        CreateSysytemBlock(db, trans, insertPoint, fontId);//绘制系统图需要的图块
+                        CreateSystemBlock(db, trans, insertPoint, fontId);//绘制系统图需要的图块
                     }
                     bt.DowngradeOpen();
                     trans.Commit();
@@ -182,7 +182,7 @@ namespace AutoDraw
         /// <param name="insertPoint"></param>
         /// <param name="FontId"></param>
         /// <returns></returns>
-        public bool CreateSysytemBlock(Database db, Transaction trans, Point3d insertPoint, ObjectId FontId)
+        public bool CreateSystemBlock(Database db, Transaction trans, Point3d insertPoint, ObjectId FontId)
         {
             bool a = true;
             // Open the Block table for read

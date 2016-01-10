@@ -9,7 +9,7 @@ namespace AutoDraw
     public class ClassStruct
     {
         //自定义站点类型
-        public class KeyPoint
+        public class KeyPoint:IComparable
         {
             private string _location = string.Empty;
             private string _name = string.Empty;
@@ -68,6 +68,13 @@ namespace AutoDraw
                 _type = StationType;
                 _distance = Distance;
             }
+
+            int IComparable.CompareTo(object obj)
+            {
+                KeyPoint temp = (KeyPoint)obj;
+                return this.distance.CompareTo(temp.distance);
+            }
+
         }
 
         //重写为站点

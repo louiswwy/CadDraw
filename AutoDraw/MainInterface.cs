@@ -130,9 +130,23 @@ namespace AutoDraw
 
             List<string> unCheckConnection = new List<string>();
 
-
+            #region 对车站列表排序
             Point3d insertSystemPoint = new Point3d(insertOriginSignlePoint.X, insertOriginSignlePoint.Y + 600, 0);
-            DrawSystemPicture(insertSystemPoint, StationList, List_ConnectionAndLine);
+            List<KeyValuePair<int, string>> tempdictionary = new List<KeyValuePair<int, string>>(); 
+            List<ClassStruct.StationPoint> RailWayStation = new List<ClassStruct.StationPoint>();
+            foreach (KeyValuePair<string, string> pair in dictRailStation)
+            {
+                tempdictionary.Add(new KeyValuePair<int, string>(Convert.ToInt32(pair.Value.Split(new char[] { ',' })[2]), pair.Key + "," + pair.Value));
+            }
+            var result = from pair in tempdictionary orderby pair.Key select pair;
+            foreach (var sorted in result)
+            {
+                string[] values = sorted.Value.Split(new char[] { ',' });
+                RailWayStation.Add(new ClassStruct.StationPoint(values[0], values[1], values[2], sorted.Key));
+            }
+            #endregion
+
+            DrawSystemPicture(insertSystemPoint, RailWayStation, StationList, List_ConnectionAndLine, fontStyleId);
 
 
             foreach (var _station in StationList) //
@@ -732,7 +746,7 @@ namespace AutoDraw
                 pl.LinetypeScale = 20;
                 pl.Color = Autodesk.AutoCAD.Colors.Color.FromRgb(255,159,127);
                 pl.LineWeight = LineWeight.LineWeight025;//(LineWeight)20;
-                pl.Closed = true;
+                //pl.Closed = true;
                 mLines[num] = pl;
                 num++;
 
@@ -758,7 +772,7 @@ namespace AutoDraw
             pl.LinetypeScale = 20;
             pl.Color = linecolor;
 
-            pl.Closed = true;
+            //pl.Closed = true;
             pl.LineWeight = LineWeight.LineWeight025;//(LineWeight)20;
             
             mLines[num] = pl;
@@ -797,7 +811,7 @@ namespace AutoDraw
                 pl.Color = Autodesk.AutoCAD.Colors.Color.FromRgb(127, 255, 127);
                 pl.LinetypeId = lineType;
                 pl.LinetypeScale = 20;
-                pl.Closed = true;
+                //pl.Closed = true;
                 pl.LineWeight = LineWeight.LineWeight025;//(LineWeight)20;
                 mLines[num] = pl;
                 num++;
@@ -822,7 +836,7 @@ namespace AutoDraw
                 pl.AddVertexAt(1, new Point2d(vect2.X, vect2.Y), 0, lineWidth, lineWidth);
                 pl.Color = lineColor;
                 pl.LinetypeScale = 20;
-                pl.Closed = true;
+                //pl.Closed = true;
                 pl.LineWeight = LineWeight.LineWeight025;//(LineWeight)20;
                 mLines[num] = pl;
                 num++;
@@ -5022,8 +5036,14 @@ namespace AutoDraw
             }
         }
 
-
-        public void DrawSystemPicture(Point3d insertPoint,List<ClassStruct.StationPoint> StationList, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine)
+        /// <summary>
+        /// 绘制系统图
+        /// </summary>
+        /// <param name="insertPoint">插入点</param>
+        /// <param name="dictRailStation">火车站站点</param>
+        /// <param name="StationList">基站站点</param>
+        /// <param name="List_ConnectionAndLine">基站-防灾设备</param>
+        public void DrawSystemPicture(Point3d insertPoint, List<ClassStruct.StationPoint> dictRailStation, List<ClassStruct.StationPoint> StationList, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine,ObjectId FontId)
         {
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
@@ -5032,15 +5052,187 @@ namespace AutoDraw
                 {
                     int rowTime = 0;
                     ObjectId spaceId = db.CurrentSpaceId;
-                    foreach (ClassStruct.StationPoint SigalStation in StationList)
-                    {
-                        //SigalStation
+                    drawFunction dF = new drawFunction();
 
+                    #region 
+                    List<ClassStruct.StationPoint> UniqueStation = new List<ClassStruct.StationPoint>();
+                    List<string> aaa = new List<string>();
+                    foreach (var a in StationList)
+                    {
+                        aaa.Add(a.name);
+                        bool InTheList = false;
+                        foreach (var b in UniqueStation)
+                        {
+                            if (a.name == b.name && a.location == b.location) //如果已存在
+                            {
+                                InTheList = true;
+                                break;
+                            }
+
+                        }
+                        if (InTheList == false)
+                        {
+                            UniqueStation.Add(a); //如果不重复则添加进去
+                        }
+                    }
+                    #endregion
+
+                    foreach (ClassStruct.StationPoint SigalStation in UniqueStation)
+                    {
+
+                        //绘制基站图
                         Dictionary<string, string> attSN = new Dictionary<string, string>();
                         attSN.Add("站点名称", SigalStation.name);
                         attSN.Add("站点里程", SigalStation.location);
-
                         spaceId.InsertBlockReference("0", "系统_站点", new Point3d(insertPoint.X + 30 * rowTime, insertPoint.Y, 0), new Scale3d(1), 0, attSN);
+
+                        //绘制设备
+                        List<ClassStruct.EquipePoint> connectedEqipe = new List<ClassStruct.EquipePoint>();
+                        List<string> equipeName = new List<string>();
+                        foreach (ClassStruct.ConnectionAndLine Station_Equipe in List_ConnectionAndLine)//循环List_ConnectionAndLine查看基站连接的设备
+                        {
+                            if (SigalStation.name == Station_Equipe.station.name && SigalStation.type == Station_Equipe.station.type && SigalStation.location == Station_Equipe.station.location) 
+                            {
+                                connectedEqipe.Add(Station_Equipe.equipe);
+                                equipeName.Add(Station_Equipe.equipe.name);
+                            }
+                        }
+
+                        //直线
+                        Point3d startP = new Point3d(insertPoint.X + 30 * rowTime, insertPoint.Y - 32, 0);
+                        Point3d endP = new Point3d(insertPoint.X + 30 * rowTime, startP.Y - 10, 0);
+                        Line line1 = new Line(startP, endP);
+                        db.AddToModelSpace(line1);
+
+                        //根据连接的设备数量决定设备绘制位置
+                        if (connectedEqipe.Count == 1) 
+                        {
+                            double rotateAngle;
+
+                            string EquipeBlockName = transferSystemBlockName(connectedEqipe[0].name);
+                            if (EquipeBlockName == "风向风速计_G")
+                            {
+                                rotateAngle = 180 * Math.PI / 180;
+                            }
+                            else
+                            {
+                                rotateAngle = 0;
+                            }
+
+                            spaceId.InsertBlockReference("0", EquipeBlockName, new Point3d(insertPoint.X + 30 * rowTime, insertPoint.Y - 58, 0), new Scale3d(1), rotateAngle, attSN);
+
+                            DBText DistanceText = (DBText)dF.insertText(connectedEqipe[0].location, new Point3d(insertPoint.X + 30 * rowTime - 2, insertPoint.Y - 55, 0), 3, TextHorizontalMode.TextLeft, FontId);
+                            DistanceText.Rotation = 90 * Math.PI / 180;
+
+                            //连接线
+                            Point3d startP1 = endP;
+                            Point3d endP1 = new Point3d(startP1.X, startP1.Y - 15, 0);
+                            Line line2 = new Line(startP1, new Point3d(endP.X, insertPoint.Y - 58, 0));
+
+                            db.AddToModelSpace(DistanceText, line2);
+                        }
+                        else if (connectedEqipe.Count == 2)
+                        {
+                            int margin = 0;
+                            
+                            foreach (ClassStruct.EquipePoint eq in connectedEqipe)
+                            {
+                                List<Point3d> registPoint = new List<Point3d>(); //用于画线的点
+                                registPoint.Add(endP);
+                                registPoint.Add(new Point3d(insertPoint.X + 30 * rowTime - 4 + 8 * margin, endP.Y, 0));
+                                registPoint.Add(new Point3d(insertPoint.X + 30 * rowTime - 4 + 8 * margin, insertPoint.Y - 58, 0));
+                                Polyline[] drawMline = drawMutiLine(registPoint, 0.01, Autodesk.AutoCAD.Colors.Color.FromRgb(255, 255, 255));
+                                db.AddToModelSpace(drawMline);
+
+                                string EquipeBlockName = transferSystemBlockName(eq.name);
+                                
+                                double rotateAngle;
+
+                                if (EquipeBlockName == "风向风速计_G")
+                                {
+                                    rotateAngle = 180 * Math.PI / 180;
+                                }
+                                else
+                                {
+                                    rotateAngle = 0;
+                                }
+
+                                spaceId.InsertBlockReference("0", EquipeBlockName, new Point3d(insertPoint.X + 30 * rowTime - 4 + 8 * margin, insertPoint.Y - 58, 0), new Scale3d(1), rotateAngle, attSN);
+
+                                DBText DistanceText = (DBText)dF.insertText(connectedEqipe[0].location, new Point3d(insertPoint.X + 30 * rowTime - 6 + 8 * margin, insertPoint.Y - 55, 0), 3, TextHorizontalMode.TextLeft, FontId);
+
+                                DistanceText.Rotation = 90 * Math.PI / 180;
+                                db.AddToModelSpace(DistanceText);
+
+                                margin++;
+                            }
+                        }
+                        else if (connectedEqipe.Count == 3)
+                        {
+                            int margin = 0;
+                            foreach (ClassStruct.EquipePoint eq in connectedEqipe)
+                            {
+                                List<Point3d> registPoint = new List<Point3d>(); //用于画线的点
+                                registPoint.Add(endP);
+                                registPoint.Add(new Point3d(insertPoint.X + 30 * rowTime - 8 + 8 * margin, endP.Y, 0));
+                                registPoint.Add(new Point3d(insertPoint.X + 30 * rowTime - 8 + 8 * margin, insertPoint.Y - 58, 0));
+                                Polyline[] drawMline = drawMutiLine(registPoint, 0.01, Autodesk.AutoCAD.Colors.Color.FromRgb(255, 255, 255));
+                                db.AddToModelSpace(drawMline);
+
+                                string EquipeBlockName = transferSystemBlockName(eq.name);
+
+                                double rotateAngle;
+
+                                if (EquipeBlockName == "风向风速计_G")
+                                {
+                                    rotateAngle = 180 * Math.PI / 180;
+                                }
+                                else
+                                {
+                                    rotateAngle = 0;
+                                }
+                                spaceId.InsertBlockReference("0", EquipeBlockName, new Point3d(insertPoint.X + 30 * rowTime - 8 + 8 * margin, insertPoint.Y - 58, 0), new Scale3d(1), rotateAngle, attSN);
+
+                                DBText DistanceText = (DBText)dF.insertText(connectedEqipe[0].location, new Point3d(insertPoint.X + 30 * rowTime - 10 + 8 * margin, insertPoint.Y - 55, 0), 3, TextHorizontalMode.TextLeft, FontId);
+
+                                DistanceText.Rotation = 90 * Math.PI / 180;
+                                db.AddToModelSpace(DistanceText);
+                                margin++;
+                            }
+                        }
+                        else if (connectedEqipe.Count == 4)
+                        {
+                            int margin = 0;
+                            foreach (ClassStruct.EquipePoint eq in connectedEqipe)
+                            {
+                                List<Point3d> registPoint = new List<Point3d>(); //用于画线的点
+                                registPoint.Add(endP);
+                                registPoint.Add(new Point3d(insertPoint.X + 30 * rowTime - 12 + 8 * margin, endP.Y, 0));
+                                registPoint.Add(new Point3d(insertPoint.X + 30 * rowTime - 12 + 8 * margin, insertPoint.Y - 58, 0));
+                                Polyline[] drawMline = drawMutiLine(registPoint, 0.01, Autodesk.AutoCAD.Colors.Color.FromRgb(255, 255, 255));
+                                db.AddToModelSpace(drawMline);
+
+                                string EquipeBlockName = transferSystemBlockName(eq.name);
+
+                                double rotateAngle;
+
+                                if (EquipeBlockName == "风向风速计_G")
+                                {
+                                    rotateAngle = 180 * Math.PI / 180;
+                                }
+                                else
+                                {
+                                    rotateAngle = 0;
+                                }
+                                spaceId.InsertBlockReference("0", EquipeBlockName, new Point3d(insertPoint.X + 30 * rowTime - 12 + 8 * margin, insertPoint.Y - 58, 0), new Scale3d(1), rotateAngle, attSN);
+
+                                DBText DistanceText = (DBText)dF.insertText(connectedEqipe[0].location, new Point3d(insertPoint.X + 30 * rowTime - 14 + 8 * margin, insertPoint.Y - 55, 0), 3, TextHorizontalMode.TextLeft, FontId);
+
+                                DistanceText.Rotation = 90 * Math.PI / 180;
+                                db.AddToModelSpace(DistanceText);
+                                margin++;
+                            }
+                        }
                         rowTime++;
                     }
 
@@ -5054,6 +5246,21 @@ namespace AutoDraw
 
             }
 
+        }
+
+        public string transferSystemBlockName(string originName)
+        {
+            string systemBlockName = "";
+            if (originName.Contains("风速"))
+            {
+                systemBlockName = "风向风速计_G";
+            }
+            else
+            {
+                systemBlockName = originName;
+            }
+
+            return systemBlockName;
         }
     }
 }
