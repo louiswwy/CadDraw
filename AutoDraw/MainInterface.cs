@@ -642,7 +642,9 @@ namespace AutoDraw
                     db2.AddToCurrentSpace(NumbEqipeTable); //添加设备数量表
                     #endregion
 
+
                     #endregion
+
 
                     #region 添加MText，绘制说明
 
@@ -715,6 +717,8 @@ namespace AutoDraw
                     acBlkTblRec.DowngradeOpen();
 
                     trans2.Commit();
+
+
 
                     
                 }
