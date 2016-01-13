@@ -4721,6 +4721,8 @@ namespace AutoDraw
                         ClassStruct.LineType lineDefinition = new ClassStruct.LineType(splitValue[1], linelist.Key, splitValue[4], double.Parse(splitValue[2]), splitValue[3], double.Parse(splitValue[5]), double.Parse(splitValue[6]));
 
                         lineOfFournisseur.Add(lineDefinition);
+
+
                     }
 
 
