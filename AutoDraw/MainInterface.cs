@@ -5270,6 +5270,36 @@ namespace AutoDraw
 
             return systemBlockName;
         }
+
+        private void 修改系统图ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+                Editor ed = doc.Editor;
+
+                //选择集
+                PromptSelectionResult psr = ed.GetSelection();
+
+
+                using (Transaction trans = doc.TransactionManager.StartTransaction())
+                {
+                    //选中项
+                    foreach (ObjectId objId in psr.Value.GetObjectIds())
+                    {
+                        //筛选
+                        #region 筛选选择集
+
+                        #endregion
+                    }
+                }
+            }
+            catch(Autodesk.AutoCAD.Runtime.Exception ex)
+            {
+
+            }
+
+        }
     }
 }
  
