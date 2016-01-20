@@ -5275,6 +5275,7 @@ namespace AutoDraw
         {
             try
             {
+                this.Hide();
                 Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                 Editor ed = doc.Editor;
 
@@ -5289,7 +5290,7 @@ namespace AutoDraw
                     {
                         //筛选
                         #region 筛选选择集
-
+                        this.Show();
                         #endregion
                     }
                 }
