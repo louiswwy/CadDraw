@@ -5280,26 +5280,44 @@ namespace AutoDraw
                 Editor ed = doc.Editor;
 
                 //选择集
-                PromptSelectionResult psr = ed.GetSelection();
+                
+                PromptEntityOptions opt = new PromptEntityOptions("\n请选择系统图块:");
+                opt.SetRejectMessage("\n选中块不是系统图块!");
+                opt.AddAllowedClass(typeof(BlockReference), true);
 
-
+                PromptEntityResult psr = ed.GetEntity(opt);
+                
                 if (psr.Status==PromptStatus.OK) //如果选中项
                 {
                     using (Transaction trans = doc.TransactionManager.StartTransaction())
                     {
                         //选中项
-                        foreach (ObjectId objId in psr.Value.GetObjectIds())
+                        BlockReference bRef = (BlockReference)trans.GetObject(psr.ObjectId, OpenMode.ForWrite);
+                        if (bRef != null)
                         {
-                            //筛选
-                            #region 筛选选择集
-                            //this.Show();
-                            #endregion
+                            if (bRef.Name == "系统_站点")
+                            {
+                                foreach (ObjectId objId in bRef.AttributeCollection)
+                                {
+                                    //筛选
+                                    #region 筛选选择集
+
+                                    AttributeReference attRef = objId.GetObject(OpenMode.ForRead) as AttributeReference;
+                                    //this.Show();
+
+                                    int a = 0;
+                                    string aa = attRef.Tag.ToString();
+                                    //string bb = attRef..ToString();
+                                    #endregion
+                                }
+                            }
                         }
-                    } 
+                    }
+                    
                 }
                 else
                 {
-                    ed.WriteMessage("未选中项！");
+                    ed.WriteMessage("未选中规定项！");
                 }
 
                 this.Show(); //显示窗体
