@@ -5275,7 +5275,7 @@ namespace AutoDraw
         {
             try
             {
-                this.Hide();
+                this.Hide(); //隐藏窗体
                 Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                 Editor ed = doc.Editor;
 
@@ -5283,17 +5283,26 @@ namespace AutoDraw
                 PromptSelectionResult psr = ed.GetSelection();
 
 
-                using (Transaction trans = doc.TransactionManager.StartTransaction())
+                if (psr.Status==PromptStatus.OK) //如果选中项
                 {
-                    //选中项
-                    foreach (ObjectId objId in psr.Value.GetObjectIds())
+                    using (Transaction trans = doc.TransactionManager.StartTransaction())
                     {
-                        //筛选
-                        #region 筛选选择集
-                        this.Show();
-                        #endregion
-                    }
+                        //选中项
+                        foreach (ObjectId objId in psr.Value.GetObjectIds())
+                        {
+                            //筛选
+                            #region 筛选选择集
+                            //this.Show();
+                            #endregion
+                        }
+                    } 
                 }
+                else
+                {
+                    ed.WriteMessage("未选中项！");
+                }
+
+                this.Show(); //显示窗体
             }
             catch(Autodesk.AutoCAD.Runtime.Exception ex)
             {
