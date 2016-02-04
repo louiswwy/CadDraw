@@ -5280,7 +5280,7 @@ namespace AutoDraw
                 Editor ed = doc.Editor;
 
                 //选择集
-                
+                //PromptEntityOptions只能选一个实体
                 PromptEntityOptions opt = new PromptEntityOptions("\n请选择系统图块:");
                 opt.SetRejectMessage("\n选中块不是系统图块!");
                 opt.AddAllowedClass(typeof(BlockReference), true);
@@ -5297,6 +5297,8 @@ namespace AutoDraw
                         {
                             if (bRef.Name == "系统_站点")
                             {
+                                string sName = "";
+                                string sLocation = "";
                                 foreach (ObjectId objId in bRef.AttributeCollection)
                                 {
                                     //筛选
@@ -5307,9 +5309,27 @@ namespace AutoDraw
 
                                     int a = 0;
                                     string aa = attRef.Tag.ToString();
-                                    //string bb = attRef..ToString();
+
+                                    string bb = attRef.TextString.ToString();
+                                    if (aa == "")
+                                    {
+                                        sName = bb;
+                                    }
+                                    else if (aa == "")
+                                    {
+                                        sLocation = bb;
+                                    }
                                     #endregion
                                 }
+
+                                //是否确认删除
+                                if (MessageBox.Show("是否删除：\n\t名称为：" + sName + "\n\t里程为：" + sLocation + "的站点", "注意", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                {
+                                    //如果确认删除，则删除对应xml数据
+
+                                    //提示重新绘制
+                                }
+
                             }
                         }
                     }
