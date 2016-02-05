@@ -18,7 +18,6 @@ namespace AutoDraw
         }
 
         //项目中的里程格式
-        DataTable StandardLiChen;
         private void button2_Click(object sender, EventArgs e)
         {
             

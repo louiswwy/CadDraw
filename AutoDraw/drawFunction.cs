@@ -268,7 +268,7 @@ namespace AutoDraw
             #endregion
 
             #region 添加块属性
-            AttributeDefinition stationName = new AttributeDefinition(Point3d.Origin, "xx站", "站点名称", "输入站点名称：", FontId);
+            AttributeDefinition stationName = new AttributeDefinition(Point3d.Origin, "类型", "站点类型", "输入类型名称：", FontId);
             stationName.TextStyleId = FontId;
             stationName.WidthFactor = 0.7;
             stationName.Height = 3;//文字高度
@@ -292,6 +292,7 @@ namespace AutoDraw
             stationType.Rotation = 90 * Math.PI / 180;
             acBlkTblRec.AppendEntity(stationType);
             trans.AddNewlyCreatedDBObject(stationType, true);
+
 
             #endregion
             db.TransactionManager.AddNewlyCreatedDBObject(acBlkTblRec, true);

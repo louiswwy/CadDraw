@@ -214,7 +214,6 @@ namespace AutoDraw
         {
             if(comboBox4.Enabled!=false&& T_MaxDistance.Enabled != false)
             {
-                string Max = "";
             }
         }
 

@@ -14,7 +14,6 @@ namespace AutoDraw
     {
         public string dataTimeTag = "";
         string XmlFilePath = "";
-        List<string> NandT;
         XmlFunction xf;
         DataSet LineType;
         Dictionary<string, string> DicNandT;
@@ -270,8 +269,7 @@ namespace AutoDraw
         }
 
 
-
-        int i = 0;
+        
         private void timer1_Tick(object sender, EventArgs e)
         {
             toolStripStatusLabel1.Text = "项目路径： " + XmlFilePath;
@@ -283,21 +281,6 @@ namespace AutoDraw
 
         }
 
-        //声明一个更新Address的委托
-        public delegate void TimeMarkUpdateHandler(object sender, TimeMarkUpdateEventArgs e);
-
-        //声明一个更新Address的事件
-        public event TimeMarkUpdateHandler TimeMarkUpdated;
-
-        public class TimeMarkUpdateEventArgs : System.EventArgs
-        {
-            private Dictionary<string, string> passDictionary;
-            public TimeMarkUpdateEventArgs(Dictionary<string, string> PassValue)
-            {
-                this.passDictionary = PassValue;
-            }
-            public Dictionary<string, string> markTheTime { get { return passDictionary; } }
-        }
 
 
 

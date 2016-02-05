@@ -9,7 +9,6 @@ namespace AutoDraw
 {
     class XmlFunction
     {
-        Dictionary<string, string> loadedDic;
 
         /// <summary>
         /// xml文件中写入站点信息

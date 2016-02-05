@@ -10,14 +10,14 @@ namespace AutoDraw
 {
     public class ProjetStarter//:IExtensionApplication
     {
-        Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
+        //Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
         MainInterface form;
         [CommandMethod("AutoDrawer")]
         public void starter()
         {
             if (form == null || form.IsDisposed)
             {
-                ed.WriteMessage("AutoDrawer 功能已载入.");
+                //ed.WriteMessage("AutoDrawer 功能已载入.");
                 form = new MainInterface();
                 try
                 {

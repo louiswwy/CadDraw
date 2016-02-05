@@ -34,28 +34,24 @@ namespace AutoDraw
         /// 添加站点信息
         /// </summary>
         DataSet tableST;
-        DataSet oldTableSt;
         System.Data.DataTable stTable;
         Dictionary<string, string> InfoStation = new Dictionary<string, string>();
 
         /// <summary>
         /// 风监控
         /// </summary>
-        DataSet tableWind;
         System.Data.DataTable WindTable;
         Dictionary<string, string> InfoWindPoint = new Dictionary<string, string>();
 
         /// <summary>
         /// 雨监控
         /// </summary>
-        DataSet tableRain;
         System.Data.DataTable RainTable;
         Dictionary<string, string> InfoRainPoint = new Dictionary<string, string>();
 
         /// <summary>
         /// 雪监控
         /// </summary>
-        DataSet tableSnow;
         System.Data.DataTable SnowTable;
         Dictionary<string, string> InfoSnowPoint = new Dictionary<string, string>();
 
@@ -380,9 +376,7 @@ namespace AutoDraw
                     //绘图起始点
                     Point3d equipeInsertPoint = new Point3d(innerStartPoint.X + 170, innerStartPoint.Y + 180, 0);
 
-
-                    //每一个都插入一次
-                    bool stationInsertion = false;
+                    
 
                     List<Point3d> registBoxInsertPoint = new List<Point3d>();  //记录控制箱插入点用于画线
                     List<List<Point3d>> registEquipeInsertPoint = new List<List<Point3d>>();  //记录防灾控制箱至设备的多段线的端点
@@ -538,7 +532,6 @@ namespace AutoDraw
                                     }
                                     else
                                     {
-                                        int count = 0;
                                         //foreach (KeyValuePair<string, double> line in LineLength)
                                         {
                                             if (!LineLength.Keys.Contains(selectedLine.name))
@@ -1736,10 +1729,7 @@ namespace AutoDraw
 
                 lastLoadFilePath = newFilePath;
                 addFiletoSystem(newFilePath); //检查并设置xml、icon文件夹
-
-                /****废弃******/
-                Form_LineType fLT = new Form_LineType(newFilePath + "\\setting.xml");
-                fLT.TimeMarkUpdated += new Form_LineType.TimeMarkUpdateHandler(getTimeMark);
+                
                 /****废弃******/
 
                 /*if (Local_lastLoadedLineTime == "" && Local_lastLoadedLineTime == fLT.dataTimeTag) //如果还没有读取linelist，切没有打开linetype界面
@@ -3121,13 +3111,13 @@ namespace AutoDraw
 
             if (!filePath.ToLower().Contains("template"))
             {
-                if (modifData == false)
+                if (modifData == false) //删除数据
                 {
                     //treeView1.SelectedNode;
                     删除ToolStripMenuItem_Click(null, null);
 
                 }
-                else//当修改数据时
+                else//当修改数据时 关闭修改模式
                 {
                     B_AddWayPoint.Text = "+";
                     B_SupWayPoint.Text = "-";
@@ -4154,13 +4144,7 @@ namespace AutoDraw
             }
         }
 
-        public void getTimeMark(object sender, AutoDraw.Form_LineType.TimeMarkUpdateEventArgs e)
-        {
-            lineList = e.markTheTime;
-            
-        }
         string Local_lastLoadedLineTime = "";
-        string remotTimeMark = "";
         Dictionary<string, string> lineList;
         List<string> listLine;
         private void C_Line_SelectedIndexChanged(object sender, EventArgs e)
@@ -5090,7 +5074,7 @@ namespace AutoDraw
 
                         //绘制基站图
                         Dictionary<string, string> attSN = new Dictionary<string, string>();
-                        attSN.Add("站点名称", SigalStation.name);
+                        attSN.Add("站点类型", SigalStation.type);
                         attSN.Add("站点里程", SigalStation.location);
                         spaceId.InsertBlockReference("0", "系统_站点", new Point3d(insertPoint.X + 30 * rowTime, insertPoint.Y, 0), new Scale3d(1), 0, attSN);
 
@@ -5306,8 +5290,7 @@ namespace AutoDraw
 
                                     AttributeReference attRef = objId.GetObject(OpenMode.ForRead) as AttributeReference;
                                     //this.Show();
-
-                                    int a = 0;
+                                    
                                     string aa = attRef.Tag.ToString();
 
                                     string bb = attRef.TextString.ToString();
@@ -5344,7 +5327,7 @@ namespace AutoDraw
             }
             catch(Autodesk.AutoCAD.Runtime.Exception ex)
             {
-
+                MessageBox.Show(ex.ToString() + "");
             }
 
         }
