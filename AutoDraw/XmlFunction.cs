@@ -340,11 +340,11 @@ namespace AutoDraw
             xmlDoc.Load(xmlFile);
 
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
-            XmlNode subroot = root.SelectSingleNode("Connection");//查找<Connection> 
+            XmlNode subroot = root.SelectSingleNode("Connections");//查找<Connection> 
 
             if (subroot == null)
             {
-                subroot = xmlDoc.CreateElement("Connection"); //添加
+                subroot = xmlDoc.CreateElement("Connections"); //添加
                 root.AppendChild(subroot);
             }
             else
@@ -354,6 +354,38 @@ namespace AutoDraw
 
             xmlDoc.Save(xmlFile);
 
+        }
+
+        public void removeConnection(string xmlFile, string removeItem)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode subroot = root.SelectSingleNode("Connections");//查找<Connections> 
+
+            if (subroot != null)
+            {
+                foreach (XmlNode childNode in subroot.ChildNodes) //遍历<pair>子节点
+                {
+                    //<pair>子节点
+                    XmlNode StationRoot = childNode.SelectSingleNode("Station");//查找<Station>节点
+                    if (StationRoot != null)
+                    {
+                        if (StationRoot.InnerText == removeItem)
+                        {
+                            childNode.RemoveAll();  //删除对应<pair>节点
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                //subroot.RemoveAll();
+            }
+
+            xmlDoc.Save(xmlFile);
         }
 
         public void loadConnectionXml(string xmlFile)

@@ -5257,21 +5257,28 @@ namespace AutoDraw
 
         private void 修改系统图ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
+            ModifSystemInfor();
+        }
+
+        public void ModifSystemInfor()
+        {
             try
             {
                 this.Hide(); //隐藏窗体
+                DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
                 Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                 Editor ed = doc.Editor;
 
                 //选择集
                 //PromptEntityOptions只能选一个实体
-                PromptEntityOptions opt = new PromptEntityOptions("\n请选择系统图块:");
+                PromptEntityOptions opt = new PromptEntityOptions("\n请选择系统图块:"); //单选
                 opt.SetRejectMessage("\n选中块不是系统图块!");
                 opt.AddAllowedClass(typeof(BlockReference), true);
 
                 PromptEntityResult psr = ed.GetEntity(opt);
-                
-                if (psr.Status==PromptStatus.OK) //如果选中项
+
+                if (psr.Status == PromptStatus.OK) //如果选中项
                 {
                     using (Transaction trans = doc.TransactionManager.StartTransaction())
                     {
@@ -5290,15 +5297,15 @@ namespace AutoDraw
 
                                     AttributeReference attRef = objId.GetObject(OpenMode.ForRead) as AttributeReference;
                                     //this.Show();
-                                    
-                                    string aa = attRef.Tag.ToString();
 
-                                    string bb = attRef.TextString.ToString();
-                                    if (aa == "")
+                                    string aa = attRef.Tag.ToString(); //块属性的tag
+
+                                    string bb = attRef.TextString.ToString(); //块属性显示的内容
+                                    if (!bb.Contains("+"))
                                     {
                                         sName = bb;
                                     }
-                                    else if (aa == "")
+                                    else
                                     {
                                         sLocation = bb;
                                     }
@@ -5308,28 +5315,31 @@ namespace AutoDraw
                                 //是否确认删除
                                 if (MessageBox.Show("是否删除：\n\t名称为：" + sName + "\n\t里程为：" + sLocation + "的站点", "注意", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                 {
-                                    //如果确认删除，则删除对应xml数据
-
+                                    ed.WriteMessage("删除现有图纸、重新绘图案。");
+                                    //如果确认删除，则删除xml文件中对应的连接数据
+                                    XmlFunction xf = new XmlFunction();
+                                    xf.removeConnection(xmlFilePath + "\\setting.xml", sName); //
                                     //提示重新绘制
+
+
                                 }
 
                             }
                         }
                     }
-                    
+
                 }
                 else
                 {
                     ed.WriteMessage("未选中规定项！");
                 }
-
+                m_DocumentLock.Dispose();
                 this.Show(); //显示窗体
             }
-            catch(Autodesk.AutoCAD.Runtime.Exception ex)
+            catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {
                 MessageBox.Show(ex.ToString() + "");
             }
-
         }
     }
 }
