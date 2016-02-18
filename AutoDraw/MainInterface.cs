@@ -5076,6 +5076,7 @@ namespace AutoDraw
 
                         //绘制基站图
                         Dictionary<string, string> attSN = new Dictionary<string, string>();
+                        attSN.Add("站点名称", SigalStation.name);
                         attSN.Add("站点类型", SigalStation.type);
                         attSN.Add("站点里程", SigalStation.location);
                         spaceId.InsertBlockReference("0", "系统_站点", new Point3d(insertPoint.X + 30 * rowTime, insertPoint.Y, 0), new Scale3d(1), 0, attSN);
@@ -5268,6 +5269,7 @@ namespace AutoDraw
             try
             {
                 this.Hide(); //隐藏窗体
+                this.Parent.Hide();
                 DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
                 Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                 Editor ed = doc.Editor;
@@ -5292,6 +5294,7 @@ namespace AutoDraw
                             {
                                 string sName = "";
                                 string sLocation = "";
+                                string sType = "";
                                 foreach (ObjectId objId in bRef.AttributeCollection)
                                 {
                                     //筛选
@@ -5303,26 +5306,34 @@ namespace AutoDraw
                                     string aa = attRef.Tag.ToString(); //块属性的tag
 
                                     string bb = attRef.TextString.ToString(); //块属性显示的内容
-                                    if (!bb.Contains("+"))
+                                    if (bb.Contains("+"))
                                     {
-                                        sName = bb;
+                                        sLocation = bb;
+                                        
+                                    }
+                                    else if (bb.Contains("所")|| bb.Contains("站"))
+                                    {
+                                        sType = bb;
                                     }
                                     else
                                     {
-                                        sLocation = bb;
+                                        sName = bb;
+
                                     }
                                     #endregion
                                 }
 
                                 //是否确认删除
-                                if (MessageBox.Show("是否删除：\n\t名称为：" + sName + "\n\t里程为：" + sLocation + "的站点", "注意", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                if (MessageBox.Show("是否删除：\n\t名称为：" + sName + "\n\t里程为：" + sLocation + "\n\t类型为：" + sType + "\n的站点", "注意", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                 {
                                     ed.WriteMessage("重新绘图案。");
                                     //如果确认删除，则删除xml文件中对应的连接数据
                                     XmlFunction xf = new XmlFunction();
-                                    xf.removeConnection(xmlFilePath + "\\setting.xml", sName); //
+                                    ClassStruct.StationPoint not_draw_station = new ClassStruct.StationPoint(sLocation, sName, sType, 0);
+                                    xf.addNotDrawBlock(xmlFilePath + "\\setting.xml", not_draw_station);
+                                    //xf.removeConnection(xmlFilePath + "\\setting.xml", sName); //
                                     //提示重新绘制
-
+                                    MessageBox.Show("请删除现有图形后重新绘制。");
 
                                 }
 
@@ -5336,7 +5347,9 @@ namespace AutoDraw
                     ed.WriteMessage("未选中规定项！");
                 }
                 m_DocumentLock.Dispose();
+
                 this.Show(); //显示窗体
+                this.Parent.Show();
             }
             catch (Autodesk.AutoCAD.Runtime.Exception ex)
             {

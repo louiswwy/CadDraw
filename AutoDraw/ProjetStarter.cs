@@ -11,17 +11,20 @@ namespace AutoDraw
     public class ProjetStarter//:IExtensionApplication
     {
         //Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
-        MainInterface form;
+        //MainInterface form;
+        newForm1 nf;
         [CommandMethod("AutoDrawer")]
         public void starter()
         {
-            if (form == null || form.IsDisposed)
+            if (nf == null || nf.IsDisposed)
             {
                 //ed.WriteMessage("AutoDrawer 功能已载入.");
-                form = new MainInterface();
+                //form = new MainInterface();
+                nf = new newForm1();
                 try
                 {
-                    Application.ShowModelessDialog(form);  //显示非模态对话框 
+                    //Application.ShowModelessDialog(form);  //显示非模态对话框 
+                    Application.ShowModelessDialog(nf);  //显示非模态对话框 
                 }
                 catch (System.Exception ee)
                 {
@@ -34,7 +37,7 @@ namespace AutoDraw
             else
             {
 
-                form.Activate();
+                //nf.Show();
             }
         }
 

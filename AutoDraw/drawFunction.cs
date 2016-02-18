@@ -268,30 +268,43 @@ namespace AutoDraw
             #endregion
 
             #region 添加块属性
-            AttributeDefinition stationName = new AttributeDefinition(Point3d.Origin, "类型", "站点类型", "输入类型名称：", FontId);
+
+            AttributeDefinition stationName = new AttributeDefinition(Point3d.Origin, "名称", "站点名称", "输入站点名称：", FontId);
             stationName.TextStyleId = FontId;
             stationName.WidthFactor = 0.7;
             stationName.Height = 3;//文字高度
             stationName.HorizontalMode = TextHorizontalMode.TextRight;
             stationName.VerticalMode = TextVerticalMode.TextVerticalMid;
             stationName.Invisible = false;
-            stationName.AlignmentPoint = new Point3d(LeftUpPoint.X - 4, LeftUpPoint.Y, 0);
+            stationName.AlignmentPoint = new Point3d(LeftUpPoint.X - 7, LeftUpPoint.Y, 0);
             stationName.Rotation = 90 * Math.PI / 180;
             acBlkTblRec.AppendEntity(stationName);
             trans.AddNewlyCreatedDBObject(stationName, true);
 
-
-            AttributeDefinition stationType = new AttributeDefinition(Point3d.Origin, "????+???", "站点里程", "输入站点里程：", FontId);
+            AttributeDefinition stationType = new AttributeDefinition(Point3d.Origin, "类型", "站点类型", "输入类型名称：", FontId);
             stationType.TextStyleId = FontId;
             stationType.WidthFactor = 0.7;
             stationType.Height = 3;//文字高度
-            stationType.HorizontalMode = TextHorizontalMode.TextLeft;
+            stationType.HorizontalMode = TextHorizontalMode.TextRight;
             stationType.VerticalMode = TextVerticalMode.TextVerticalMid;
             stationType.Invisible = false;
-            stationType.AlignmentPoint = new Point3d(LeftUpPoint.X - 4, rightDownPoint.Y, 0);
+            stationType.AlignmentPoint = new Point3d(LeftUpPoint.X - 4, LeftUpPoint.Y, 0);
             stationType.Rotation = 90 * Math.PI / 180;
             acBlkTblRec.AppendEntity(stationType);
             trans.AddNewlyCreatedDBObject(stationType, true);
+
+
+            AttributeDefinition stationLoca = new AttributeDefinition(Point3d.Origin, "????+???", "站点里程", "输入站点里程：", FontId);
+            stationLoca.TextStyleId = FontId;
+            stationLoca.WidthFactor = 0.7;
+            stationLoca.Height = 3;//文字高度
+            stationLoca.HorizontalMode = TextHorizontalMode.TextLeft;
+            stationLoca.VerticalMode = TextVerticalMode.TextVerticalMid;
+            stationLoca.Invisible = false;
+            stationLoca.AlignmentPoint = new Point3d(LeftUpPoint.X - 4, rightDownPoint.Y, 0);
+            stationLoca.Rotation = 90 * Math.PI / 180;
+            acBlkTblRec.AppendEntity(stationLoca);
+            trans.AddNewlyCreatedDBObject(stationLoca, true);
 
 
             #endregion

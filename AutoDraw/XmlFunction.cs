@@ -72,6 +72,7 @@ namespace AutoDraw
                     XmlNodeList nodeList = subStationRoot.ChildNodes;//获取FatherNode节点的所有子节点   
                     PFunction pf = new PFunction();
 
+                    string notdrawList = loadNotDrawBlockList(xmlFile);
                     foreach (var item in nodeList)
                     {
                         XmlElement xe = (XmlElement)item;
@@ -97,7 +98,7 @@ namespace AutoDraw
                         string name = nameNode.InnerText;
                         string type = typeNode.InnerText;
 
-                        if (!loadNotDrawBlockList(xmlFile).Contains(name)) //如果不在‘不绘制列表中’则输出
+                        if (!notdrawList.Contains(name)&& !notdrawList.Contains(type)) //如果不在‘不绘制列表中’则输出
                         {
                             inforStation.Add(key.ToUpper(), name + "," + type + "," + DistNum);
                         }
@@ -810,12 +811,16 @@ namespace AutoDraw
             XmlNode wpRoot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
             XmlNode ndRoot = wpRoot.SelectSingleNode("NotDrawStationPointLists");//查找<NotDrawStationPointLists> 
 
-            XmlNodeList ndSRoot = ndRoot.SelectNodes("StationPoints");
-            foreach(XmlNode sigNode in ndSRoot)
+            if (ndRoot != null)
             {
-                List_NotDraw += sigNode.SelectSingleNode("PName").InnerText + ",";
+                XmlNodeList ndSRoot = ndRoot.SelectNodes("StationPoints");
+                foreach (XmlNode sigNode in ndSRoot)
+                {
+                    List_NotDraw += sigNode.SelectSingleNode("PName").InnerText + sigNode.SelectSingleNode("PType").InnerText + ",";
+                }
             }
             return List_NotDraw;
+            
         }
         #endregion
     }

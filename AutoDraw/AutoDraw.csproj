@@ -16,9 +16,10 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -71,6 +72,12 @@
     <Compile Include="LiChen.Designer.cs">
       <DependentUpon>LiChen.cs</DependentUpon>
     </Compile>
+    <Compile Include="newForm1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="newForm1.Designer.cs">
+      <DependentUpon>newForm1.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProjetInfor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -116,6 +123,9 @@
     <EmbeddedResource Include="LiChen.resx">
       <DependentUpon>LiChen.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="newForm1.resx">
+      <DependentUpon>newForm1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProjetInfor.resx">
       <DependentUpon>ProjetInfor.cs</DependentUpon>
     </EmbeddedResource>
@@ -141,8 +151,12 @@
     <None Include="Properties\DataSources\AutoDraw.Properties.Resources.datasource" />
     <None Include="Properties\DataSources\MainInterface.datasource" />
     <None Include="Properties\DataSources\ProjetStarter.datasource" />
-    <None Include="Properties\DataSources\PublicFonction.datasource" />
-    <None Include="Properties\DataSources\TuQian.datasource" />
+    <None Include="Properties\DataSources\PublicFonction.datasource">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\DataSources\TuQian.datasource">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Resources\abc.txt" />
   </ItemGroup>
   <ItemGroup>
