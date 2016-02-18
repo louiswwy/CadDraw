@@ -2806,6 +2806,8 @@ namespace AutoDraw
 
             XmlNode WayPointNode = CreateNode(xmlDoc, root, "WayPoints", ""); //所亭
             CreateNode(xmlDoc, WayPointNode, "StationPointLists", ""); //所亭
+
+            CreateNode(xmlDoc, WayPointNode, "NotDrawStationPointLists", ""); //所亭
             CreateNode(xmlDoc, WayPointNode, "WindPointLists", "");//风点
             CreateNode(xmlDoc, WayPointNode, "RainPointLists", "");//雨点
             CreateNode(xmlDoc, WayPointNode, "SnowPointLists", "");//雪点
@@ -4538,7 +4540,7 @@ namespace AutoDraw
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button7_Click(object sender, EventArgs e)
+        private void B_FunDraw_Click(object sender, EventArgs e)
         {
             if (listView1.Items.Count!=0)
             {
@@ -4557,8 +4559,8 @@ namespace AutoDraw
 
                     return;
                 }
-                    #region 读取数据
-                    Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists");
+                #region 读取数据
+                Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists"); //读取站点列表
                 Dictionary<string, string> STstationPoint = new Dictionary<string, string>();
                 Dictionary<string, string> RailstationPoint = new Dictionary<string, string>();
                 foreach (var par in origStation)
@@ -5315,7 +5317,7 @@ namespace AutoDraw
                                 //是否确认删除
                                 if (MessageBox.Show("是否删除：\n\t名称为：" + sName + "\n\t里程为：" + sLocation + "的站点", "注意", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                 {
-                                    ed.WriteMessage("删除现有图纸、重新绘图案。");
+                                    ed.WriteMessage("重新绘图案。");
                                     //如果确认删除，则删除xml文件中对应的连接数据
                                     XmlFunction xf = new XmlFunction();
                                     xf.removeConnection(xmlFilePath + "\\setting.xml", sName); //
@@ -5343,4 +5345,3 @@ namespace AutoDraw
         }
     }
 }
- 

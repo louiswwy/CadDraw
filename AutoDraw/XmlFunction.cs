@@ -97,7 +97,14 @@ namespace AutoDraw
                         string name = nameNode.InnerText;
                         string type = typeNode.InnerText;
 
-                        inforStation.Add(key.ToUpper(), name + "," + type + "," + DistNum);
+                        if (!loadNotDrawBlockList(xmlFile).Contains(name)) //如果不在‘不绘制列表中’则输出
+                        {
+                            inforStation.Add(key.ToUpper(), name + "," + type + "," + DistNum);
+                        }
+                        else //否则，忽视
+                        {
+
+                        }
                     }
                 }
             }
@@ -175,7 +182,7 @@ namespace AutoDraw
         }
 
         /// <summary>
-        /// 删除项
+        /// 删除waypoint项
         /// </summary>
         /// <param name="xmlFile"></param>
         /// <param name="NodeName"></param>
@@ -203,7 +210,7 @@ namespace AutoDraw
         }
 
         /// <summary>
-        /// 删除制定项
+        /// 删除指定waypoint项
         /// </summary>
         /// <param name="xmlFile"></param>
         /// <param name="parentNode"></param>
@@ -374,7 +381,7 @@ namespace AutoDraw
                     {
                         if (StationRoot.InnerText == removeItem)
                         {
-                            childNode.RemoveAll();  //删除对应<pair>节点
+                            subroot.RemoveChild(childNode); //删除对应<pair>节点
                         }
                     }
                 }
@@ -545,7 +552,7 @@ namespace AutoDraw
         #endregion
 
 
-        #region 规则部分
+        #region 规则部分 没有使用 
         public void writeRule(string xmlPath, string Nequipe)
         {
             XmlDocument xmlDoc = new XmlDocument();
@@ -695,6 +702,120 @@ namespace AutoDraw
                 return errorList;
                 
             }
+        }
+        #endregion
+
+        #region 不绘制的站点
+        public bool addNotDrawBlock(string xmlFile,ClassStruct.StationPoint blockInfo)
+        {
+            bool tryInsert = false;
+            try
+            {
+
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(xmlFile);
+
+                XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+                XmlNode wpRoot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
+                XmlNode ndRoot = wpRoot.SelectSingleNode("NotDrawStationPointLists");//查找<NotDrawStationPointLists> 
+
+                if (ndRoot == null) //如果不存在则添加‘NotDrawStationPointLists’节点
+                {
+                    wpRoot = xmlDoc.CreateElement("NotDrawStationPointLists"); //添加Connections节点
+                    wpRoot.AppendChild(ndRoot);
+                }
+                else
+                {
+                    if (!hasElement(ndRoot, blockInfo.location)) //如果不含有该项则新增
+                    {
+                        XmlElement xe1 = xmlDoc.CreateElement("StationPoints");//创建一个<WayPoint>节点 
+                        xe1.SetAttribute("location", blockInfo.location);//设置该节点location属性 
+
+                        XmlElement subxe1 = xmlDoc.CreateElement("PName");//创建一个<PName>节点 
+                        subxe1.InnerText = blockInfo.name;
+
+                        XmlElement subxe2 = xmlDoc.CreateElement("PType");//创建一个<PName>节点 
+                        subxe2.InnerText = blockInfo.type;
+
+                        xe1.AppendChild(subxe1);
+
+                        xe1.AppendChild(subxe2);
+
+                        ndRoot.AppendChild(xe1);
+                    }
+                }
+                xmlDoc.Save(xmlFile);
+                tryInsert = true;
+            }
+            catch(System.Exception ex)
+            {
+                string errorMessage = ex.Message.ToString();
+            }
+
+            return tryInsert;
+        }
+
+        public bool supNotDrawBlock(string xmlFile, ClassStruct.StationPoint blockInfo)
+        {
+            bool tryInsert = false;
+            try
+            {
+
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(xmlFile);
+
+                XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+                XmlNode wpRoot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
+                XmlNode ndRoot = wpRoot.SelectSingleNode("NotDrawStationPointLists");//查找<NotDrawStationPointLists> 
+
+                if (ndRoot != null) //如果不存在则添加‘NotDrawStationPointLists’节点
+                {
+                    foreach(XmlNode xN in ndRoot.ChildNodes)
+                    {
+                        if(xN.Attributes["location"].Value == blockInfo.location)
+                        {
+                            if (xN.SelectSingleNode("PName").InnerText == blockInfo.name)
+                            {
+                                if(xN.SelectSingleNode("PType").InnerText == blockInfo.type)
+                                {
+                                    ndRoot.RemoveChild(xN); //如果有则删除
+                                }
+                            }
+                        }
+                    }
+                    xmlDoc.Save(xmlFile);
+                }
+
+
+                tryInsert = true;
+            }
+            catch (System.Exception ex)
+            {
+                string errorMessage = ex.Message.ToString();
+            }
+
+            return tryInsert;
+        }
+
+        public string loadNotDrawBlockList(string xmlFile)
+        {
+            string List_NotDraw = "";
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode wpRoot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
+            XmlNode ndRoot = wpRoot.SelectSingleNode("NotDrawStationPointLists");//查找<NotDrawStationPointLists> 
+
+            XmlNodeList ndSRoot = ndRoot.SelectNodes("StationPoints");
+            foreach(XmlNode sigNode in ndSRoot)
+            {
+                List_NotDraw += sigNode.SelectSingleNode("PName").InnerText + ",";
+            }
+            return List_NotDraw;
         }
         #endregion
     }

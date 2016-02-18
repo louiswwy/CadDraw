@@ -59,14 +59,5 @@ namespace AutoDraw.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   查找类似  的本地化字符串。
-        /// </summary>
-        internal static string abc {
-            get {
-                return ResourceManager.GetString("abc", resourceCulture);
-            }
-        }
     }
 }
