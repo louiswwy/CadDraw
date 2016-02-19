@@ -276,7 +276,7 @@ namespace AutoDraw
             stationName.HorizontalMode = TextHorizontalMode.TextRight;
             stationName.VerticalMode = TextVerticalMode.TextVerticalMid;
             stationName.Invisible = false;
-            stationName.AlignmentPoint = new Point3d(LeftUpPoint.X - 7, LeftUpPoint.Y, 0);
+            stationName.AlignmentPoint = new Point3d(LeftUpPoint.X - 8.5, LeftUpPoint.Y, 0);
             stationName.Rotation = 90 * Math.PI / 180;
             acBlkTblRec.AppendEntity(stationName);
             trans.AddNewlyCreatedDBObject(stationName, true);
