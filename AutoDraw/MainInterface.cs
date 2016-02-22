@@ -1643,6 +1643,7 @@ namespace AutoDraw
                     //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
                 }
 
+                refreshAbandoneBlock(xmlFilePath + "\\setting.xml");  //填充ListView2
 
                 fileStationDataView(dataGridStation, colName, InfoStation, "StationTable");         //填充车站datagridView
                 fileStationDataView(dataGridWind, tableST, colName, InfoWindPoint, "WindTable");         //填充风点datagridView
@@ -3371,7 +3372,23 @@ namespace AutoDraw
             this.listView1.EndUpdate();  //结束数据处理，UI界面一次性绘制。  
         }
 
+        private void fileListView(List<ClassStruct.StationPoint> list_Item)
+        {          
+            this.listView2.BeginUpdate();
+            for (int i = 0; i < list_Item.Count; i++)
+            {
+                ClassStruct.StationPoint item = list_Item[i];
+                ListViewItem lvi = new ListViewItem();
 
+                lvi.SubItems.Add(item.type);
+                lvi.SubItems.Add(item.name);
+                lvi.SubItems.Add(item.location);
+                //this.listView2.EnsureVisible(i);
+                this.listView2.Items.Add(lvi);
+            }
+           
+            this.listView2.EndUpdate();  //结束数据处理，UI界面一次性绘制。  
+        }
 
 
         /// <summary>
@@ -5332,6 +5349,9 @@ namespace AutoDraw
                                     ClassStruct.StationPoint not_draw_station = new ClassStruct.StationPoint(sLocation, sName, sType, 0);
                                     xf.addNotDrawBlock(xmlFilePath + "\\setting.xml", not_draw_station);
                                     //xf.removeConnection(xmlFilePath + "\\setting.xml", sName); //
+
+                                    refreshAbandoneBlock(xmlFilePath + "\\setting.xml");
+
                                     //提示重新绘制
                                     MessageBox.Show("请删除现有图形后重新绘制。");
 
@@ -5355,6 +5375,19 @@ namespace AutoDraw
             {
                 MessageBox.Show(ex.ToString() + "");
             }
+        }
+
+
+
+        public void refreshAbandoneBlock(string xmlPath)
+        {
+            XmlFunction xf = new XmlFunction();
+            List<ClassStruct.StationPoint> list_not_draw_station = new List<ClassStruct.StationPoint>();
+            xf.loadNotDrawBlockList(xmlFilePath + "\\setting.xml", out list_not_draw_station);
+
+            listView2.Clear();
+            fileListView(list_not_draw_station); //刷新ListView2
+
         }
     }
 }

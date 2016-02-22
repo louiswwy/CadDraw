@@ -822,6 +822,38 @@ namespace AutoDraw
             return List_NotDraw;
             
         }
+
+        public string loadNotDrawBlockList(string xmlFile, out List<ClassStruct.StationPoint> list_not_draw_station)
+        {
+            string List_NotDraw = "";
+            ClassStruct.StationPoint not_draw;
+            list_not_draw_station = new List<ClassStruct.StationPoint>();
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode wpRoot = root.SelectSingleNode("WayPoints");//查找<WayPoints> 
+            XmlNode ndRoot = wpRoot.SelectSingleNode("NotDrawStationPointLists");//查找<NotDrawStationPointLists> 
+
+            if (ndRoot != null)
+            {
+                XmlNodeList ndSRoot = ndRoot.SelectNodes("StationPoints");
+                foreach (XmlNode sigNode in ndSRoot)
+                {
+                    string name = sigNode.SelectSingleNode("PName").InnerText;
+                    string type = sigNode.SelectSingleNode("PType").InnerText;
+                    string location = sigNode.Attributes["location"].InnerText;
+
+                    List_NotDraw += name + type + ",";
+
+                    not_draw = new ClassStruct.StationPoint(location, name, type, 0);
+
+                    list_not_draw_station.Add(not_draw);
+                }
+            }
+            return List_NotDraw;
+
+        }
         #endregion
     }
 }
