@@ -1643,14 +1643,16 @@ namespace AutoDraw
                     //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
                 }
 
-                refreshAbandoneBlock(xmlFilePath + "\\setting.xml");  //填充ListView2
+               
 
                 fileStationDataView(dataGridStation, colName, InfoStation, "StationTable");         //填充车站datagridView
                 fileStationDataView(dataGridWind, tableST, colName, InfoWindPoint, "WindTable");         //填充风点datagridView
                 fileStationDataView(dataGridRain, tableST, colName, InfoRainPoint, "RainTable");             //填充雨点datagridView
                 fileStationDataView(dataGridSnow, tableST, colName, InfoSnowPoint, "SnowTable");           //填充雪点datagridView
-                //fileStationDataView(dataGridearth, colName, new Dictionary<string, string>());          //填充地震点datagridView
                 
+                //fileStationDataView(dataGridearth, colName, new Dictionary<string, string>());          //填充地震点datagridView
+
+                refreshAbandoneBlock(xmlFilePath + "\\setting.xml");  //填充ListView2
             }
 
             #endregion
@@ -3373,16 +3375,35 @@ namespace AutoDraw
         }
 
         private void fileListView(List<ClassStruct.StationPoint> list_Item)
-        {          
+        {
+            //listView2.View = View.Details;
+
+            listView2.Columns.Add("类型");
+            listView2.Columns.Add("名称");
+            listView2.Columns.Add("里程");
+
             this.listView2.BeginUpdate();
+
+            /*this.listView2.Columns.Add("类型");
+            this.listView2.Columns.Add("名称");
+            this.listView2.Columns.Add("里程");*/
+
+            //ListViewItem[] listItem = new ListViewItem[]();
             for (int i = 0; i < list_Item.Count; i++)
             {
                 ClassStruct.StationPoint item = list_Item[i];
-                ListViewItem lvi = new ListViewItem();
+                ListViewItem lvi = new ListViewItem(item.type + "");
+                
+                lvi.Text = item.type;
 
-                lvi.SubItems.Add(item.type);
-                lvi.SubItems.Add(item.name);
-                lvi.SubItems.Add(item.location);
+                ListViewItem.ListViewSubItem listViewSubItem  = new ListViewItem.ListViewSubItem();
+                listViewSubItem.Text = item.name;
+                lvi.SubItems.Add(listViewSubItem);
+
+                ListViewItem.ListViewSubItem listViewSubSubItem = new ListViewItem.ListViewSubItem();
+                listViewSubSubItem.Text = item.location;
+                lvi.SubItems.Add(listViewSubSubItem);
+
                 //this.listView2.EnsureVisible(i);
                 this.listView2.Items.Add(lvi);
             }
@@ -5388,6 +5409,27 @@ namespace AutoDraw
             listView2.Clear();
             fileListView(list_not_draw_station); //刷新ListView2
 
+        }
+
+        private void 删除ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (listView2.SelectedItems.Count > 0)
+            {
+                ListViewItem item = listView2.SelectedItems[0];
+
+                string subItemName = listView2.SelectedItems[0].SubItems[1].Text;
+                string subItemLocation = listView2.SelectedItems[0].SubItems[2].Text;
+                string ItemType = item.Text;
+
+                if(MessageBox.Show("是否删除项目：\n\t" + ItemType+","+ subItemName+","+ subItemLocation + "?", "注意", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                {
+                    XmlFunction xf = new XmlFunction();
+                    xf.supNotDrawBlock(xmlFilePath + "\\setting.xml", new ClassStruct.StationPoint(subItemLocation, subItemName, ItemType, 0));
+                    refreshAbandoneBlock(xmlFilePath + "\\setting.xml");
+                }
+
+                //MessageBox.Show("是否删除项目：\n\t"+ item.a)
+            }
         }
     }
 }

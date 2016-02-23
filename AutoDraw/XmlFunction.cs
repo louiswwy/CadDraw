@@ -773,6 +773,7 @@ namespace AutoDraw
 
                 if (ndRoot != null) //如果不存在则添加‘NotDrawStationPointLists’节点
                 {
+                    
                     foreach(XmlNode xN in ndRoot.ChildNodes)
                     {
                         if(xN.Attributes["location"].Value == blockInfo.location)
@@ -782,6 +783,7 @@ namespace AutoDraw
                                 if(xN.SelectSingleNode("PType").InnerText == blockInfo.type)
                                 {
                                     ndRoot.RemoveChild(xN); //如果有则删除
+                                    break;
                                 }
                             }
                         }

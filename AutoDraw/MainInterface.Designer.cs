@@ -109,19 +109,19 @@
             this.listView1 = new System.Windows.Forms.ListView();
             this.splitContainer8 = new System.Windows.Forms.SplitContainer();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.listView2 = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuListView = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.删除ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.listBox1 = new System.Windows.Forms.ListBox();
             this.button6 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.B_Draw = new System.Windows.Forms.Button();
             this.B_Add = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.columnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnLocation = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.listView2 = new System.Windows.Forms.ListView();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -936,6 +936,7 @@
             // 
             // splitContainer6.Panel2
             // 
+            this.splitContainer6.Panel2.Controls.Add(this.listBox1);
             this.splitContainer6.Panel2.Controls.Add(this.button6);
             this.splitContainer6.Panel2.Controls.Add(this.button1);
             this.splitContainer6.Panel2.Controls.Add(this.B_Draw);
@@ -1014,7 +1015,6 @@
             // 
             // splitContainer8.Panel2
             // 
-            this.splitContainer8.Panel2.Controls.Add(this.listBox1);
             this.splitContainer8.Panel2.Controls.Add(this.listView2);
             this.splitContainer8.Size = new System.Drawing.Size(224, 248);
             this.splitContainer8.SplitterDistance = 25;
@@ -1028,6 +1028,42 @@
             this.panel3.Size = new System.Drawing.Size(224, 25);
             this.panel3.TabIndex = 0;
             // 
+            // listView2
+            // 
+            this.listView2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3});
+            this.listView2.ContextMenuStrip = this.contextMenuListView;
+            this.listView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView2.FullRowSelect = true;
+            this.listView2.GridLines = true;
+            this.listView2.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem1});
+            this.listView2.Location = new System.Drawing.Point(0, 0);
+            this.listView2.MultiSelect = false;
+            this.listView2.Name = "listView2";
+            this.listView2.Size = new System.Drawing.Size(224, 219);
+            this.listView2.TabIndex = 1;
+            this.listView2.UseCompatibleStateImageBehavior = false;
+            this.listView2.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "类型";
+            this.columnHeader1.Width = 83;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "名称";
+            this.columnHeader2.Width = 71;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "里程";
+            this.columnHeader3.Width = 68;
+            // 
             // contextMenuListView
             // 
             this.contextMenuListView.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1040,6 +1076,16 @@
             this.删除ToolStripMenuItem1.Name = "删除ToolStripMenuItem1";
             this.删除ToolStripMenuItem1.Size = new System.Drawing.Size(100, 22);
             this.删除ToolStripMenuItem1.Text = "删除";
+            this.删除ToolStripMenuItem1.Click += new System.EventHandler(this.删除ToolStripMenuItem1_Click);
+            // 
+            // listBox1
+            // 
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.ItemHeight = 12;
+            this.listBox1.Location = new System.Drawing.Point(15, 401);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(120, 88);
+            this.listBox1.TabIndex = 2;
             // 
             // button6
             // 
@@ -1106,44 +1152,6 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Visible = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // listBox1
-            // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 12;
-            this.listBox1.Location = new System.Drawing.Point(42, 39);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(120, 88);
-            this.listBox1.TabIndex = 2;
-            // 
-            // columnType
-            // 
-            this.columnType.Text = "类型";
-            // 
-            // columnName
-            // 
-            this.columnName.Text = "名称";
-            // 
-            // columnLocation
-            // 
-            this.columnLocation.Text = "里程";
-            // 
-            // listView2
-            // 
-            this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnType,
-            this.columnName,
-            this.columnLocation});
-            this.listView2.ContextMenuStrip = this.contextMenuListView;
-            this.listView2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listView2.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
-            this.listView2.Location = new System.Drawing.Point(0, 0);
-            this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(224, 219);
-            this.listView2.TabIndex = 1;
-            this.listView2.UseCompatibleStateImageBehavior = false;
-            this.listView2.View = System.Windows.Forms.View.Details;
             // 
             // MainInterface
             // 
@@ -1304,8 +1312,8 @@
         private System.Windows.Forms.ToolStripMenuItem 删除ToolStripMenuItem1;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.ListView listView2;
-        private System.Windows.Forms.ColumnHeader columnType;
-        private System.Windows.Forms.ColumnHeader columnName;
-        private System.Windows.Forms.ColumnHeader columnLocation;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
     }
 }
