@@ -63,11 +63,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(481, 356);
+            this.ClientSize = new System.Drawing.Size(994, 661);
             this.ContextMenuStrip = this.contextMenuStrip1;
             this.Controls.Add(this.button1);
             this.ImeMode = System.Windows.Forms.ImeMode.On;
             this.IsMdiContainer = true;
+            this.MinimumSize = new System.Drawing.Size(1010, 700);
             this.Name = "newForm1";
             this.Text = "newForm1";
             this.Load += new System.EventHandler(this.newForm1_Load);

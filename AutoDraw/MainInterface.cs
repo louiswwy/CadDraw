@@ -3074,7 +3074,11 @@ namespace AutoDraw
             PFunction pF = new PFunction();
             foreach (TreeNode childNode in selectedNode.Nodes)
             {
-                if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)") || childNode.Text.ToString().Replace(" ", "").Contains("AT所")) //汉字
+                if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                {
+                    licheng = childNode.Text.ToString();
+                }
+                else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)") || childNode.Text.ToString().Replace(" ", "").Contains("AT所")) //汉字
                 {
                     if (childNode.Text.ToString().Replace(" ", "").Contains("AT所") || childNode.Text.ToString().Replace(" ", "").Contains("牵引变电所") || childNode.Text.ToString().Replace(" ", "").Contains("车站") || childNode.Text.ToString().Replace(" ", "").Contains("基站") || childNode.Text.ToString().Replace(" ", "").Contains("桥梁"))
                     {
@@ -3085,10 +3089,6 @@ namespace AutoDraw
                         Name = childNode.Text.ToString();
                     }
                 }
-                else if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
-                {
-                    licheng = childNode.Text.ToString();
-                } 
             }
 
             if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
@@ -3242,7 +3242,11 @@ namespace AutoDraw
                 {
                     foreach (TreeNode childNode in selectedNode.Nodes)
                     {
-                        if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
+                        if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                        {
+                            T_SLocation.Text = childNode.Text.ToString();
+                        }
+                        else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
                         {
                             if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
                             {
@@ -3252,10 +3256,6 @@ namespace AutoDraw
                             {
                                 T_SName.Text = childNode.Text.ToString();
                             }
-                        }
-                        else if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
-                        {
-                            T_SLocation.Text = childNode.Text.ToString();
                         }
                     }
                     if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
@@ -3273,7 +3273,11 @@ namespace AutoDraw
                 {
                     foreach (TreeNode childNode in selectedNode.Parent.Nodes)
                     {
-                        if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
+                        if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                        {
+                            T_SLocation.Text = childNode.Text.ToString();
+                        }
+                        else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
                         {
                             if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
                             {
@@ -3283,11 +3287,7 @@ namespace AutoDraw
                             {
                                 T_SName.Text = childNode.Text.ToString();
                             }
-                        }
-                        else if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
-                        {
-                            T_SLocation.Text = childNode.Text.ToString();
-                        }
+                        } 
                     }
                     if (pF.isExMatch(selectedNode.Parent.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
                     {

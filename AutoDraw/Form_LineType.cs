@@ -92,7 +92,7 @@ namespace AutoDraw
                             }
                         }
 
-                        //fileDataView(newDicNandT);
+                        fileDataView(newDicNandT);
                         //dataGridView1.Columns[0].ReadOnly = true;  //只读
                     }
                     else
@@ -114,7 +114,7 @@ namespace AutoDraw
         //初始化
         public void fileDataView(Dictionary<string, string> DicNandT)
         {
-            if (LineType == null)
+            if (true)//LineType == null)
             {
                 LineType = new DataSet();
                 System.Data.DataTable lineTable = new DataTable();
@@ -289,19 +289,25 @@ namespace AutoDraw
             
         }
 
-        private void comboFournisseur_Click(object sender, EventArgs e)
+        private void comboFournisseur_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboFournisseur.SelectedText.ToString() != "")
+            if (comboFournisseur.SelectedItem.ToString() != "")
             {
                 Dictionary<string, string> LineInfoByFournisseur = new Dictionary<string, string>();
-                foreach(KeyValuePair<string,string> pair in newDicNandT)
+                foreach (KeyValuePair<string, string> pair in newDicNandT)
                 {
-                    LineInfoByFournisseur.Add(pair.Key, pair.Value);
+                    if (pair.Value.ToString().Contains(comboFournisseur.SelectedItem.ToString())) //要改
+                    {
+
+                        LineInfoByFournisseur.Add(pair.Key, pair.Value);
+                    }
                 }
                 //根据设备商名称
                 fileDataView(LineInfoByFournisseur);
             }
         }
+
+        //private void select
     }
 }
 

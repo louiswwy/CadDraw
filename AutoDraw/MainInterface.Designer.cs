@@ -125,21 +125,17 @@
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.contextMenutTreeView.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
             this.splitContainer4.Panel1.SuspendLayout();
             this.splitContainer4.Panel2.SuspendLayout();
             this.splitContainer4.SuspendLayout();
@@ -154,23 +150,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridRain)).BeginInit();
             this.tabPageDZ.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridearth)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).BeginInit();
             this.splitContainer5.Panel1.SuspendLayout();
             this.splitContainer5.Panel2.SuspendLayout();
             this.splitContainer5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
             this.splitContainer6.Panel1.SuspendLayout();
             this.splitContainer6.Panel2.SuspendLayout();
             this.splitContainer6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).BeginInit();
             this.splitContainer7.Panel1.SuspendLayout();
             this.splitContainer7.Panel2.SuspendLayout();
             this.splitContainer7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).BeginInit();
             this.splitContainer8.Panel1.SuspendLayout();
             this.splitContainer8.Panel2.SuspendLayout();
             this.splitContainer8.SuspendLayout();
@@ -228,20 +219,21 @@
             this.比例尺ToolStripMenuItem1,
             this.可选线缆类型ToolStripMenuItem});
             this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
-            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.比例尺ToolStripMenuItem.Text = "图纸属性";
             // 
             // 比例尺ToolStripMenuItem1
             // 
             this.比例尺ToolStripMenuItem1.Name = "比例尺ToolStripMenuItem1";
-            this.比例尺ToolStripMenuItem1.Size = new System.Drawing.Size(148, 22);
+            this.比例尺ToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.比例尺ToolStripMenuItem1.Text = "比例尺";
+            this.比例尺ToolStripMenuItem1.Visible = false;
             this.比例尺ToolStripMenuItem1.Click += new System.EventHandler(this.比例尺ToolStripMenuItem1_Click);
             // 
             // 可选线缆类型ToolStripMenuItem
             // 
             this.可选线缆类型ToolStripMenuItem.Name = "可选线缆类型ToolStripMenuItem";
-            this.可选线缆类型ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.可选线缆类型ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.可选线缆类型ToolStripMenuItem.Text = "可选线缆类型";
             this.可选线缆类型ToolStripMenuItem.Click += new System.EventHandler(this.可选线缆类型ToolStripMenuItem_Click);
             // 
@@ -251,21 +243,22 @@
             this.项目信息ToolStripMenuItem,
             this.里程信息ToolStripMenuItem});
             this.项目属性ToolStripMenuItem.Name = "项目属性ToolStripMenuItem";
-            this.项目属性ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.项目属性ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.项目属性ToolStripMenuItem.Text = "项目属性";
             // 
             // 项目信息ToolStripMenuItem
             // 
             this.项目信息ToolStripMenuItem.Name = "项目信息ToolStripMenuItem";
-            this.项目信息ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.项目信息ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.项目信息ToolStripMenuItem.Text = "项目信息";
             this.项目信息ToolStripMenuItem.Click += new System.EventHandler(this.项目信息ToolStripMenuItem_Click);
             // 
             // 里程信息ToolStripMenuItem
             // 
             this.里程信息ToolStripMenuItem.Name = "里程信息ToolStripMenuItem";
-            this.里程信息ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.里程信息ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.里程信息ToolStripMenuItem.Text = "里程信息";
+            this.里程信息ToolStripMenuItem.Visible = false;
             // 
             // 导入图块ToolStripMenuItem
             // 
@@ -285,7 +278,7 @@
             // 修改系统图ToolStripMenuItem
             // 
             this.修改系统图ToolStripMenuItem.Name = "修改系统图ToolStripMenuItem";
-            this.修改系统图ToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.修改系统图ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.修改系统图ToolStripMenuItem.Text = "修改系统图";
             this.修改系统图ToolStripMenuItem.Click += new System.EventHandler(this.修改系统图ToolStripMenuItem_Click);
             // 
@@ -1086,6 +1079,7 @@
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(120, 88);
             this.listBox1.TabIndex = 2;
+            this.listBox1.Visible = false;
             // 
             // button6
             // 
@@ -1175,23 +1169,19 @@
             this.panel1.ResumeLayout(false);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.contextMenutTreeView.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel1.PerformLayout();
             this.splitContainer2.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.splitContainer4.Panel1.ResumeLayout(false);
             this.splitContainer4.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
             this.splitContainer4.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPageST.ResumeLayout(false);
@@ -1207,23 +1197,18 @@
             this.splitContainer5.Panel1.ResumeLayout(false);
             this.splitContainer5.Panel2.ResumeLayout(false);
             this.splitContainer5.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
             this.splitContainer5.ResumeLayout(false);
             this.splitContainer6.Panel1.ResumeLayout(false);
             this.splitContainer6.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).EndInit();
             this.splitContainer6.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
             this.splitContainer7.Panel1.ResumeLayout(false);
             this.splitContainer7.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).EndInit();
             this.splitContainer7.ResumeLayout(false);
             this.splitContainer8.Panel1.ResumeLayout(false);
             this.splitContainer8.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).EndInit();
             this.splitContainer8.ResumeLayout(false);
             this.contextMenuListView.ResumeLayout(false);
             this.ResumeLayout(false);
