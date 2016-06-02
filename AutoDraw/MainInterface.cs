@@ -3078,7 +3078,7 @@ namespace AutoDraw
                 {
                     licheng = childNode.Text.ToString();
                 }
-                else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)") || childNode.Text.ToString().Replace(" ", "").Contains("AT所")) //汉字
+                else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)") || childNode.Text.ToString().Replace(" ", "").Contains("AT所")) //汉字
                 {
                     if (childNode.Text.ToString().Replace(" ", "").Contains("AT所") || childNode.Text.ToString().Replace(" ", "").Contains("牵引变电所") || childNode.Text.ToString().Replace(" ", "").Contains("车站") || childNode.Text.ToString().Replace(" ", "").Contains("基站") || childNode.Text.ToString().Replace(" ", "").Contains("桥梁"))
                     {
@@ -3091,7 +3091,7 @@ namespace AutoDraw
                 }
             }
 
-            if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
+            if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)")) //((\d*)\#*
             {
                 if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
                 {
