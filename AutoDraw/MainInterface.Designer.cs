@@ -57,6 +57,8 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.label7 = new System.Windows.Forms.Label();
+            this.C_reletive_position = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.comboFournisseur = new System.Windows.Forms.ComboBox();
             this.B_FunDraw = new System.Windows.Forms.Button();
@@ -64,11 +66,11 @@
             this.B_SupWayPoint = new System.Windows.Forms.Button();
             this.B_AddWayPoint = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.TypeWayPoint = new System.Windows.Forms.ComboBox();
+            this.C_TypeWayPoint = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.T_SName = new System.Windows.Forms.TextBox();
             this.T_SLocation = new System.Windows.Forms.TextBox();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.Tree_SummaryBox = new System.Windows.Forms.TreeView();
             this.contextMenutTreeView = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.修改ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.删除ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -125,17 +127,21 @@
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.contextMenutTreeView.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
             this.splitContainer4.Panel1.SuspendLayout();
             this.splitContainer4.Panel2.SuspendLayout();
             this.splitContainer4.SuspendLayout();
@@ -150,18 +156,23 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridRain)).BeginInit();
             this.tabPageDZ.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridearth)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).BeginInit();
             this.splitContainer5.Panel1.SuspendLayout();
             this.splitContainer5.Panel2.SuspendLayout();
             this.splitContainer5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
             this.splitContainer6.Panel1.SuspendLayout();
             this.splitContainer6.Panel2.SuspendLayout();
             this.splitContainer6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).BeginInit();
             this.splitContainer7.Panel1.SuspendLayout();
             this.splitContainer7.Panel2.SuspendLayout();
             this.splitContainer7.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).BeginInit();
             this.splitContainer8.Panel1.SuspendLayout();
             this.splitContainer8.Panel2.SuspendLayout();
             this.splitContainer8.SuspendLayout();
@@ -219,13 +230,13 @@
             this.比例尺ToolStripMenuItem1,
             this.可选线缆类型ToolStripMenuItem});
             this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
-            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.比例尺ToolStripMenuItem.Text = "图纸属性";
             // 
             // 比例尺ToolStripMenuItem1
             // 
             this.比例尺ToolStripMenuItem1.Name = "比例尺ToolStripMenuItem1";
-            this.比例尺ToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.比例尺ToolStripMenuItem1.Size = new System.Drawing.Size(148, 22);
             this.比例尺ToolStripMenuItem1.Text = "比例尺";
             this.比例尺ToolStripMenuItem1.Visible = false;
             this.比例尺ToolStripMenuItem1.Click += new System.EventHandler(this.比例尺ToolStripMenuItem1_Click);
@@ -233,7 +244,7 @@
             // 可选线缆类型ToolStripMenuItem
             // 
             this.可选线缆类型ToolStripMenuItem.Name = "可选线缆类型ToolStripMenuItem";
-            this.可选线缆类型ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.可选线缆类型ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.可选线缆类型ToolStripMenuItem.Text = "可选线缆类型";
             this.可选线缆类型ToolStripMenuItem.Click += new System.EventHandler(this.可选线缆类型ToolStripMenuItem_Click);
             // 
@@ -243,20 +254,20 @@
             this.项目信息ToolStripMenuItem,
             this.里程信息ToolStripMenuItem});
             this.项目属性ToolStripMenuItem.Name = "项目属性ToolStripMenuItem";
-            this.项目属性ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.项目属性ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.项目属性ToolStripMenuItem.Text = "项目属性";
             // 
             // 项目信息ToolStripMenuItem
             // 
             this.项目信息ToolStripMenuItem.Name = "项目信息ToolStripMenuItem";
-            this.项目信息ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.项目信息ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.项目信息ToolStripMenuItem.Text = "项目信息";
             this.项目信息ToolStripMenuItem.Click += new System.EventHandler(this.项目信息ToolStripMenuItem_Click);
             // 
             // 里程信息ToolStripMenuItem
             // 
             this.里程信息ToolStripMenuItem.Name = "里程信息ToolStripMenuItem";
-            this.里程信息ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.里程信息ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.里程信息ToolStripMenuItem.Text = "里程信息";
             this.里程信息ToolStripMenuItem.Visible = false;
             // 
@@ -278,7 +289,7 @@
             // 修改系统图ToolStripMenuItem
             // 
             this.修改系统图ToolStripMenuItem.Name = "修改系统图ToolStripMenuItem";
-            this.修改系统图ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.修改系统图ToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
             this.修改系统图ToolStripMenuItem.Text = "修改系统图";
             this.修改系统图ToolStripMenuItem.Click += new System.EventHandler(this.修改系统图ToolStripMenuItem_Click);
             // 
@@ -325,6 +336,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.label7);
+            this.splitContainer1.Panel1.Controls.Add(this.C_reletive_position);
             this.splitContainer1.Panel1.Controls.Add(this.label3);
             this.splitContainer1.Panel1.Controls.Add(this.comboFournisseur);
             this.splitContainer1.Panel1.Controls.Add(this.B_FunDraw);
@@ -332,19 +345,36 @@
             this.splitContainer1.Panel1.Controls.Add(this.B_SupWayPoint);
             this.splitContainer1.Panel1.Controls.Add(this.B_AddWayPoint);
             this.splitContainer1.Panel1.Controls.Add(this.label1);
-            this.splitContainer1.Panel1.Controls.Add(this.TypeWayPoint);
+            this.splitContainer1.Panel1.Controls.Add(this.C_TypeWayPoint);
             this.splitContainer1.Panel1.Controls.Add(this.label2);
             this.splitContainer1.Panel1.Controls.Add(this.T_SName);
             this.splitContainer1.Panel1.Controls.Add(this.T_SLocation);
-            this.splitContainer1.Panel1.Controls.Add(this.treeView1);
+            this.splitContainer1.Panel1.Controls.Add(this.Tree_SummaryBox);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
             this.splitContainer1.Size = new System.Drawing.Size(717, 614);
-            this.splitContainer1.SplitterDistance = 184;
+            this.splitContainer1.SplitterDistance = 200;
             this.splitContainer1.SplitterWidth = 8;
             this.splitContainer1.TabIndex = 12;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(8, 97);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(53, 12);
+            this.label7.TabIndex = 18;
+            this.label7.Text = "相对位置";
+            // 
+            // C_reletive_position
+            // 
+            this.C_reletive_position.FormattingEnabled = true;
+            this.C_reletive_position.Location = new System.Drawing.Point(69, 94);
+            this.C_reletive_position.Name = "C_reletive_position";
+            this.C_reletive_position.Size = new System.Drawing.Size(121, 20);
+            this.C_reletive_position.TabIndex = 17;
             // 
             // label3
             // 
@@ -367,9 +397,9 @@
             // 
             // B_FunDraw
             // 
-            this.B_FunDraw.Location = new System.Drawing.Point(10, 495);
+            this.B_FunDraw.Location = new System.Drawing.Point(10, 514);
             this.B_FunDraw.Name = "B_FunDraw";
-            this.B_FunDraw.Size = new System.Drawing.Size(165, 23);
+            this.B_FunDraw.Size = new System.Drawing.Size(180, 23);
             this.B_FunDraw.TabIndex = 14;
             this.B_FunDraw.Text = "绘图";
             this.B_FunDraw.UseVisualStyleBackColor = true;
@@ -388,7 +418,7 @@
             // 
             this.B_SupWayPoint.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.B_SupWayPoint.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.B_SupWayPoint.Location = new System.Drawing.Point(101, 94);
+            this.B_SupWayPoint.Location = new System.Drawing.Point(115, 153);
             this.B_SupWayPoint.Name = "B_SupWayPoint";
             this.B_SupWayPoint.Size = new System.Drawing.Size(75, 30);
             this.B_SupWayPoint.TabIndex = 11;
@@ -400,7 +430,7 @@
             // 
             this.B_AddWayPoint.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.B_AddWayPoint.Font = new System.Drawing.Font("宋体", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.B_AddWayPoint.Location = new System.Drawing.Point(10, 94);
+            this.B_AddWayPoint.Location = new System.Drawing.Point(10, 153);
             this.B_AddWayPoint.Name = "B_AddWayPoint";
             this.B_AddWayPoint.Size = new System.Drawing.Size(75, 30);
             this.B_AddWayPoint.TabIndex = 5;
@@ -417,20 +447,22 @@
             this.label1.TabIndex = 7;
             this.label1.Text = "名称";
             // 
-            // TypeWayPoint
+            // C_TypeWayPoint
             // 
-            this.TypeWayPoint.FormattingEnabled = true;
-            this.TypeWayPoint.Items.AddRange(new object[] {
+            this.C_TypeWayPoint.FormattingEnabled = true;
+            this.C_TypeWayPoint.Items.AddRange(new object[] {
             "车站",
             "牵引变电所",
             "AT所",
             "基站",
-            "分区所"});
-            this.TypeWayPoint.Location = new System.Drawing.Point(55, 14);
-            this.TypeWayPoint.Name = "TypeWayPoint";
-            this.TypeWayPoint.Size = new System.Drawing.Size(121, 20);
-            this.TypeWayPoint.TabIndex = 1;
-            this.TypeWayPoint.SelectedIndexChanged += new System.EventHandler(this.TypeWayPoint_SelectedIndexChanged);
+            "分区所",
+            "桥梁",
+            "隧道"});
+            this.C_TypeWayPoint.Location = new System.Drawing.Point(69, 12);
+            this.C_TypeWayPoint.Name = "C_TypeWayPoint";
+            this.C_TypeWayPoint.Size = new System.Drawing.Size(121, 20);
+            this.C_TypeWayPoint.TabIndex = 1;
+            this.C_TypeWayPoint.SelectedIndexChanged += new System.EventHandler(this.C_TypeWayPoint_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -443,25 +475,25 @@
             // 
             // T_SName
             // 
-            this.T_SName.Location = new System.Drawing.Point(55, 40);
+            this.T_SName.Location = new System.Drawing.Point(69, 38);
             this.T_SName.Name = "T_SName";
             this.T_SName.Size = new System.Drawing.Size(121, 21);
             this.T_SName.TabIndex = 6;
             // 
             // T_SLocation
             // 
-            this.T_SLocation.Location = new System.Drawing.Point(55, 67);
+            this.T_SLocation.Location = new System.Drawing.Point(69, 65);
             this.T_SLocation.Name = "T_SLocation";
             this.T_SLocation.Size = new System.Drawing.Size(121, 21);
             this.T_SLocation.TabIndex = 9;
             // 
-            // treeView1
+            // Tree_SummaryBox
             // 
-            this.treeView1.ContextMenuStrip = this.contextMenutTreeView;
-            this.treeView1.Location = new System.Drawing.Point(10, 130);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(166, 325);
-            this.treeView1.TabIndex = 3;
+            this.Tree_SummaryBox.ContextMenuStrip = this.contextMenutTreeView;
+            this.Tree_SummaryBox.Location = new System.Drawing.Point(10, 189);
+            this.Tree_SummaryBox.Name = "Tree_SummaryBox";
+            this.Tree_SummaryBox.Size = new System.Drawing.Size(180, 266);
+            this.Tree_SummaryBox.TabIndex = 3;
             // 
             // contextMenutTreeView
             // 
@@ -500,7 +532,7 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer5);
-            this.splitContainer2.Size = new System.Drawing.Size(525, 614);
+            this.splitContainer2.Size = new System.Drawing.Size(509, 614);
             this.splitContainer2.SplitterDistance = 365;
             this.splitContainer2.SplitterWidth = 8;
             this.splitContainer2.TabIndex = 0;
@@ -512,7 +544,7 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(521, 361);
+            this.groupBox1.Size = new System.Drawing.Size(505, 361);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "防灾设备选择";
@@ -534,7 +566,7 @@
             // 
             this.splitContainer4.Panel2.Controls.Add(this.button4);
             this.splitContainer4.Panel2.Controls.Add(this.button3);
-            this.splitContainer4.Size = new System.Drawing.Size(515, 341);
+            this.splitContainer4.Size = new System.Drawing.Size(499, 341);
             this.splitContainer4.SplitterDistance = 308;
             this.splitContainer4.TabIndex = 1;
             // 
@@ -549,7 +581,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(513, 306);
+            this.tabControl1.Size = new System.Drawing.Size(497, 306);
             this.tabControl1.TabIndex = 1;
             this.tabControl1.Click += new System.EventHandler(this.tabControl1_Click);
             // 
@@ -559,7 +591,7 @@
             this.tabPageST.Location = new System.Drawing.Point(4, 22);
             this.tabPageST.Name = "tabPageST";
             this.tabPageST.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageST.Size = new System.Drawing.Size(505, 280);
+            this.tabPageST.Size = new System.Drawing.Size(489, 280);
             this.tabPageST.TabIndex = 0;
             this.tabPageST.Text = "所亭列表";
             this.tabPageST.UseVisualStyleBackColor = true;
@@ -591,7 +623,7 @@
             this.dataGridStation.Location = new System.Drawing.Point(3, 3);
             this.dataGridStation.Name = "dataGridStation";
             this.dataGridStation.RowTemplate.Height = 23;
-            this.dataGridStation.Size = new System.Drawing.Size(499, 274);
+            this.dataGridStation.Size = new System.Drawing.Size(483, 274);
             this.dataGridStation.TabIndex = 0;
             this.dataGridStation.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridStation_DataError);
             this.dataGridStation.Click += new System.EventHandler(this.dataGridView1_Click);
@@ -602,7 +634,7 @@
             this.tabPageF.Location = new System.Drawing.Point(4, 22);
             this.tabPageF.Name = "tabPageF";
             this.tabPageF.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageF.Size = new System.Drawing.Size(505, 280);
+            this.tabPageF.Size = new System.Drawing.Size(492, 280);
             this.tabPageF.TabIndex = 1;
             this.tabPageF.Text = "风速计";
             this.tabPageF.UseVisualStyleBackColor = true;
@@ -630,7 +662,7 @@
             this.dataGridWind.Location = new System.Drawing.Point(3, 3);
             this.dataGridWind.Name = "dataGridWind";
             this.dataGridWind.RowTemplate.Height = 23;
-            this.dataGridWind.Size = new System.Drawing.Size(499, 274);
+            this.dataGridWind.Size = new System.Drawing.Size(486, 274);
             this.dataGridWind.TabIndex = 0;
             this.dataGridWind.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridWind_DataError);
             // 
@@ -640,7 +672,7 @@
             this.tabPageX.Location = new System.Drawing.Point(4, 22);
             this.tabPageX.Name = "tabPageX";
             this.tabPageX.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageX.Size = new System.Drawing.Size(505, 280);
+            this.tabPageX.Size = new System.Drawing.Size(492, 280);
             this.tabPageX.TabIndex = 2;
             this.tabPageX.Text = "雪深计";
             this.tabPageX.UseVisualStyleBackColor = true;
@@ -668,7 +700,7 @@
             this.dataGridSnow.Location = new System.Drawing.Point(3, 3);
             this.dataGridSnow.Name = "dataGridSnow";
             this.dataGridSnow.RowTemplate.Height = 23;
-            this.dataGridSnow.Size = new System.Drawing.Size(499, 274);
+            this.dataGridSnow.Size = new System.Drawing.Size(486, 274);
             this.dataGridSnow.TabIndex = 0;
             this.dataGridSnow.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridSnow_DataError);
             // 
@@ -678,7 +710,7 @@
             this.tabPageRain.Location = new System.Drawing.Point(4, 22);
             this.tabPageRain.Name = "tabPageRain";
             this.tabPageRain.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageRain.Size = new System.Drawing.Size(505, 280);
+            this.tabPageRain.Size = new System.Drawing.Size(492, 280);
             this.tabPageRain.TabIndex = 3;
             this.tabPageRain.Text = "雨量计";
             this.tabPageRain.UseVisualStyleBackColor = true;
@@ -706,7 +738,7 @@
             this.dataGridRain.Location = new System.Drawing.Point(3, 3);
             this.dataGridRain.Name = "dataGridRain";
             this.dataGridRain.RowTemplate.Height = 23;
-            this.dataGridRain.Size = new System.Drawing.Size(499, 274);
+            this.dataGridRain.Size = new System.Drawing.Size(486, 274);
             this.dataGridRain.TabIndex = 0;
             this.dataGridRain.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridRain_DataError);
             // 
@@ -716,7 +748,7 @@
             this.tabPageDZ.Location = new System.Drawing.Point(4, 22);
             this.tabPageDZ.Name = "tabPageDZ";
             this.tabPageDZ.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageDZ.Size = new System.Drawing.Size(505, 280);
+            this.tabPageDZ.Size = new System.Drawing.Size(492, 280);
             this.tabPageDZ.TabIndex = 4;
             this.tabPageDZ.Text = "地震";
             this.tabPageDZ.UseVisualStyleBackColor = true;
@@ -744,7 +776,7 @@
             this.dataGridearth.Location = new System.Drawing.Point(3, 3);
             this.dataGridearth.Name = "dataGridearth";
             this.dataGridearth.RowTemplate.Height = 23;
-            this.dataGridearth.Size = new System.Drawing.Size(499, 274);
+            this.dataGridearth.Size = new System.Drawing.Size(486, 274);
             this.dataGridearth.TabIndex = 0;
             this.dataGridearth.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridearth_DataError);
             // 
@@ -793,8 +825,8 @@
             this.splitContainer5.Panel2.Controls.Add(this.label4);
             this.splitContainer5.Panel2.Controls.Add(this.C_equipeType);
             this.splitContainer5.Panel2.Controls.Add(this.B_AddEquipe);
-            this.splitContainer5.Size = new System.Drawing.Size(521, 237);
-            this.splitContainer5.SplitterDistance = 345;
+            this.splitContainer5.Size = new System.Drawing.Size(505, 237);
+            this.splitContainer5.SplitterDistance = 329;
             this.splitContainer5.TabIndex = 2;
             this.splitContainer5.Visible = false;
             // 
@@ -803,7 +835,7 @@
             this.selectedWayPoint.Dock = System.Windows.Forms.DockStyle.Fill;
             this.selectedWayPoint.Location = new System.Drawing.Point(0, 0);
             this.selectedWayPoint.Name = "selectedWayPoint";
-            this.selectedWayPoint.Size = new System.Drawing.Size(345, 237);
+            this.selectedWayPoint.Size = new System.Drawing.Size(329, 237);
             this.selectedWayPoint.TabIndex = 0;
             this.selectedWayPoint.Click += new System.EventHandler(this.selectedWayPoint_Click);
             // 
@@ -1169,19 +1201,23 @@
             this.panel1.ResumeLayout(false);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.contextMenutTreeView.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel1.PerformLayout();
             this.splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.splitContainer4.Panel1.ResumeLayout(false);
             this.splitContainer4.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
             this.splitContainer4.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPageST.ResumeLayout(false);
@@ -1197,18 +1233,23 @@
             this.splitContainer5.Panel1.ResumeLayout(false);
             this.splitContainer5.Panel2.ResumeLayout(false);
             this.splitContainer5.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
             this.splitContainer5.ResumeLayout(false);
             this.splitContainer6.Panel1.ResumeLayout(false);
             this.splitContainer6.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).EndInit();
             this.splitContainer6.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
             this.splitContainer7.Panel1.ResumeLayout(false);
             this.splitContainer7.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).EndInit();
             this.splitContainer7.ResumeLayout(false);
             this.splitContainer8.Panel1.ResumeLayout(false);
             this.splitContainer8.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).EndInit();
             this.splitContainer8.ResumeLayout(false);
             this.contextMenuListView.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -1227,12 +1268,12 @@
         private System.Windows.Forms.Button B_Add;
         private System.Windows.Forms.Button B_Draw;
         private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem;
-        private System.Windows.Forms.ComboBox TypeWayPoint;
+        private System.Windows.Forms.ComboBox C_TypeWayPoint;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ToolStripMenuItem 比例尺ToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem 导入图块ToolStripMenuItem;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.TreeView Tree_SummaryBox;
         private System.Windows.Forms.TextBox T_SLocation;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
@@ -1300,5 +1341,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ComboBox C_reletive_position;
     }
 }

@@ -1606,8 +1606,8 @@ namespace AutoDraw
                 #endregion
                 if (InfoStation.Count > 0)
                 {
-                    treeView1.Nodes.Clear(); //清空treeView
-                    refreshTreeview(treeView1, InfoStation, true);  //刷新treeView1
+                    Tree_SummaryBox.Nodes.Clear(); //清空treeView
+                    refreshTreeview(Tree_SummaryBox, InfoStation, true);  //刷新treeView1
 
                 }
 
@@ -2436,9 +2436,9 @@ namespace AutoDraw
                 if (modifData == false)
                 {
                     #region 添加字典信息
-                    if (TypeWayPoint.SelectedItem != null)
+                    if (C_TypeWayPoint.SelectedItem != null)
                     {
-                        if (TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.Text.ToString().Replace(" ","") != "")
+                        if (C_TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.Text.ToString().Replace(" ","") != "")
                         {
                             PFunction pF=new PFunction();
                             if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)$")) //如果不是汉字
@@ -2452,14 +2452,14 @@ namespace AutoDraw
                                 MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                 return;
                             }
-                            else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() != "桥梁") //如果里程不符合规范
+                            else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && C_TypeWayPoint.SelectedItem.ToString() != "桥梁") //如果里程不符合规范
                             {
                                 MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                 return;
                             }
                             string sLocation = "";
                             string sName = T_SName.Text.ToString().Replace(" ","");
-                            string sType = TypeWayPoint.SelectedItem.ToString().Replace(" ", "");
+                            string sType = C_TypeWayPoint.SelectedItem.ToString().Replace(" ", "");
 
                             #region 如果录入桥梁里程时添加一个textbox
                             if (sType == "桥梁")
@@ -2473,7 +2473,7 @@ namespace AutoDraw
                                     {
                                         if (temp.Name == "tempText")
                                         {
-                                            if (!pF.isExMatch(temp.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
+                                            if (!pF.isExMatch(temp.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && C_TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
                                             {
                                                 MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                                 return;
@@ -2567,13 +2567,13 @@ namespace AutoDraw
                                     fileStationDataView(dataGridStation, colName, InfoStation, "StationTable");
                                     //fileStationDataView(dataGridStation, colName, loadedInfor, "StationTable"); //填充datagridView 
 
-                                    treeView1.Nodes.Clear();
-                                    refreshTreeview(treeView1, loadedInfor, true);
+                                    Tree_SummaryBox.Nodes.Clear();
+                                    refreshTreeview(Tree_SummaryBox, loadedInfor, true);
 
                                     //如果数据插入成功，清空各输入栏
                                     T_SLocation.Text = "";
                                     T_SName.Text = "";
-                                    TypeWayPoint.SelectedItem = "";
+                                    C_TypeWayPoint.SelectedItem = "";
                                 }
                                 
                             }
@@ -2603,12 +2603,12 @@ namespace AutoDraw
                         MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                         return;
                     }
-                    if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() != "桥梁") //如果里程不符合规范
+                    if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && C_TypeWayPoint.SelectedItem.ToString() != "桥梁") //如果里程不符合规范
                     {
                         MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                         return;
                     }
-                    else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})-([A-Z]+)(\d+)\+(\d{0,4})$") && TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
+                    else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})-([A-Z]+)(\d+)\+(\d{0,4})$") && C_TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
                     {
                         MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                         return;
@@ -2616,7 +2616,7 @@ namespace AutoDraw
 
                     
                     //treeview选中项
-                    TreeNode selectNode = treeView1.SelectedNode;
+                    TreeNode selectNode = Tree_SummaryBox.SelectedNode;
 
                     List<string> LNT = new List<string>();
                     if (selectNode.Level == 1)
@@ -2634,7 +2634,7 @@ namespace AutoDraw
 
                     //
                     string name = T_SName.Text.ToString().Replace(" ", "");
-                    string type = TypeWayPoint.SelectedItem.ToString();
+                    string type = C_TypeWayPoint.SelectedItem.ToString();
                     if (type != "桥梁")
                     {
                         location = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""));
@@ -2706,8 +2706,8 @@ namespace AutoDraw
                         }
 
                         //清除treeview
-                        treeView1.Nodes.Clear();
-                        refreshTreeview(treeView1, InfoStation, true);
+                        Tree_SummaryBox.Nodes.Clear();
+                        refreshTreeview(Tree_SummaryBox, InfoStation, true);
                         dataGridStation.DataSource = "";
 
                         //dataGridStation(st)
@@ -2718,7 +2718,7 @@ namespace AutoDraw
 
                         T_SLocation.Text = "";
                         T_SName.Text = "";
-                        TypeWayPoint.SelectedItem = "";
+                        C_TypeWayPoint.SelectedItem = "";
 
                     }
                     #endregion
@@ -2972,7 +2972,7 @@ namespace AutoDraw
                 {
                     TreeNode node1 = new TreeNode();
                     node1.Text = item.Key;  
-                    treeView1.Nodes.Add(node1);
+                    Tree_SummaryBox.Nodes.Add(node1);
 
                     TreeNode node1_1 = new TreeNode();
                     node1_1.Text = item.Value.Split(new char[] { ',' })[0]; 
@@ -2995,7 +2995,7 @@ namespace AutoDraw
 
         private void 删除ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TreeNode selectedNode = treeView1.SelectedNode;
+            TreeNode selectedNode = Tree_SummaryBox.SelectedNode;
             supprimeTreeView(selectedNode);
         }
 
@@ -3005,7 +3005,7 @@ namespace AutoDraw
         bool modifData = false;
         private void supprimeTreeView(TreeNode selectNode)
         {
-            if (treeView1.SelectedNode!=null)
+            if (Tree_SummaryBox.SelectedNode!=null)
             {
 
                 XmlFunction xf = new XmlFunction();
@@ -3018,7 +3018,7 @@ namespace AutoDraw
                     {
                         
                         xf.supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""));
-                        treeView1.Nodes.Clear();
+                        Tree_SummaryBox.Nodes.Clear();
                         InfoStation.Remove(inforOneStation[0].ToString());
                         System.Data.DataTable stationData = tableST.Tables["StationTable"];
 
@@ -3035,7 +3035,7 @@ namespace AutoDraw
                             removeIndex++;
 
                         }
-                        refreshTreeview(treeView1, InfoStation, true);
+                        refreshTreeview(Tree_SummaryBox, InfoStation, true);
                     }
                 }
                 else if (selectNode.Level > 1)
@@ -3045,17 +3045,17 @@ namespace AutoDraw
 
                     if (MessageBox.Show("确定删除项:\n里程:" + inforOneStation[0].ToString() + "\n类型:" + inforOneStation[2].ToString() + "\n站名:" + inforOneStation[1].ToString(), "注意", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                     {
-                            treeView1.Nodes.Clear();
+                            Tree_SummaryBox.Nodes.Clear();
                             xf.supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""));
                             InfoStation.Remove(inforOneStation[0].ToString());
 
-                            refreshTreeview(treeView1, InfoStation, true);
+                            refreshTreeview(Tree_SummaryBox, InfoStation, true);
                         }
 
                 }
                 else if (selectNode.Level == 0)
                 {
-                    MessageBox.Show("此节点：" + treeView1.SelectedNode.Text.ToString().Split(new char[] { ' ' })[0] + "。不能删除！", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("此节点：" + Tree_SummaryBox.SelectedNode.Text.ToString().Split(new char[] { ' ' })[0] + "。不能删除！", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             else
@@ -3129,7 +3129,7 @@ namespace AutoDraw
                     modifData = false;
                     T_SName.Text = "";
                     T_SLocation.Text = "";
-                    TypeWayPoint.SelectedItem = "";
+                    C_TypeWayPoint.SelectedItem = "";
                     //如果类型为桥梁
                     //foreach(var comp in this.sp)
                 } 
@@ -3143,9 +3143,9 @@ namespace AutoDraw
         }
         Label tempLabel;
         TextBox tempText;
-        private void TypeWayPoint_SelectedIndexChanged(object sender, EventArgs e)
+        private void C_TypeWayPoint_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (TypeWayPoint.SelectedItem.ToString() == "桥梁")
+            if (C_TypeWayPoint.SelectedItem.ToString() == "桥梁")
             {
                 T_SLocation.Text = "";
                 T_SLocation.Size = new Size(45, 21);
@@ -3166,7 +3166,7 @@ namespace AutoDraw
                 this.splitContainer1.Panel1.Controls.Add(tempText);
                 
             }
-            else if (TypeWayPoint.SelectedItem.ToString() != "桥梁" && T_SLocation.Size.Width == 45)
+            else if (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" && T_SLocation.Size.Width == 45)
             {
 
                 T_SLocation.Size = new System.Drawing.Size(121, 21);
@@ -3219,18 +3219,18 @@ namespace AutoDraw
 
         private void 修改ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (treeView1.Nodes.Count > 3) //默认有三个节点
+            if (Tree_SummaryBox.Nodes.Count > 3) //默认有三个节点
             {
                 //清空
                 T_SName.Text = "";
                 T_SLocation.Text = "";
-                TypeWayPoint.SelectedItem = "";
+                C_TypeWayPoint.SelectedItem = "";
 
                 modifData = true;
                 B_AddWayPoint.Text = "确认";
                 B_SupWayPoint.Text = "取消";
 
-                TreeNode selectedNode = treeView1.SelectedNode;
+                TreeNode selectedNode = Tree_SummaryBox.SelectedNode;
 
                 TreeNode SLocaNode = new TreeNode();
                 TreeNode SNameNode = new TreeNode();
@@ -3250,7 +3250,7 @@ namespace AutoDraw
                         {
                             if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
                             {
-                                TypeWayPoint.SelectedItem = childNode.Text.ToString();
+                                C_TypeWayPoint.SelectedItem = childNode.Text.ToString();
                             }
                             else
                             {
@@ -3281,7 +3281,7 @@ namespace AutoDraw
                         {
                             if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
                             {
-                                TypeWayPoint.SelectedItem = childNode.Text.ToString();
+                                C_TypeWayPoint.SelectedItem = childNode.Text.ToString();
                             }
                             else
                             {
