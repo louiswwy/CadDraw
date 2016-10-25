@@ -32,14 +32,18 @@ namespace AutoDraw
                         XmlElement xe1 = xmlDoc.CreateElement(nodeName);//创建一个<WayPoint>节点 
                         xe1.SetAttribute("location", item.Key.ToUpper());//设置该节点location属性 
 
-                        XmlElement subxe1 = xmlDoc.CreateElement("PName");//创建一个<PName>节点 
+                        XmlElement subxe1 = xmlDoc.CreateElement("PName");//创建一个<PName>节点  站点/桥梁/隧道地形的名称
                         subxe1.InnerText = item.Value.Split(new char[] { ',' })[0];
 
-                        XmlElement subxe2 = xmlDoc.CreateElement("PType");//创建一个<PName>节点 
+                        XmlElement subxe2 = xmlDoc.CreateElement("PType");//创建一个<PType>节点  站点/桥梁/隧道地形的类型
                         subxe2.InnerText = item.Value.Split(new char[] { ',' })[1];
+
+                        XmlElement subxe3 = xmlDoc.CreateElement("PPosition");//创建一个<PPosition>节点 站点相对线路的相关位置
+                        subxe3.InnerText = item.Value.Split(new char[] { ',' })[2];
 
                         xe1.AppendChild(subxe1);
                         xe1.AppendChild(subxe2);
+                        xe1.AppendChild(subxe3);
                         stationRoot.AppendChild(xe1);
                     }
 
@@ -92,15 +96,17 @@ namespace AutoDraw
 
                         Int32 DistNum = System.Math.Abs(Int32.Parse(outList[1]) * 1000 + Int32.Parse(outList[2]));
 
-                        XmlNode nameNode = xe.SelectSingleNode("PName");//查找<PName> 
-                        XmlNode typeNode = xe.SelectSingleNode("PType");//查找<PType> 
+                        XmlNode nameNode = xe.SelectSingleNode("PName");//查找<PName>  名字
+                        XmlNode typeNode = xe.SelectSingleNode("PType");//查找<PType>  类型
+                        XmlNode positionNode = xe.SelectSingleNode("PPosition");//查找<PType>  相对位置
 
                         string name = nameNode.InnerText;
                         string type = typeNode.InnerText;
+                        string position = positionNode.InnerText;
 
                         if (!notdrawList.Contains(name)&& !notdrawList.Contains(type)) //如果不在‘不绘制列表中’则输出
                         {
-                            inforStation.Add(key.ToUpper(), name + "," + type + "," + DistNum);
+                            inforStation.Add(key.ToUpper(), name + "," + type + "," + DistNum + "," + position);
                         }
                         else //否则，忽视
                         {
@@ -643,10 +649,16 @@ namespace AutoDraw
 
 
         #region 项目信息
-        public void writeProjrtInfo(string xmlPath, string proName, string PictureName, string NumChapter, string ProjetShortName)
+        public void writeProjrtInfo(string xmlPath, ClassStruct.ProjectInfo projectInfor)// string proName, string PictureName, string NumChapter, string ProjetShortName)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
+
+            string proName = projectInfor.ProjectName;
+            string ProjetPhase = projectInfor.ProjectPhase;
+            string PictureName = projectInfor.PrintNamePattern.PrintName;
+            string NumChapter = projectInfor.PrintNamePattern.PrintChapter;
+
 
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
             XmlNode subroot = root.SelectSingleNode("ProjetInfor");//查找<ProjetInfor> 
@@ -660,14 +672,14 @@ namespace AutoDraw
             XmlNode subrootCName = subroot.SelectSingleNode("ChapterName");//查找<ChapterName> 
             subrootCName.InnerText = NumChapter;
 
-            XmlNode subrootCShort = subroot.SelectSingleNode("ProjectShortName");//查找<ChapterName> 
-            subrootCShort.InnerText = ProjetShortName;
+            XmlNode subrootCPhase = subroot.SelectSingleNode("ProjectPhase");//查找<ChapterName> 
+            subrootCPhase.InnerText = ProjetPhase;
 
             xmlDoc.Save(xmlPath);
 
         }
 
-        public List<string> readProjrtInfo(string xmlPath)//, string proName, string PictureName,string NumChapter)
+        public ClassStruct.ProjectInfo readProjrtInfo(string xmlPath)//, string proName, string PictureName,string NumChapter)
         {
             try
             {
@@ -685,23 +697,26 @@ namespace AutoDraw
                 string PictureName = subrootPName.InnerText;
 
                 XmlNode subrootCName = subroot.SelectSingleNode("ChapterName");//查找<ChapterName> 
-                string NumChapter = subrootCName.InnerText;
+                string PrintChapter = subrootCName.InnerText;
 
-                XmlNode subrootPShort = subroot.SelectSingleNode("ProjectShortName");//查找<ChapterName> 
-                string NumPShort = subrootPShort.InnerText;
+                XmlNode subrootCPhase = subroot.SelectSingleNode("ProjectPhase");//查找<ChapterName> 
+                string ProPhase = subrootCPhase.InnerText;
 
-                projectInfo.Add(proName);
+                ClassStruct.ProjectPrintPattern ppPattern = new ClassStruct.ProjectPrintPattern(PictureName, PrintChapter);
+                ClassStruct.ProjectInfo pI = new ClassStruct.ProjectInfo(proName, ProPhase, ppPattern);
+
+                /*projectInfo.Add(proName);
                 projectInfo.Add(PictureName);
-                projectInfo.Add(NumChapter);
-                projectInfo.Add(NumPShort);
-                return projectInfo;
+                projectInfo.Add(PrintChapter);
+                projectInfo.Add(ProPhase);*/
+                return pI;
             }
             catch (Exception ee)
             {
-                List<string> errorList = new List<string>();
-                errorList.Add(ee.ToString());
-                return errorList;
-                
+                //List<string> errorList = new List<string>();
+                //errorList.Add(ee.ToString());
+                return null;
+
             }
         }
         #endregion

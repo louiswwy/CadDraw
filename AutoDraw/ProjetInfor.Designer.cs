@@ -29,18 +29,20 @@
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.T_Project_Name = new System.Windows.Forms.TextBox();
+            this.T_Print_Name = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
+            this.T_Project_Phase = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.T_Print_Chapter = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
+            this.T_Print_Pattren = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -54,28 +56,29 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "工程名称";
             // 
-            // textBox1
+            // T_Project_Name
             // 
-            this.textBox1.Location = new System.Drawing.Point(62, 16);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(223, 21);
-            this.textBox1.TabIndex = 1;
+            this.T_Project_Name.Location = new System.Drawing.Point(62, 16);
+            this.T_Project_Name.Name = "T_Project_Name";
+            this.T_Project_Name.Size = new System.Drawing.Size(223, 21);
+            this.T_Project_Name.TabIndex = 1;
             // 
-            // textBox2
+            // T_Print_Name
             // 
-            this.textBox2.Location = new System.Drawing.Point(62, 54);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(223, 21);
-            this.textBox2.TabIndex = 2;
+            this.T_Print_Name.Location = new System.Drawing.Point(62, 70);
+            this.T_Print_Name.Name = "T_Print_Name";
+            this.T_Print_Name.Size = new System.Drawing.Size(223, 21);
+            this.T_Print_Name.TabIndex = 2;
+            this.T_Print_Name.TextChanged += new System.EventHandler(this.T_Print_Name_TextChanged);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 57);
+            this.label2.Location = new System.Drawing.Point(3, 73);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(53, 12);
             this.label2.TabIndex = 2;
-            this.label2.Text = "图    号";
+            this.label2.Text = "图纸名称";
             // 
             // button1
             // 
@@ -99,22 +102,40 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.T_Print_Pattren);
+            this.panel1.Controls.Add(this.label5);
             this.panel1.Controls.Add(this.label4);
-            this.panel1.Controls.Add(this.textBox4);
+            this.panel1.Controls.Add(this.T_Project_Phase);
             this.panel1.Controls.Add(this.statusStrip1);
-            this.panel1.Controls.Add(this.textBox3);
+            this.panel1.Controls.Add(this.T_Print_Chapter);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.button2);
-            this.panel1.Controls.Add(this.textBox1);
+            this.panel1.Controls.Add(this.T_Project_Name);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.label2);
-            this.panel1.Controls.Add(this.textBox2);
+            this.panel1.Controls.Add(this.T_Print_Name);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(297, 206);
             this.panel1.TabIndex = 6;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 46);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(53, 12);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "阶    段";
+            // 
+            // T_Project_Phase
+            // 
+            this.T_Project_Phase.Location = new System.Drawing.Point(62, 43);
+            this.T_Project_Phase.Name = "T_Project_Phase";
+            this.T_Project_Phase.Size = new System.Drawing.Size(223, 21);
+            this.T_Project_Phase.TabIndex = 8;
             // 
             // statusStrip1
             // 
@@ -132,37 +153,38 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(131, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
-            // textBox3
+            // T_Print_Chapter
             // 
-            this.textBox3.Location = new System.Drawing.Point(62, 89);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(223, 21);
-            this.textBox3.TabIndex = 3;
+            this.T_Print_Chapter.Location = new System.Drawing.Point(62, 97);
+            this.T_Print_Chapter.Name = "T_Print_Chapter";
+            this.T_Print_Chapter.Size = new System.Drawing.Size(223, 21);
+            this.T_Print_Chapter.TabIndex = 3;
+            this.T_Print_Chapter.TextChanged += new System.EventHandler(this.T_Print_Chapter_TextChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 92);
+            this.label3.Location = new System.Drawing.Point(3, 100);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(53, 12);
             this.label3.TabIndex = 6;
             this.label3.Text = "单    元";
             // 
-            // textBox4
+            // T_Print_Pattren
             // 
-            this.textBox4.Location = new System.Drawing.Point(62, 122);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(223, 21);
-            this.textBox4.TabIndex = 8;
+            this.T_Print_Pattren.Location = new System.Drawing.Point(62, 124);
+            this.T_Print_Pattren.Name = "T_Print_Pattren";
+            this.T_Print_Pattren.Size = new System.Drawing.Size(223, 21);
+            this.T_Print_Pattren.TabIndex = 10;
             // 
-            // label4
+            // label5
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(3, 125);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(53, 12);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "阶    段";
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(3, 127);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(53, 12);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "图号规则";
             // 
             // ProjetInfor
             // 
@@ -186,17 +208,19 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox T_Project_Name;
+        private System.Windows.Forms.TextBox T_Print_Name;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox T_Print_Chapter;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.TextBox T_Project_Phase;
+        private System.Windows.Forms.TextBox T_Print_Pattren;
+        private System.Windows.Forms.Label label5;
     }
 }

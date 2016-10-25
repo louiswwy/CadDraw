@@ -230,7 +230,7 @@
             this.比例尺ToolStripMenuItem1,
             this.可选线缆类型ToolStripMenuItem});
             this.比例尺ToolStripMenuItem.Name = "比例尺ToolStripMenuItem";
-            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.比例尺ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.比例尺ToolStripMenuItem.Text = "图纸属性";
             // 
             // 比例尺ToolStripMenuItem1
@@ -254,20 +254,20 @@
             this.项目信息ToolStripMenuItem,
             this.里程信息ToolStripMenuItem});
             this.项目属性ToolStripMenuItem.Name = "项目属性ToolStripMenuItem";
-            this.项目属性ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.项目属性ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.项目属性ToolStripMenuItem.Text = "项目属性";
             // 
             // 项目信息ToolStripMenuItem
             // 
             this.项目信息ToolStripMenuItem.Name = "项目信息ToolStripMenuItem";
-            this.项目信息ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.项目信息ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.项目信息ToolStripMenuItem.Text = "项目信息";
             this.项目信息ToolStripMenuItem.Click += new System.EventHandler(this.项目信息ToolStripMenuItem_Click);
             // 
             // 里程信息ToolStripMenuItem
             // 
             this.里程信息ToolStripMenuItem.Name = "里程信息ToolStripMenuItem";
-            this.里程信息ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.里程信息ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.里程信息ToolStripMenuItem.Text = "里程信息";
             this.里程信息ToolStripMenuItem.Visible = false;
             // 
@@ -371,6 +371,9 @@
             // C_reletive_position
             // 
             this.C_reletive_position.FormattingEnabled = true;
+            this.C_reletive_position.Items.AddRange(new object[] {
+            "上行线右侧",
+            "下行线右侧"});
             this.C_reletive_position.Location = new System.Drawing.Point(69, 94);
             this.C_reletive_position.Name = "C_reletive_position";
             this.C_reletive_position.Size = new System.Drawing.Size(121, 20);

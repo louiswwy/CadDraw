@@ -37,6 +37,9 @@ namespace AutoDraw
         System.Data.DataTable stTable;
         Dictionary<string, string> InfoStation = new Dictionary<string, string>();
 
+        DataSet tableBrig;
+        System.Data.DataTable brigTable;
+        Dictionary<string, string> InfoBrig = new Dictionary<string, string>();
         /// <summary>
         /// 风监控
         /// </summary>
@@ -87,7 +90,7 @@ namespace AutoDraw
         public void DrawPicture(Dictionary<string,string> dictRailStation, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine)
         {
             XmlFunction xF = new XmlFunction();
-            List<string> projetInfor;
+            ClassStruct.ProjectInfo projetInfor;
 
             projetInfor = xF.readProjrtInfo(xmlFilePath + "\\setting.xml");
             DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
@@ -229,7 +232,7 @@ namespace AutoDraw
         /// <param name="StationToBeDraw">基站、所亭</param>
         /// <param name="LeftRightStation">相对于基站的左右车站</param>
         /// <param name="List_EquipmentInfor">防灾设备清单</param>
-        public void drawSingleStationPicture(Point2d insertSignlePoint, ObjectId fontStyleId, List<string> projetInfo, ClassStruct.StationPoint StationToBeDraw, List<string> LeftRightStation, List<ClassStruct.EquipePoint> List_EquipmentInfor, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine,int drawNum)//List<string> connectionDict)
+        public void drawSingleStationPicture(Point2d insertSignlePoint, ObjectId fontStyleId, ClassStruct.ProjectInfo projetInfo, ClassStruct.StationPoint StationToBeDraw, List<string> LeftRightStation, List<ClassStruct.EquipePoint> List_EquipmentInfor, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine,int drawNum)//List<string> connectionDict)
         {
             Point2d outerStartPoint = insertSignlePoint;
             Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
@@ -294,17 +297,24 @@ namespace AutoDraw
                     //块属性的字典对象
                     //图签块
                     Dictionary<string, string> attTQ = new Dictionary<string, string>();
-                    attTQ.Add("项目名称", projetInfo[0]);
-                    attTQ.Add("图纸名称", projetInfo[1] + "-" + projetInfo[2] + "-"+ pictureNum);
+                    attTQ.Add("项目名称", projetInfo.ProjectName);
+                    if (projetInfo.PrintNamePattern.PrintChapter != "")
+                    {
+                        attTQ.Add("图纸名称", projetInfo.PrintNamePattern.PrintName + "-" + projetInfo.PrintNamePattern.PrintChapter + "-" + pictureNum);
+                    }
+                    else
+                    {
+                        attTQ.Add("图纸名称", projetInfo.PrintNamePattern.PrintName + "-" + pictureNum);
+                    }
                     attTQ.Add("图纸比例", "1：100");
                     attTQ.Add("绘制日期", System.DateTime.Now.Year + "." + System.DateTime.Now.Month);
                     attTQ.Add("页数", "第1张，共1张");
 
                     Dictionary<string, string> attGD = new Dictionary<string, string>();
-                    attGD.Add("上行/下行线", projetInfo[3] + "下行线");
+                    attGD.Add("上行/下行线", projetInfo.PrintNamePattern.PrintName.Substring(0,2) + "下行线"); //取前两个汉字
 
                     Dictionary<string, string> attGD2 = new Dictionary<string, string>();
-                    attGD2.Add("上行/下行线", projetInfo[3] + "上行线");
+                    attGD2.Add("上行/下行线", projetInfo.PrintNamePattern.PrintName.Substring(0, 2) + "上行线"); //取前两个汉字
 
                     BlockTable acBlkTbl = trans2.GetObject(db2.BlockTableId, OpenMode.ForRead) as BlockTable;
                     acBlkTbl.UpgradeOpen();
@@ -1528,6 +1538,7 @@ namespace AutoDraw
             colName.Add("名称");
             colName.Add("类型");
             colName.Add("公里");
+            colName.Add("相对位置");
             #region 添加事件
             try
             {
@@ -1572,6 +1583,7 @@ namespace AutoDraw
                     stTable.Columns.Add(colName[1], typeof(string));
                     stTable.Columns.Add(colName[2], typeof(string));
                     stTable.Columns.Add(colName[3], typeof(string));
+                    stTable.Columns.Add(colName[4], typeof(string));
                     stTable.PrimaryKey = new System.Data.DataColumn[] { ST };
 
                     WindTable = tableST.Tables.Add("WindTable");//创建‘风点’表
@@ -1579,6 +1591,7 @@ namespace AutoDraw
                     WindTable.Columns.Add(colName[1], typeof(string));
                     WindTable.Columns.Add(colName[2], typeof(string));
                     WindTable.Columns.Add(colName[3], typeof(string));
+                    WindTable.Columns.Add(colName[4], typeof(string));
                     WindTable.PrimaryKey = new System.Data.DataColumn[] { WT };
 
                     RainTable = tableST.Tables.Add("RainTable");//创建‘雨点’表
@@ -1586,6 +1599,7 @@ namespace AutoDraw
                     RainTable.Columns.Add(colName[1], typeof(string));
                     RainTable.Columns.Add(colName[2], typeof(string));
                     RainTable.Columns.Add(colName[3], typeof(string));
+                    RainTable.Columns.Add(colName[4], typeof(string));
                     RainTable.PrimaryKey = new System.Data.DataColumn[] { RT };
 
                     SnowTable = tableST.Tables.Add("SnowTable");//创建‘雪点’表
@@ -1593,6 +1607,7 @@ namespace AutoDraw
                     SnowTable.Columns.Add(colName[1], typeof(string));
                     SnowTable.Columns.Add(colName[2], typeof(string));
                     SnowTable.Columns.Add(colName[3], typeof(string));
+                    SnowTable.Columns.Add(colName[4], typeof(string));
                     SnowTable.PrimaryKey = new System.Data.DataColumn[] { SnowT };
 
                     EarthTable = tableST.Tables.Add("EarthTable");//创建‘地震点’表
@@ -1600,6 +1615,7 @@ namespace AutoDraw
                     EarthTable.Columns.Add(colName[1], typeof(string));
                     EarthTable.Columns.Add(colName[2], typeof(string));
                     EarthTable.Columns.Add(colName[3], typeof(string));
+                    EarthTable.Columns.Add(colName[4], typeof(string));
                     EarthTable.PrimaryKey = new System.Data.DataColumn[] { EarthT };
 
                 }
@@ -2452,17 +2468,23 @@ namespace AutoDraw
                                 MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                 return;
                             }
-                            else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && C_TypeWayPoint.SelectedItem.ToString() != "桥梁") //如果里程不符合规范
+                            /*else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" || C_TypeWayPoint.SelectedItem.ToString() != "隧道")) //如果里程不符合规范
                             {
                                 MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                 return;
-                            }
+                            }*/
                             string sLocation = "";
                             string sName = T_SName.Text.ToString().Replace(" ","");
                             string sType = C_TypeWayPoint.SelectedItem.ToString().Replace(" ", "");
+                            string sPosition = "";
+
+                            if (sType != "桥梁" && sType != "隧道")
+                            {
+                                sPosition = C_reletive_position.SelectedItem.ToString().Replace(" ", ""); 
+                            }
 
                             #region 如果录入桥梁里程时添加一个textbox
-                            if (sType == "桥梁")
+                            if (sType == "桥梁"|| sType == "隧道")
                             {
                                 string locationPart2 = "";
                                 foreach (var component in splitContainer1.Panel1.Controls)
@@ -2473,17 +2495,22 @@ namespace AutoDraw
                                     {
                                         if (temp.Name == "tempText")
                                         {
-                                            if (!pF.isExMatch(temp.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && C_TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
+                                            if (!pF.isExMatch(temp.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" || C_TypeWayPoint.SelectedItem.ToString() != "隧道")) //如果里程不符合规范
                                             {
                                                 MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                                                 return;
                                             }
-                                            locationPart2 = temp.Text.ToString().ToUpper().Replace(" ", "");
+                                            if (temp.Text.ToString() != "")
+                                            {
+                                                locationPart2 = temp.Text.ToString().ToUpper().Replace(" ", "");
+                                                temp.Text = "";
+
+                                            }
                                         }
                                     }
                                 }
 
-                                sLocation = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", "")) + "-" + transferDistanceToNumberToString(locationPart2);
+                                sLocation = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", "")) + "-" + transferDistanceToNumberToString(locationPart2); //桥梁/隧道的里程格式是 xx+xx-yy+yy
                             }
                             else
                             {
@@ -2494,7 +2521,7 @@ namespace AutoDraw
                             //添加字典项
                             if (!InfoStation.ContainsKey(sLocation))
                             {
-                                InfoStation.Add(sLocation, sName + "," + sType);
+                                InfoStation.Add(sLocation, sName + "," + sType+","+ sPosition);
                                 
 
                                 List<string> colName = new List<string>();
@@ -2506,7 +2533,10 @@ namespace AutoDraw
                                     #region 读写xml-wayPoint
                                     XmlFunction xF = new XmlFunction();
 
+                                    //录入数据
                                     xF.addWayPointNode(xmlFilePath + "\\setting.xml", "StationPointLists", "StationPoints", InfoStation);
+                              
+                                    //自动添加地震仪数据
                                     if (sType.Contains("牵引变电所")|| sType.Contains("AT所")|| sType.Contains("分区所")) //如果是牵引变电所、分区所、AT所则默认安装地震仪，写入信息
                                     {
                                         PFunction pf = new PFunction();
@@ -2534,7 +2564,7 @@ namespace AutoDraw
                                     string licheng = "";
                                     tempDict = LocationToInt(loadedInfor, out licheng);
                                     InfoStation.Clear();
-                                    foreach (KeyValuePair<double, string> pair in tempDict)
+                                    foreach (KeyValuePair<double, string> pair in tempDict) //
                                     {
                                         string[] p_Values = pair.Value.Split(new char[] { ',' });
 
@@ -2588,10 +2618,14 @@ namespace AutoDraw
                             MessageBox.Show("请录入所有信息.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
+                    else
+                    {
+                        MessageBox.Show("请录入所有信息。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                     #endregion
 
 
-                    
+
                 }
                 else //modifData==true的时候。修改功能开启时，变更dictionary中数据
                 {
@@ -2803,9 +2837,9 @@ namespace AutoDraw
 
             XmlNode node1= CreateNode(xmlDoc, root, "ProjetInfor", "");
             CreateNode(xmlDoc, node1, "ProjetName","?");
+            CreateNode(xmlDoc, node1, "ProjectPhase", "?");
             CreateNode(xmlDoc, node1, "PictureName", "?");
             CreateNode(xmlDoc, node1, "ChapterName", "?");
-            CreateNode(xmlDoc, node1, "ProjectShortName", "?");
 
             XmlNode WayPointNode = CreateNode(xmlDoc, root, "WayPoints", ""); //所亭
             CreateNode(xmlDoc, WayPointNode, "StationPointLists", ""); //所亭
@@ -2918,13 +2952,22 @@ namespace AutoDraw
             TreeNode rootFQ = new TreeNode();  //添加牵引变电所
             rootFQ.Text = "分区所";
             treeVIewToRefresh.Nodes.Add(rootFQ);
+
+
+            TreeNode rootB_T = new TreeNode();  //添加地形
+            rootB_T.Text = "桥梁/隧道";
+            treeVIewToRefresh.Nodes.Add(rootB_T);
             //rootQY.Nodes.Add(rootQY);
             //InfoStation=InfoStation.
+
+            //计数
             int numS = 0;
             int numJ = 0;
             int numA = 0;
             int numQ = 0;
             int numF = 0;
+            int numBT = 0;
+
             foreach (var item in InfoStation)
             {
                 if (NoL==true)
@@ -2967,6 +3010,11 @@ namespace AutoDraw
                         rootFQ.Nodes.Add(nameNode);
                         numF++;
                     }
+                    else if (item.Value.Split(new char[] { ',' })[1] == "桥梁"|| item.Value.Split(new char[] { ',' })[1] == "隧道")
+                    {
+                        rootB_T.Nodes.Add(nameNode);
+                        numBT++;
+                    }
                 }
                 else
                 {
@@ -2977,10 +3025,14 @@ namespace AutoDraw
                     TreeNode node1_1 = new TreeNode();
                     node1_1.Text = item.Value.Split(new char[] { ',' })[0]; 
                     node1.Nodes.Add(node1_1);
-
+                    
                     TreeNode node1_2 = new TreeNode();
                     node1_2.Text = item.Value.Split(new char[] { ',' })[1];
-                    node1.Nodes.Add(node1_2); 
+                    node1.Nodes.Add(node1_2);
+
+                    TreeNode node1_3 = new TreeNode();
+                    node1_3.Text = item.Value.Split(new char[] { ',' })[2];
+                    node1.Nodes.Add(node1_3);
                 }
 
 
@@ -2991,6 +3043,7 @@ namespace AutoDraw
             rootAT.Text = rootAT.Text + " 共有：" + numA + "个";
             rootQY.Text = rootQY.Text + " 共有：" + numQ + "个";
             rootFQ.Text = rootFQ.Text + " 共有：" + numF + "个";
+            rootB_T.Text = rootB_T.Text + " 共有：" + numBT + "个";
         }
 
         private void 删除ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -3145,40 +3198,43 @@ namespace AutoDraw
         TextBox tempText;
         private void C_TypeWayPoint_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (C_TypeWayPoint.SelectedItem.ToString() == "桥梁")
+            if ((C_TypeWayPoint.SelectedItem.ToString() == "桥梁" || C_TypeWayPoint.SelectedItem.ToString() == "隧道") && T_SLocation.Size.Width != 45)
             {
+                C_reletive_position.Enabled = false; //桥梁/隧道不需要录入该信息
                 T_SLocation.Text = "";
                 T_SLocation.Size = new Size(45, 21);
 
                 tempLabel = new Label();
                 tempLabel.Text = "<->";
                 tempLabel.Name = "tempLabel";
-                tempLabel.Location = new Point(107, 72);
+                tempLabel.Location = new Point(107, 70);
                 tempLabel.Size = new Size(23, 12);
 
                 tempText = new TextBox();
-                tempText.Location = new Point(132, 69);
+                tempText.Location = new Point(132, 65);
                 tempText.Name = "tempText";
                 tempText.Size = new Size(45, 21);
 
                 //添加控件
                 this.splitContainer1.Panel1.Controls.Add(tempLabel);
                 this.splitContainer1.Panel1.Controls.Add(tempText);
-                
+
             }
-            else if (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" && T_SLocation.Size.Width == 45)
+            else if (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" && T_SLocation.Size.Width == 45&& C_TypeWayPoint.SelectedItem.ToString() != "隧道")
             {
 
+                C_reletive_position.Enabled = true;//其他站点需要录入该信息
+
                 T_SLocation.Size = new System.Drawing.Size(121, 21);
-                                   
+
                 if (tempLabel != null)
-                    {
-                        this.splitContainer1.Panel1.Controls.Remove(tempLabel);
-                    }
+                {
+                    this.splitContainer1.Panel1.Controls.Remove(tempLabel);  //删除控件tempLabel
+                }
                 if (tempText != null)
-                    {
-                        this.splitContainer1.Panel1.Controls.Remove(tempText);
-                    }
+                {
+                    this.splitContainer1.Panel1.Controls.Remove(tempText);  //删除控件tempText
+                }
                 /* //优化后删除循环
                 foreach (var component in splitContainer1.Panel1.Controls)
                 {
@@ -3207,7 +3263,7 @@ namespace AutoDraw
                     }
                     i++;
                 }*/
-               
+
             }
 
         }
@@ -3381,6 +3437,7 @@ namespace AutoDraw
             listView2.Columns.Add("类型");
             listView2.Columns.Add("名称");
             listView2.Columns.Add("里程");
+            listView2.Columns.Add("相对位置");
 
             this.listView2.BeginUpdate();
 
@@ -3433,7 +3490,7 @@ namespace AutoDraw
                     {
                         string[] Loadvalue = station.Value.ToString().Split(new char[] { ',' });
 
-                        stTable.Rows.Add(station.Key.ToUpper(), Loadvalue[0] , Loadvalue[1], Loadvalue[2]);  //添加
+                        stTable.Rows.Add(station.Key.ToUpper(), Loadvalue[0] , Loadvalue[1], Loadvalue[2], Loadvalue[3]);  //添加
                     }
 
                 }
@@ -3967,6 +4024,7 @@ namespace AutoDraw
 
                     string selectName = dataGridStation.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[0];
                     string selectType = dataGridStation.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[1];
+                    string selectposition = dataGridStation.Rows[nRow].Cells[1].Value.ToString().Split(new char[] { ',' })[2];
 
 
                     if (selectType != "车站")
@@ -4591,7 +4649,7 @@ namespace AutoDraw
 
                 XmlFunction XF = new XmlFunction();
 
-                if (XF.readProjrtInfo(xmlFilePath + "\\setting.xml") == null || XF.readProjrtInfo(xmlFilePath + "\\setting.xml")[0] == "?")
+                if (XF.readProjrtInfo(xmlFilePath + "\\setting.xml") == null || XF.readProjrtInfo(xmlFilePath + "\\setting.xml").ProjectName == "?")
                 {
                     MessageBox.Show("请先设置图纸名称。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -4922,8 +4980,17 @@ namespace AutoDraw
 
         private void 项目信息ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ProjetInfor pJ = new ProjetInfor(xmlFilePath);
+            string projectName = "";
+            ProjetInfor pJ = new ProjetInfor(xmlFilePath,out projectName);
+            pJ.Owner = this;
             pJ.ShowDialog();
+
+        }
+
+        public void refreshTitleName(string newTitle)
+        {
+            //XmlFunction xf = new XmlFunction();
+            this.Text = newTitle;
         }
 
         private void dataGridWind_DataError(object sender, DataGridViewDataErrorEventArgs e)

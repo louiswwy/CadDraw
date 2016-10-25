@@ -8,6 +8,95 @@ namespace AutoDraw
 {
     public class ClassStruct
     {
+        public class ProjectInfo
+        {
+            //工程名称
+            //阶段
+            //图号规则
+            //缩写+图册+张
+
+            private string _projetName;
+            private string _projetPhase;
+            private ProjectPrintPattern _printPattern;
+            public string ProjectName
+            {
+                get
+                {
+                    return this._projetName;
+                }
+                set
+                {
+                    this._projetName = value;
+                }
+            }
+            public string ProjectPhase
+            {
+                get
+                {
+                    return this._projetPhase;
+                }
+                set
+                {
+                    this._projetPhase = value;
+                }
+            }
+            public ProjectPrintPattern PrintNamePattern
+            {
+                get
+                {
+                    return this._printPattern;
+                }
+                set
+                {
+                    this._printPattern = value;
+                }
+            }
+
+            public ProjectInfo(string Project_Name, string Project_Phase, ProjectPrintPattern Print_Name_Pattern)
+            {
+                this._projetName = Project_Name;
+                this._projetPhase = Project_Phase;
+                this._printPattern = Print_Name_Pattern;
+
+            }
+        }
+        public class ProjectPrintPattern
+        {
+            //图号规则
+            //缩写+图册+张
+
+            private string _printName;
+            private string _printChapter;
+            public string PrintName
+            {
+                get
+                {
+                    return this._printName;
+                }
+                set
+                {
+                    this._printName = value;
+                }
+            }
+            public string PrintChapter
+            {
+                get
+                {
+                    return this._printChapter;
+                }
+                set
+                {
+                    this._printChapter = value;
+                }
+            }
+
+            public ProjectPrintPattern(string projetShortName, string projectChapter)
+            {
+                this._printName = projetShortName;
+                this._printChapter = projectChapter;
+            }
+        }
+
         //自定义站点类型
         public class KeyPoint:IComparable
         {
