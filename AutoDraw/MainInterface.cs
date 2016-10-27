@@ -1573,6 +1573,11 @@ namespace AutoDraw
                 InfoRainPoint = Xf.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists");
                 InfoSnowPoint = Xf.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPointLists");
 
+                //读取项目名称                
+                ClassStruct.ProjectInfo PI = Xf.readProjrtInfo(xmlFilePath + "\\setting.xml");
+                refreshTitleName(PI.ProjectName);
+
+
                 #region 给各个dataGridView指定datasource
                 if (tableST == null)
                 {
@@ -4987,10 +4992,23 @@ namespace AutoDraw
 
         }
 
+        //更新窗口名称
         public void refreshTitleName(string newTitle)
         {
+            string currentFilePath = getFilePath();
             //XmlFunction xf = new XmlFunction();
-            this.Text = newTitle;
+
+            if (newTitle != "?") //如果读取的值不为默认值“？”
+            {
+                this.Text = "[" + currentFilePath + "]  " + newTitle;
+            }
+            else
+            {
+                this.Text = "[" + currentFilePath + "]  " + "未指定项目名称";
+            }
+
+
+ 
         }
 
         private void dataGridWind_DataError(object sender, DataGridViewDataErrorEventArgs e)
@@ -5496,6 +5514,14 @@ namespace AutoDraw
                 }
 
                 //MessageBox.Show("是否删除项目：\n\t"+ item.a)
+            }
+        }
+
+        private void C_reletive_position_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(C_reletive_position.SelectedItem.ToString()== "上行线右侧" || C_reletive_position.SelectedItem.ToString() == "下行线右侧")
+            {
+
             }
         }
     }

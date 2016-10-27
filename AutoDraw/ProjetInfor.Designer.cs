@@ -35,14 +35,14 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.T_Print_Pattren = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.T_Project_Phase = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.T_Print_Chapter = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.T_Print_Pattren = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -68,7 +68,7 @@
             this.T_Print_Name.Location = new System.Drawing.Point(62, 70);
             this.T_Print_Name.Name = "T_Print_Name";
             this.T_Print_Name.Size = new System.Drawing.Size(223, 21);
-            this.T_Print_Name.TabIndex = 2;
+            this.T_Print_Name.TabIndex = 3;
             this.T_Print_Name.TextChanged += new System.EventHandler(this.T_Print_Name_TextChanged);
             // 
             // label2
@@ -85,7 +85,7 @@
             this.button1.Location = new System.Drawing.Point(29, 158);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(92, 23);
-            this.button1.TabIndex = 4;
+            this.button1.TabIndex = 6;
             this.button1.Text = "确认";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
@@ -121,6 +121,22 @@
             this.panel1.Size = new System.Drawing.Size(297, 206);
             this.panel1.TabIndex = 6;
             // 
+            // T_Print_Pattren
+            // 
+            this.T_Print_Pattren.Location = new System.Drawing.Point(62, 124);
+            this.T_Print_Pattren.Name = "T_Print_Pattren";
+            this.T_Print_Pattren.Size = new System.Drawing.Size(223, 21);
+            this.T_Print_Pattren.TabIndex = 5;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(3, 127);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(53, 12);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "图号规则";
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -135,7 +151,7 @@
             this.T_Project_Phase.Location = new System.Drawing.Point(62, 43);
             this.T_Project_Phase.Name = "T_Project_Phase";
             this.T_Project_Phase.Size = new System.Drawing.Size(223, 21);
-            this.T_Project_Phase.TabIndex = 8;
+            this.T_Project_Phase.TabIndex = 2;
             // 
             // statusStrip1
             // 
@@ -158,7 +174,7 @@
             this.T_Print_Chapter.Location = new System.Drawing.Point(62, 97);
             this.T_Print_Chapter.Name = "T_Print_Chapter";
             this.T_Print_Chapter.Size = new System.Drawing.Size(223, 21);
-            this.T_Print_Chapter.TabIndex = 3;
+            this.T_Print_Chapter.TabIndex = 4;
             this.T_Print_Chapter.TextChanged += new System.EventHandler(this.T_Print_Chapter_TextChanged);
             // 
             // label3
@@ -170,22 +186,6 @@
             this.label3.TabIndex = 6;
             this.label3.Text = "单    元";
             // 
-            // T_Print_Pattren
-            // 
-            this.T_Print_Pattren.Location = new System.Drawing.Point(62, 124);
-            this.T_Print_Pattren.Name = "T_Print_Pattren";
-            this.T_Print_Pattren.Size = new System.Drawing.Size(223, 21);
-            this.T_Print_Pattren.TabIndex = 10;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(3, 127);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(53, 12);
-            this.label5.TabIndex = 11;
-            this.label5.Text = "图号规则";
-            // 
             // ProjetInfor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -196,6 +196,7 @@
             this.MinimumSize = new System.Drawing.Size(313, 245);
             this.Name = "ProjetInfor";
             this.Text = "项目信息";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ProjetInfor_FormClosing);
             this.Load += new System.EventHandler(this.ProjetInfor_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();

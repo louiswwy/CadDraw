@@ -15,6 +15,9 @@ namespace AutoDraw
         string xmlDicPath = "";
 
         string projetName = "";
+
+        ClassStruct.ProjectInfo pI;
+
         public ProjetInfor(string xmlPat,out string projectName)
         {
             InitializeComponent();
@@ -32,7 +35,7 @@ namespace AutoDraw
                     if (MessageBox.Show("项目名称:" + T_Project_Name.Text.ToString().Replace(" ", "") + "\n图纸阶段:" + T_Project_Phase.Text.ToString().Replace(" ", "") + "\n确认保存?", "确认", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
                     {
                         ClassStruct.ProjectPrintPattern ppPattern = new ClassStruct.ProjectPrintPattern(T_Print_Name.Text.ToString().Replace(" ", ""), T_Print_Chapter.Text.ToString().Replace(" ", ""));
-                        ClassStruct.ProjectInfo pI = new ClassStruct.ProjectInfo(T_Project_Name.Text.ToString().Replace(" ", ""), T_Project_Phase.Text.Replace(" ", ""), ppPattern);
+                        pI = new ClassStruct.ProjectInfo(T_Project_Name.Text.ToString().Replace(" ", ""), T_Project_Phase.Text.Replace(" ", ""), ppPattern);
 
                         xF.writeProjrtInfo(xmlDicPath + "\\setting.xml", pI);
                         toolStripStatusLabel1.Text = "项目名称:" + T_Project_Name.Text.ToString().Replace(" ", "") + "已保存.";
@@ -40,7 +43,7 @@ namespace AutoDraw
                         MainInterface ower = (MainInterface)this.Owner;
                         ower.refreshTitleName(pI.ProjectName);
 
-                        projetName = T_Project_Name.Text.ToString().Replace(" ", "");
+                        //projetName = T_Project_Name.Text.ToString().Replace(" ", "");
                     }
                 }
                 catch (Exception ee)
@@ -95,6 +98,13 @@ namespace AutoDraw
             {
                 T_Print_Pattren.Text = T_Print_Name.Text.Replace(" ", "") + "-";
             }
+        }
+
+        private void ProjetInfor_FormClosing(object sender, FormClosingEventArgs e)
+        {
+
+            MainInterface ower = (MainInterface)this.Owner;
+            ower.refreshTitleName(pI.ProjectName);
         }
     }
 }
