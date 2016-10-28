@@ -177,7 +177,12 @@ namespace AutoDraw
                         else if (xe2.Name == "PType")//如果找到
                         {
                             xe2.InnerText = newInfor[0].Split(new char[] { ',' })[2];//则修改
-                            
+
+                        }
+                        else if (xe2.Name == "PPosition")//如果找到
+                        {
+                            xe2.InnerText = newInfor[0].Split(new char[] { ',' })[3];//则修改
+
                         }
                     }
                     
@@ -711,10 +716,11 @@ namespace AutoDraw
                 projectInfo.Add(ProPhase);*/
                 return pI;
             }
-            catch (Exception ee)
+            catch (Exception)
             {
                 //List<string> errorList = new List<string>();
                 //errorList.Add(ee.ToString());
+
                 return null;
 
             }

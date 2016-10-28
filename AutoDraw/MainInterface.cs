@@ -2456,176 +2456,196 @@ namespace AutoDraw
                 //修改功能关闭时
                 if (modifData == false)
                 {
-                    #region 添加字典信息
-                    if (C_TypeWayPoint.SelectedItem != null)
+                    try
                     {
-                        if (C_TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.Text.ToString().Replace(" ","") != "")
+                        #region 添加字典信息
+                        if (C_TypeWayPoint.SelectedItem != null)
                         {
-                            PFunction pF=new PFunction();
-                            if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)$")) //如果不是汉字
+                            if (C_TypeWayPoint.SelectedItem.ToString() != "" && T_SLocation.Text != "" && T_SName.Text.ToString().Replace(" ", "") != "")
                             {
-                                MessageBox.Show("站名： '" + T_SName.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
-                                return;
-                            }
-                            //if (!pF.isExMatch(T_SLocation.Text.ToString().Replace(" ", ""), @"^([A-Z]*)(\d*)([A-Z]*)(\d*).(\d{0,4})$"))   (\d+)+(\d{0,4})
-                            if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$")) //如果里程不符合规范
-                            {
-                                MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
-                                return;
-                            }
-                            /*else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" || C_TypeWayPoint.SelectedItem.ToString() != "隧道")) //如果里程不符合规范
-                            {
-                                MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
-                                return;
-                            }*/
-                            string sLocation = "";
-                            string sName = T_SName.Text.ToString().Replace(" ","");
-                            string sType = C_TypeWayPoint.SelectedItem.ToString().Replace(" ", "");
-                            string sPosition = "";
-
-                            if (sType != "桥梁" && sType != "隧道")
-                            {
-                                sPosition = C_reletive_position.SelectedItem.ToString().Replace(" ", ""); 
-                            }
-
-                            #region 如果录入桥梁里程时添加一个textbox
-                            if (sType == "桥梁"|| sType == "隧道")
-                            {
-                                string locationPart2 = "";
-                                foreach (var component in splitContainer1.Panel1.Controls)
+                                PFunction pF = new PFunction();
+                                if (!pF.isExMatch(T_SName.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)(\d*)$")) //如果不是汉字
                                 {
-                                    TextBox temp = component as TextBox;
-
-                                    if (temp != null)
+                                    if (!T_SName.Text.ToString().Contains("AT"))
                                     {
-                                        if (temp.Name == "tempText")
-                                        {
-                                            if (!pF.isExMatch(temp.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" || C_TypeWayPoint.SelectedItem.ToString() != "隧道")) //如果里程不符合规范
-                                            {
-                                                MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
-                                                return;
-                                            }
-                                            if (temp.Text.ToString() != "")
-                                            {
-                                                locationPart2 = temp.Text.ToString().ToUpper().Replace(" ", "");
-                                                temp.Text = "";
+                                        MessageBox.Show("站名： '" + T_SName.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
+                                        return; 
+                                    }
+                                }
+                                //if (!pF.isExMatch(T_SLocation.Text.ToString().Replace(" ", ""), @"^([A-Z]*)(\d*)([A-Z]*)(\d*).(\d{0,4})$"))   (\d+)+(\d{0,4})
+                                if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$")) //如果里程不符合规范
+                                {
+                                    MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
+                                    return;
+                                }
+                                /*else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" || C_TypeWayPoint.SelectedItem.ToString() != "隧道")) //如果里程不符合规范
+                                {
+                                    MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
+                                    return;
+                                }*/
+                                string sLocation = "";
+                                string sName = T_SName.Text.ToString().Replace(" ", "");
+                                string sType = C_TypeWayPoint.SelectedItem.ToString().Replace(" ", "");
+                                string sPosition = "";
 
-                                            }
-                                        }
+                                if (sType != "桥梁" && sType != "隧道")
+                                {
+                                    if (C_reletive_position.SelectedItem != null)
+                                    {
+                                        sPosition = C_reletive_position.SelectedItem.ToString().Replace(" ", "");
+
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show(this, "请输入站点的相对位置。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                                        return;
                                     }
                                 }
 
-                                sLocation = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", "")) + "-" + transferDistanceToNumberToString(locationPart2); //桥梁/隧道的里程格式是 xx+xx-yy+yy
-                            }
-                            else
-                            {
-                                sLocation = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""));
-                            }
-                            #endregion
-
-                            //添加字典项
-                            if (!InfoStation.ContainsKey(sLocation))
-                            {
-                                InfoStation.Add(sLocation, sName + "," + sType+","+ sPosition);
-                                
-
-                                List<string> colName = new List<string>();
-                                
-
-                               
-                                if (InfoStation.Count > 0)
+                                #region 如果录入桥梁里程时添加一个textbox
+                                if (sType == "桥梁" || sType == "隧道")
                                 {
-                                    #region 读写xml-wayPoint
-                                    XmlFunction xF = new XmlFunction();
-
-                                    //录入数据
-                                    xF.addWayPointNode(xmlFilePath + "\\setting.xml", "StationPointLists", "StationPoints", InfoStation);
-                              
-                                    //自动添加地震仪数据
-                                    if (sType.Contains("牵引变电所")|| sType.Contains("AT所")|| sType.Contains("分区所")) //如果是牵引变电所、分区所、AT所则默认安装地震仪，写入信息
+                                    string locationPart2 = "";
+                                    foreach (var component in splitContainer1.Panel1.Controls)
                                     {
-                                        PFunction pf = new PFunction();
-                                        List<string> listLoc = new List<string>();
+                                        TextBox temp = component as TextBox;
 
-                                        pf.isExMatch(sLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
-
-                                        double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
-                                        InfoEarthPoint.Add(sLocation, sName + "," + "地震仪" + "," + distance);
-                                        xF.addWayPointNode(xmlFilePath + "\\setting.xml", "EarthPointLists", "EarthPoints", InfoEarthPoint);
-                                    }
-
-
-                                    Dictionary<string, string> loadedInfor = xF.loadWayPoint(xmlFilePath + "\\setting.xml","StationPointLists");
-                                    #endregion
-
-                                    //
-                                    if (stTable != null)
-                                    {
-                                        stTable.Clear();
-                                    }
-                                    
-                                    Dictionary<double, string> tempDict = new Dictionary<double, string>();
-
-                                    string licheng = "";
-                                    tempDict = LocationToInt(loadedInfor, out licheng);
-                                    InfoStation.Clear();
-                                    foreach (KeyValuePair<double, string> pair in tempDict) //
-                                    {
-                                        string[] p_Values = pair.Value.Split(new char[] { ',' });
-
-                                        string values = "";
-
-                                        for (int a = 0; a < p_Values.Length - 1; a++)
+                                        if (temp != null)
                                         {
-                                            if (a == 0)
+                                            if (temp.Name == "tempText")
                                             {
-                                                values = p_Values[a];
-                                            }
-                                            else
-                                            {
+                                                if (!pF.isExMatch(temp.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" || C_TypeWayPoint.SelectedItem.ToString() != "隧道")) //如果里程不符合规范
+                                                {
+                                                    MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
+                                                    return;
+                                                }
+                                                if (temp.Text.ToString() != "")
+                                                {
+                                                    locationPart2 = temp.Text.ToString().ToUpper().Replace(" ", "");
+                                                    temp.Text = "";
 
-                                                values = values + "," + p_Values[a];
+                                                }
                                             }
                                         }
-
-                                        InfoStation.Add(p_Values[p_Values.Length - 1], values);
-
-                                        //string name = pair.Value.Split(new char[] { ',' })[0];
-                                        //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
-                                        //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
                                     }
 
-
-                                    dataGridStation.DataSource = "";
-
-                                    //dataGridStation(st)
-                                    fileStationDataView(dataGridStation, colName, InfoStation, "StationTable");
-                                    //fileStationDataView(dataGridStation, colName, loadedInfor, "StationTable"); //填充datagridView 
-
-                                    Tree_SummaryBox.Nodes.Clear();
-                                    refreshTreeview(Tree_SummaryBox, loadedInfor, true);
-
-                                    //如果数据插入成功，清空各输入栏
-                                    T_SLocation.Text = "";
-                                    T_SName.Text = "";
-                                    C_TypeWayPoint.SelectedItem = "";
+                                    sLocation = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", "")) + "-" + transferDistanceToNumberToString(locationPart2); //桥梁/隧道的里程格式是 xx+xx-yy+yy
                                 }
-                                
+                                else
+                                {
+                                    sLocation = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""));
+                                }
+                                #endregion
+
+                                //添加字典项
+                                if (!InfoStation.ContainsKey(sLocation))
+                                {
+                                    InfoStation.Add(sLocation, sName + "," + sType + "," + sPosition);
+
+
+                                    List<string> colName = new List<string>();
+
+
+
+                                    if (InfoStation.Count > 0)
+                                    {
+                                        #region 读写xml-wayPoint
+                                        XmlFunction xF = new XmlFunction();
+
+                                        //录入数据
+                                        xF.addWayPointNode(xmlFilePath + "\\setting.xml", "StationPointLists", "StationPoints", InfoStation);
+
+                                        //自动添加地震仪数据
+                                        if (sType.Contains("牵引变电所") || sType.Contains("AT所") || sType.Contains("分区所")) //如果是牵引变电所、分区所、AT所则默认安装地震仪，写入信息
+                                        {
+                                            PFunction pf = new PFunction();
+                                            List<string> listLoc = new List<string>();
+
+                                            pf.isExMatch(sLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+
+                                            double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+                                            InfoEarthPoint.Add(sLocation, sName + "," + "地震仪" + "," + distance);
+                                            xF.addWayPointNode(xmlFilePath + "\\setting.xml", "EarthPointLists", "EarthPoints", InfoEarthPoint);
+                                        }
+
+
+                                        Dictionary<string, string> loadedInfor = xF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists");
+                                        #endregion
+
+                                        //
+                                        if (stTable != null)
+                                        {
+                                            stTable.Clear();
+                                        }
+
+                                        Dictionary<double, string> tempDict = new Dictionary<double, string>();
+
+                                        string licheng = "";
+                                        tempDict = LocationToInt(loadedInfor, out licheng);
+                                        InfoStation.Clear();
+                                        foreach (KeyValuePair<double, string> pair in tempDict) //
+                                        {
+                                            string[] p_Values = pair.Value.Split(new char[] { ',' });
+
+                                            string values = "";
+
+                                            for (int a = 0; a < p_Values.Length - 1; a++)
+                                            {
+                                                if (a == 0)
+                                                {
+                                                    values = p_Values[a];
+                                                }
+                                                else
+                                                {
+
+                                                    values = values + "," + p_Values[a];
+                                                }
+                                            }
+
+                                            InfoStation.Add(p_Values[p_Values.Length - 1], values);
+
+                                            //string name = pair.Value.Split(new char[] { ',' })[0];
+                                            //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
+                                            //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
+                                        }
+
+
+                                        dataGridStation.DataSource = "";
+
+                                        //dataGridStation(st)
+                                        fileStationDataView(dataGridStation, colName, InfoStation, "StationTable");
+                                        //fileStationDataView(dataGridStation, colName, loadedInfor, "StationTable"); //填充datagridView 
+
+                                        Tree_SummaryBox.Nodes.Clear();
+                                        refreshTreeview(Tree_SummaryBox, loadedInfor, true);
+
+                                        //如果数据插入成功，清空各输入栏
+                                        T_SLocation.Text = "";
+                                        T_SName.Text = "";
+                                        C_TypeWayPoint.SelectedItem = "";
+                                    }
+
+                                }
+                                else
+                                {
+                                    MessageBox.Show("已定义" + System.Environment.NewLine + "里程为:'" + sLocation + "'" + System.Environment.NewLine + "名称为:'" + sName + "'的路点.");
+                                }
                             }
+
                             else
                             {
-                                MessageBox.Show("已定义"+System.Environment.NewLine +"里程为:'" + sLocation+"'" + System.Environment.NewLine + "名称为:'" + sName + "'的路点.");
+                                MessageBox.Show("请录入所有信息.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                         }
-
                         else
                         {
-                            MessageBox.Show("请录入所有信息.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show("请录入所有信息。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
-                    else
+                    catch (System.Exception ex)
                     {
-                        MessageBox.Show("请录入所有信息。", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("遇到错误." + "/n错误信息:/n" + ex.Data.ToString(), "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        throw;
                     }
                     #endregion
 
@@ -2642,12 +2662,12 @@ namespace AutoDraw
                         MessageBox.Show("站名： " + T_SName.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                         return;
                     }
-                    if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && C_TypeWayPoint.SelectedItem.ToString() != "桥梁") //如果里程不符合规范
+                    if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && C_TypeWayPoint.SelectedItem.ToString() != "桥梁" && C_TypeWayPoint.SelectedItem.ToString() != "隧道") //如果里程不符合规范
                     {
                         MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                         return;
                     }
-                    else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})-([A-Z]+)(\d+)\+(\d{0,4})$") && C_TypeWayPoint.SelectedItem.ToString() == "桥梁") //如果里程不符合规范
+                    else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})-([A-Z]+)(\d+)\+(\d{0,4})$") && (C_TypeWayPoint.SelectedItem.ToString() == "桥梁" || C_TypeWayPoint.SelectedItem.ToString() == "隧道")) //如果里程不符合规范
                     {
                         MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                         return;
@@ -2657,14 +2677,14 @@ namespace AutoDraw
                     //treeview选中项
                     TreeNode selectNode = Tree_SummaryBox.SelectedNode;
 
-                    List<string> LNT = new List<string>();
+                    List<string> Location_Name_Type_RelevantPosition = new List<string>(); //list name type
                     if (selectNode.Level == 1)
                     {
-                        LNT = treeViewFunction(selectNode);
+                        Location_Name_Type_RelevantPosition = treeViewFunction(selectNode);
                     }
                     else if (selectNode.Level == 2)
                     {
-                        LNT = treeViewFunction(selectNode.Parent);
+                        Location_Name_Type_RelevantPosition = treeViewFunction(selectNode.Parent);
 
                     }
 
@@ -2674,29 +2694,38 @@ namespace AutoDraw
                     //
                     string name = T_SName.Text.ToString().Replace(" ", "");
                     string type = C_TypeWayPoint.SelectedItem.ToString();
-                    if (type != "桥梁")
+                    string relevantPosition = C_reletive_position.SelectedItem.ToString();
+
+                    if (C_reletive_position.SelectedItem == null)
                     {
-                        location = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""));
+                        MessageBox.Show(this, "请明确站点位置.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+                    if (type != "桥梁"&& type != "隧道")
+                    {
+                        //location = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""));//?????????????
+                        location = T_SLocation.Text.ToString().ToUpper().Replace(" ", "");
                     }
                     else
                     {
-                        location = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", "")) + "-" + transferDistanceToNumberToString(tempText.Text.ToString().ToUpper().Replace(" ", ""));
+                        //location = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", "")) + "-" + transferDistanceToNumberToString(tempText.Text.ToString().ToUpper().Replace(" ", ""));
+                        location = T_SLocation.Text.ToString().ToUpper().Replace(" ", "") + "-" + tempText.Text.ToString().ToUpper().Replace(" ", "");
                     }
 
-                    if (LNT[2] == type && LNT[1] == name && LNT[0] == location) //如果数据没有变
+                    if (Location_Name_Type_RelevantPosition[2] == type && Location_Name_Type_RelevantPosition[1] == name && Location_Name_Type_RelevantPosition[0] == location) //如果数据没有变
                     {
                         InforStatusLabel.Text = "项目数据没有改变.";
                         return;
                     }
                     else //如果数据改变了
                     {
-                        InfoStation.Remove(LNT[0]);
+                        InfoStation.Remove(Location_Name_Type_RelevantPosition[0]);
                         PFunction pf = new PFunction();
                         List<string> listLoc = new List<string>();
-                        pf.isExMatch(LNT[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+                        pf.isExMatch((Location_Name_Type_RelevantPosition[0]).Split(new char[] { '-' })[0], @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
 
                         double distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
-                        InfoStation.Add(location.Split(new char[]{'-'})[0], name + "," + type + "," + distance);
+                        InfoStation.Add(location, name + "," + type + "," + distance + "," + relevantPosition);//location.Split(new char[]{'-'})[0]
 
                         //修改xml文件
                         //
@@ -2706,10 +2735,10 @@ namespace AutoDraw
                         //supprimWayPoint(xmlFilePath + "\\setting.xml", inforOneStation[0].ToString().Replace(" ", ""));
                         //旧字典
                         List<string> oldDic = new List<string>();
-                        oldDic.Add(LNT[0] + "," + LNT[1] + "," + LNT[2]);
+                        oldDic.Add(Location_Name_Type_RelevantPosition[0] + "," + Location_Name_Type_RelevantPosition[1] + "," + Location_Name_Type_RelevantPosition[2]);
                         //新字典
                         List<string> newDic = new List<string>();
-                        newDic.Add(location + "," + name + "," + type);
+                        newDic.Add(location + "," + name + "," + type + "," + relevantPosition);
                         xf.modifWayPoint(xmlFilePath + "\\setting.xml", oldDic, newDic);
 
 
@@ -2718,6 +2747,7 @@ namespace AutoDraw
 
                         string licheng = "";
                         tempDict = LocationToInt(InfoStation, out licheng);
+
                         InfoStation.Clear();
                         foreach (KeyValuePair<double, string> pair in tempDict)
                         {
@@ -2977,18 +3007,24 @@ namespace AutoDraw
             {
                 if (NoL==true)
                 {
-                    TreeNode nameNode = new TreeNode();
-                    nameNode.Text = item.Value.Split(new char[] { ',' })[0];
 
-                    TreeNode disNode = new TreeNode();
-                    disNode.Text = item.Key;
+                    TreeNode nameNode = new TreeNode(); //根节点
+                    nameNode.Text = item.Value.Split(new char[] { ',' })[0]; 
 
-                    TreeNode typeNode = new TreeNode();
-                    typeNode.Text = item.Value.Split(new char[] { ',' })[1];
+                    TreeNode disNode = new TreeNode(); //里程节点
+                    disNode.Text = "里程  :" + item.Key;
+
+                    TreeNode typeNode = new TreeNode(); //类型节点
+                    typeNode.Text = "类型  :" + item.Value.Split(new char[] { ',' })[1];
+
+                    TreeNode relevantPositionNode = new TreeNode();//相对位置节点
+                    relevantPositionNode.Text = "相对位置:" + item.Value.Split(new char[] { ',' })[3];
 
                     nameNode.Nodes.Add(disNode);
 
                     nameNode.Nodes.Add(typeNode);
+
+                    nameNode.Nodes.Add(relevantPositionNode);
 
                     if (item.Value.Split(new char[] { ',' })[1]=="车站")
                     {
@@ -3125,42 +3161,42 @@ namespace AutoDraw
         //
         public List<string> treeViewFunction(TreeNode selectedNode)
         {
-            List<string> LNT = new List<string>(); //里程＼名字＼类型
+            List<string> LNTR = new List<string>(); //里程＼名字＼类型
             string licheng = "";
             string Name = "";
             string TypeS = "";
+            string RelevantpositionS = "";
+
             PFunction pF = new PFunction();
+
+            Name= selectedNode.Text.ToString().Replace(" ", "").Replace("名称:", "");
+
             foreach (TreeNode childNode in selectedNode.Nodes)
             {
-                if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                if (childNode.Text.ToString().Replace(" ","").Contains("里程"))
                 {
-                    licheng = childNode.Text.ToString();
+                    licheng = childNode.Text.ToString().Replace(" ", "").Replace("里程:","");
                 }
-                else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)") || childNode.Text.ToString().Replace(" ", "").Contains("AT所")) //汉字
+                if (childNode.Text.ToString().Replace(" ", "").Contains("名称"))
                 {
-                    if (childNode.Text.ToString().Replace(" ", "").Contains("AT所") || childNode.Text.ToString().Replace(" ", "").Contains("牵引变电所") || childNode.Text.ToString().Replace(" ", "").Contains("车站") || childNode.Text.ToString().Replace(" ", "").Contains("基站") || childNode.Text.ToString().Replace(" ", "").Contains("桥梁"))
-                    {
-                        TypeS = childNode.Text.ToString();
-                    }
-                    else
-                    {
-                        Name = childNode.Text.ToString();
-                    }
+                    Name = childNode.Text.ToString().Replace(" ", "").Replace("名称:", "");
+                }
+                if (childNode.Text.ToString().Replace(" ", "").Contains("类型"))
+                {
+                    TypeS = childNode.Text.ToString().Replace(" ", "").Replace("类型:", "");
+                }
+                if (childNode.Text.ToString().Replace(" ", "").Contains("相对位置"))
+                {
+                    RelevantpositionS = childNode.Text.ToString().Replace(" ", "").Replace("相对位置:", "");
                 }
             }
 
-            if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^([\u4e00-\u9fa5]*)")) //((\d*)\#*
-            {
-                if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
-                {
-                    Name = selectedNode.Text.ToString();
-                }
-            }
-            LNT.Add(licheng);
-            LNT.Add(Name);
-            LNT.Add(TypeS);
+            LNTR.Add(licheng);
+            LNTR.Add(Name);
+            LNTR.Add(TypeS);
+            LNTR.Add(RelevantpositionS);
 
-            return LNT;
+            return LNTR;
         }
 
         /// <summary>
@@ -3280,95 +3316,106 @@ namespace AutoDraw
 
         private void 修改ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (Tree_SummaryBox.Nodes.Count > 3) //默认有三个节点
+            if (Tree_SummaryBox.Nodes.Count > 3) //默认有六个节点 也只有两个
             {
-                //清空
-                T_SName.Text = "";
-                T_SLocation.Text = "";
-                C_TypeWayPoint.SelectedItem = "";
-
-                modifData = true;
-                B_AddWayPoint.Text = "确认";
-                B_SupWayPoint.Text = "取消";
-
                 TreeNode selectedNode = Tree_SummaryBox.SelectedNode;
 
                 TreeNode SLocaNode = new TreeNode();
                 TreeNode SNameNode = new TreeNode();
                 TreeNode STypeNode = new TreeNode();
+                TreeNode SRelevantPositionNode = new TreeNode();
 
-                PFunction pF = new PFunction();
-
-                if (selectedNode.Level == 1)
+                if (selectedNode.Level != 0) //如果选中的不是第一级，则进入修改模式
                 {
-                    foreach (TreeNode childNode in selectedNode.Nodes)
+                    //清空
+                    T_SName.Text = "";
+                    T_SLocation.Text = "";
+                    C_TypeWayPoint.SelectedItem = "";
+                    C_reletive_position.SelectedItem = "";
+
+                    modifData = true;
+                    B_AddWayPoint.Text = "确认";
+                    B_SupWayPoint.Text = "取消";
+
+
+
+                    PFunction pF = new PFunction();
+
+                    if (selectedNode.Level == 1) //如果选中的是第一子级，
                     {
-                        if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                        if (!selectedNode.Nodes.ToString().Contains("里程:") && !selectedNode.Nodes.ToString().Contains("类型:") && !selectedNode.Nodes.ToString().Contains("相对位置:"))
                         {
-                            T_SLocation.Text = childNode.Text.ToString();
+                            T_SName.Text = selectedNode.Text.ToString().Replace(" ", "");
                         }
-                        else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
+                        foreach (TreeNode childNode in selectedNode.Nodes)
                         {
-                            if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
+
+                            if (childNode.Text.ToString().Replace(" ","").Contains("里程:"))
                             {
-                                C_TypeWayPoint.SelectedItem = childNode.Text.ToString();
+                                T_SLocation.Text = childNode.Text.ToString().Replace(" ", "").Replace("里程:","");
                             }
-                            else
+                            else if (childNode.Text.ToString().Replace(" ", "").Contains("类型:"))
                             {
-                                T_SName.Text = childNode.Text.ToString();
+                                C_TypeWayPoint.SelectedItem = childNode.Text.ToString().Replace(" ", "").Replace("类型:", "");
                             }
-                        }
-                    }
-                    if (pF.isExMatch(selectedNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
-                    {
-                        if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
-                        {
-                            T_SName.Text = selectedNode.Text.ToString();
+                            else if (childNode.Text.ToString().Replace(" ", "").Contains("相对位置:"))
+                            {
+                                C_reletive_position.SelectedItem = childNode.Text.ToString().Replace(" ", "").Replace("相对位置", "");
+                            }
                         }
                     }
 
 
+
+
+                    else if (selectedNode.Level == 2)
+                    {
+                        foreach (TreeNode childNode in selectedNode.Parent.Nodes)
+                        {
+                            if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                            {
+                                T_SLocation.Text = childNode.Text.ToString();
+                            }
+                            else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
+                            {
+                                if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
+                                {
+                                    C_TypeWayPoint.SelectedItem = childNode.Text.ToString();
+                                }
+                                else
+                                {
+                                    T_SName.Text = childNode.Text.ToString();
+                                }
+                            }
+                        }
+                        if (pF.isExMatch(selectedNode.Parent.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
+                        {
+                            if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
+                            {
+                                T_SName.Text = selectedNode.Parent.Text.ToString();
+                            }
+                        }
+                        else if (pF.isExMatch(selectedNode.Parent.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                        {
+                            T_SLocation.Text = selectedNode.Parent.Text.ToString();
+                        }
+
+                    }
 
                 }
-                else if (selectedNode.Level == 2)
+                else
                 {
-                    foreach (TreeNode childNode in selectedNode.Parent.Nodes)
-                    {
-                        if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
-                        {
-                            T_SLocation.Text = childNode.Text.ToString();
-                        }
-                        else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
-                        {
-                            if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
-                            {
-                                C_TypeWayPoint.SelectedItem = childNode.Text.ToString();
-                            }
-                            else
-                            {
-                                T_SName.Text = childNode.Text.ToString();
-                            }
-                        } 
-                    }
-                    if (pF.isExMatch(selectedNode.Parent.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
-                    {
-                        if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
-                        {
-                            T_SName.Text = selectedNode.Parent.Text.ToString();
-                        }
-                    }
-                    else if (pF.isExMatch(selectedNode.Parent.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
-                    {
-                        T_SLocation.Text = selectedNode.Parent.Text.ToString();
-                    }
-
-                }
-                else if (selectedNode.Level ==0)
-                {
-                    MessageBox.Show("此节点：" + selectedNode.Text.ToString().Split(new char[] { ' ' })[0] + "。不能修改！", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(this, "此节点无法修改，请选择需要修改的项.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             
+        }
+
+        public string TreeViewFunction_NodeName_to_Name(string NodeName)
+        {
+            string a = string.Empty;
+
+            return a;
         }
           
         ImageList imageList1;
@@ -3975,7 +4022,7 @@ namespace AutoDraw
 
             else if (selectNode.Contains("列表"))
             {
-
+                MessageBox.Show("待完善");
             }
             /*
             if (tableST != null)
@@ -5000,7 +5047,7 @@ namespace AutoDraw
 
             if (newTitle != "?") //如果读取的值不为默认值“？”
             {
-                this.Text = "[" + currentFilePath + "]  " + newTitle;
+                this.Text = "[" + currentFilePath + "]  项目名称:" + newTitle;
             }
             else
             {
