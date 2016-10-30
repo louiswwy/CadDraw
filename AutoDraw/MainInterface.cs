@@ -2667,11 +2667,16 @@ namespace AutoDraw
                         MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
                         return;
                     }
-                    else if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})-([A-Z]+)(\d+)\+(\d{0,4})$") && (C_TypeWayPoint.SelectedItem.ToString() == "桥梁" || C_TypeWayPoint.SelectedItem.ToString() == "隧道")) //如果里程不符合规范
+
+                    if ((C_TypeWayPoint.SelectedItem.ToString() == "桥梁" || C_TypeWayPoint.SelectedItem.ToString() == "隧道")) //如果是桥梁隧道
                     {
-                        MessageBox.Show("里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "'格式不符合规范。");
-                        return;
+                        if (!pF.isExMatch(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$") && !pF.isExMatch(tempText.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))  //如果里程不符合规范
+                        {
+                            MessageBox.Show("起始里程： '" + T_SLocation.Text.ToString().Replace(" ", "") + "/n或/n终止里程" + tempText.Text.ToString().ToUpper().Replace(" ", "") + "'/n格式不符合规范。");
+                            return;
+                        }
                     }
+
 
                     
                     //treeview选中项
@@ -2694,13 +2699,24 @@ namespace AutoDraw
                     //
                     string name = T_SName.Text.ToString().Replace(" ", "");
                     string type = C_TypeWayPoint.SelectedItem.ToString();
-                    string relevantPosition = C_reletive_position.SelectedItem.ToString();
+                    string relevantPosition = string.Empty;
 
-                    if (C_reletive_position.SelectedItem == null)
+                    if (C_reletive_position.SelectedItem == null && (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" && C_TypeWayPoint.SelectedItem.ToString() != "隧道"))
                     {
-                        MessageBox.Show(this, "请明确站点位置.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show(this, "请明确站点相对位置.", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
                     }
+                    else if (C_reletive_position.SelectedItem != null && (C_TypeWayPoint.SelectedItem.ToString() != "桥梁" && C_TypeWayPoint.SelectedItem.ToString() != "隧道"))
+                    {
+
+                        relevantPosition = C_reletive_position.SelectedItem.ToString();
+                    }
+                    else if (C_TypeWayPoint.SelectedItem.ToString() == "桥梁" || C_TypeWayPoint.SelectedItem.ToString() == "隧道")
+                    {
+                        relevantPosition = string.Empty;
+                    }
+
+
                     if (type != "桥梁"&& type != "隧道")
                     {
                         //location = transferDistanceToNumberToString(T_SLocation.Text.ToString().ToUpper().Replace(" ", ""));//?????????????
@@ -2746,6 +2762,8 @@ namespace AutoDraw
                         Dictionary<double, string> tempDict = new Dictionary<double, string>();
 
                         string licheng = "";
+
+                        /*
                         tempDict = LocationToInt(InfoStation, out licheng);
 
                         InfoStation.Clear();
@@ -2773,7 +2791,7 @@ namespace AutoDraw
                             //stTable.Rows.Add(pair.Key.ToUpper(), Loadvalue[0], Loadvalue[1], Loadvalue[2]);  //添加
                             //tempDict.Add(,InfoStation.Keys.ToString()+"-"+InfoStation.Values.ToString());
                         }
-
+                        */
                         //清除treeview
                         Tree_SummaryBox.Nodes.Clear();
                         refreshTreeview(Tree_SummaryBox, InfoStation, true);
@@ -2977,17 +2995,20 @@ namespace AutoDraw
             treeVIewToRefresh.Nodes.Add(rootTeleTower);
 
             TreeNode rootAT = new TreeNode();  //添加AT所
-            rootAT.Text = "AT所";
+            rootAT.Text = "AT分区所";
             treeVIewToRefresh.Nodes.Add(rootAT);
 
             TreeNode rootQY = new TreeNode();  //添加牵引变电所
             rootQY.Text = "牵引变电所";
             treeVIewToRefresh.Nodes.Add(rootQY);
 
-            TreeNode rootFQ = new TreeNode();  //添加牵引变电所
-            rootFQ.Text = "分区所";
-            treeVIewToRefresh.Nodes.Add(rootFQ);
+            TreeNode rootZJ = new TreeNode();  //添加中继站
+            rootZJ.Text = "中继站";
+            treeVIewToRefresh.Nodes.Add(rootZJ);
 
+            TreeNode rootXL = new TreeNode();  //添加线路所
+            rootXL.Text = "线路所";
+            treeVIewToRefresh.Nodes.Add(rootXL);
 
             TreeNode rootB_T = new TreeNode();  //添加地形
             rootB_T.Text = "桥梁/隧道";
@@ -3000,7 +3021,8 @@ namespace AutoDraw
             int numJ = 0;
             int numA = 0;
             int numQ = 0;
-            int numF = 0;
+            int numZ = 0;
+            int numX = 0;
             int numBT = 0;
 
             foreach (var item in InfoStation)
@@ -3036,7 +3058,7 @@ namespace AutoDraw
                         rootTeleTower.Nodes.Add(nameNode);
                         numJ++;
                     }
-                    else if (item.Value.Split(new char[] { ',' })[1] == "AT所")
+                    else if (item.Value.Split(new char[] { ',' })[1] == "AT分区所")
                     {
                         rootAT.Nodes.Add(nameNode);
                         numA++;
@@ -3046,10 +3068,15 @@ namespace AutoDraw
                         rootQY.Nodes.Add(nameNode);
                         numQ++;
                     }
-                    else if (item.Value.Split(new char[] { ',' })[1] == "分区所")
+                    else if (item.Value.Split(new char[] { ',' })[1] == "中继站")
                     {
-                        rootFQ.Nodes.Add(nameNode);
-                        numF++;
+                        rootZJ.Nodes.Add(nameNode);
+                        numZ++;
+                    }
+                    else if (item.Value.Split(new char[] { ',' })[1] == "线路所")
+                    {
+                        rootXL.Nodes.Add(nameNode);
+                        numX++;
                     }
                     else if (item.Value.Split(new char[] { ',' })[1] == "桥梁"|| item.Value.Split(new char[] { ',' })[1] == "隧道")
                     {
@@ -3083,7 +3110,8 @@ namespace AutoDraw
             rootTeleTower.Text = rootTeleTower.Text + " 共有：" + numJ + "个";
             rootAT.Text = rootAT.Text + " 共有：" + numA + "个";
             rootQY.Text = rootQY.Text + " 共有：" + numQ + "个";
-            rootFQ.Text = rootFQ.Text + " 共有：" + numF + "个";
+            rootZJ.Text = rootZJ.Text + " 共有：" + numZ + "个";
+            rootXL.Text = rootXL.Text + " 共有：" + numX + "个";
             rootB_T.Text = rootB_T.Text + " 共有：" + numBT + "个";
         }
 
@@ -3352,7 +3380,16 @@ namespace AutoDraw
 
                             if (childNode.Text.ToString().Replace(" ","").Contains("里程:"))
                             {
-                                T_SLocation.Text = childNode.Text.ToString().Replace(" ", "").Replace("里程:","");
+                                string[] licheng_texts = childNode.Text.ToString().Replace(" ", "").Replace("里程:", "").Split(new char[] { '-' });
+                                if (licheng_texts.Length > 1)                                {
+
+                                    T_SLocation.Text = licheng_texts[0];
+                                    tempText.Text = licheng_texts[1];
+                                }
+                                else
+                                {
+                                    T_SLocation.Text = licheng_texts[0];
+                                }
                             }
                             else if (childNode.Text.ToString().Replace(" ", "").Contains("类型:"))
                             {
@@ -3372,33 +3409,31 @@ namespace AutoDraw
                     {
                         foreach (TreeNode childNode in selectedNode.Parent.Nodes)
                         {
-                            if (pF.isExMatch(childNode.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
+                            if (childNode.Text.ToString().Contains("里程"))
                             {
-                                T_SLocation.Text = childNode.Text.ToString();
-                            }
-                            else if (pF.isExMatch(childNode.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)")) //汉字
-                            {
-                                if (childNode.Text.ToString().Replace(" ", "") == "AT所" || childNode.Text.ToString().Replace(" ", "") == "牵引变电所" || childNode.Text.ToString().Replace(" ", "") == "车站" || childNode.Text.ToString().Replace(" ", "") == "基站" || childNode.Text.ToString().Replace(" ", "") == "桥梁")
+                                string[] licheng_texts = childNode.Text.ToString().Replace(" ", "").Replace("里程:", "").Split(new char[] { '-' });
+                                if (licheng_texts.Length > 1)
                                 {
-                                    C_TypeWayPoint.SelectedItem = childNode.Text.ToString();
+
+                                    T_SLocation.Text = licheng_texts[0];
+                                    tempText.Text = licheng_texts[1];
                                 }
                                 else
                                 {
-                                    T_SName.Text = childNode.Text.ToString();
+                                    T_SLocation.Text = licheng_texts[0];
                                 }
                             }
-                        }
-                        if (pF.isExMatch(selectedNode.Parent.Text.ToString().Replace(" ", ""), @"^((\d*)\#*[\u4e00-\u9fa5]*)"))
-                        {
-                            if (!selectedNode.Text.ToString().Contains("所") || !selectedNode.Text.ToString().Contains("站"))
+                            else if (childNode.Text.ToString().Contains("类型")) //汉字
                             {
-                                T_SName.Text = selectedNode.Parent.Text.ToString();
+                                C_TypeWayPoint.SelectedItem = childNode.Text.ToString().Replace(" ", "").Replace("类型:", "");
+                            }
+                            else if (childNode.Text.ToString().Contains("相对位置")) //汉字
+                            {
+                                C_reletive_position.SelectedItem = childNode.Text.ToString().Replace(" ", "").Replace("相对位置:", "");
                             }
                         }
-                        else if (pF.isExMatch(selectedNode.Parent.Text.ToString().ToUpper().Replace(" ", ""), @"^([A-Z]+)(\d+)\+(\d{0,4})$"))
-                        {
-                            T_SLocation.Text = selectedNode.Parent.Text.ToString();
-                        }
+
+                        T_SName.Text = selectedNode.Parent.Text.ToString();
 
                     }
 
@@ -3609,7 +3644,12 @@ namespace AutoDraw
             dataGridView1.Columns.Add("设备5", "equipe5");*/
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 确认datagridview数据变更
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void B_Apply_DataGridView_Change_Click(object sender, EventArgs e)
         {
             string selectNode = tabControl1.SelectedTab.Text.ToString();
             XmlFunction xF = new XmlFunction();
@@ -4033,7 +4073,7 @@ namespace AutoDraw
             */
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void B_Reject_DataGridView_Change_Click(object sender, EventArgs e)
         {
             tableST.RejectChanges();
         }
@@ -4684,16 +4724,16 @@ namespace AutoDraw
         }
 
         /// <summary>
-        /// 自动生成连接
+        /// 绘图
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void B_FunDraw_Click(object sender, EventArgs e)
         {
-            if (listView1.Items.Count!=0)
+            if (listView1.Items.Count!=0) //检查是否有导入图块
             {
 
-                if (comboFournisseur.SelectedItem.ToString() == "")
+                if (C_Fournisseur.SelectedItem.ToString() == "") //检查是否有选择供应商下拉框
                 {
                     MessageBox.Show("请选择设备供应商！", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -4701,12 +4741,13 @@ namespace AutoDraw
 
                 XmlFunction XF = new XmlFunction();
 
-                if (XF.readProjrtInfo(xmlFilePath + "\\setting.xml") == null || XF.readProjrtInfo(xmlFilePath + "\\setting.xml").ProjectName == "?")
+                if (XF.readProjrtInfo(xmlFilePath + "\\setting.xml") == null || XF.readProjrtInfo(xmlFilePath + "\\setting.xml").ProjectName == "?") //检查是否有设置图纸名称
                 {
                     MessageBox.Show("请先设置图纸名称。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     return;
                 }
+
                 #region 读取数据
                 Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists"); //读取站点列表
                 Dictionary<string, string> STstationPoint = new Dictionary<string, string>();
@@ -4846,7 +4887,7 @@ namespace AutoDraw
                 //Dictionary<string, string> LineByFournisseur = new Dictionary<string, string>();
                 foreach(KeyValuePair<string,string> linelist in LineTypeInfo)
                 {
-                    if (linelist.Value.Contains(comboFournisseur.SelectedItem.ToString()))  //根据下拉框选择的设备商名字筛选线型规则
+                    if (linelist.Value.Contains(C_Fournisseur.SelectedItem.ToString()))  //根据下拉框选择的设备商名字筛选线型规则
                     { 
                         //LineByFournisseur.Add(linelist.Key, linelist.Value);
                         string[] splitValue = linelist.Value.Split(new char[] { ',' });
@@ -5030,6 +5071,11 @@ namespace AutoDraw
             return connectStation;
         }
 
+        /// <summary>
+        /// 打开项目信息录入界面
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void 项目信息ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string projectName = "";
@@ -5039,7 +5085,11 @@ namespace AutoDraw
 
         }
 
-        //更新窗口名称
+        //
+        /// <summary>
+        /// 更新窗口名称
+        /// </summary>
+        /// <param name="newTitle"></param>
         public void refreshTitleName(string newTitle)
         {
             string currentFilePath = getFilePath();
@@ -5088,6 +5138,11 @@ namespace AutoDraw
             return;
         }
 
+        /// <summary>
+        /// 是否需要？
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tabControl1_Click(object sender, EventArgs e)
         {
             if (tabControl1.SelectedTab.Text.ToString() == "地震")
@@ -5165,7 +5220,7 @@ namespace AutoDraw
             }
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void C_Fournisseur_SelectedIndexChanged(object sender, EventArgs e)
         {
             /*XmlFunction xf = new XmlFunction();
             LineTypeInfo = xf.loadLineType(xmlFilePath + "\\setting.xml");
@@ -5181,24 +5236,6 @@ namespace AutoDraw
             }*/
         }
 
-        private void comboFournisseur_Click(object sender, EventArgs e)
-        {
-            XmlFunction xf = new XmlFunction();
-            LineTypeInfo = xf.loadLineType(xmlFilePath + "\\setting.xml");
-
-            ListFournniseur = new List<string>();
-            comboFournisseur.Items.Clear();
-
-            foreach (KeyValuePair<string, string> a in LineTypeInfo)
-            {
-                string fournisseur = a.Value.Split(new char[] { ',' })[4];
-                if (!ListFournniseur.Contains(fournisseur))
-                {
-                    comboFournisseur.Items.Add(fournisseur);
-                    ListFournniseur.Add(fournisseur);
-                }
-            }
-        }
 
         /// <summary>
         /// 绘制系统图
@@ -5569,6 +5606,25 @@ namespace AutoDraw
             if(C_reletive_position.SelectedItem.ToString()== "上行线右侧" || C_reletive_position.SelectedItem.ToString() == "下行线右侧")
             {
 
+            }
+        }
+
+        private void B_Refresh_LineInfor_Click(object sender, EventArgs e)
+        {
+            XmlFunction xf = new XmlFunction();
+            LineTypeInfo = xf.loadLineType(xmlFilePath + "\\setting.xml");
+
+            ListFournniseur = new List<string>();
+            C_Fournisseur.Items.Clear();
+
+            foreach (KeyValuePair<string, string> a in LineTypeInfo)
+            {
+                string fournisseur = a.Value.Split(new char[] { ',' })[4];
+                if (!ListFournniseur.Contains(fournisseur))
+                {
+                    C_Fournisseur.Items.Add(fournisseur);
+                    ListFournniseur.Add(fournisseur);
+                }
             }
         }
     }
