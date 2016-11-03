@@ -275,10 +275,11 @@ namespace AutoDraw
 
                 string station = StationEquipePair.Split(new char[] { '_' })[0];
                 string equipe = StationEquipePair.Split(new char[] { '_' })[1];
-                 
-                ClassStruct.StationPoint stationInfor = new ClassStruct.StationPoint(station.Split(new char[] { ',' })[0], station.Split(new char[] { ',' })[1], station.Split(new char[] { ',' })[2], int.Parse(station.Split(new char[] { ',' })[3]));
+                string[] list_words = StationEquipePair.Split(new char[] { '_' })[0].Split(new char[] { ',' });
+                ClassStruct.StationPoint stationInfor = new ClassStruct.StationPoint(list_words[0], list_words[1], list_words[2], int.Parse(list_words[3]), list_words[4]);
                 //生成自定义 设备信息类
-                ClassStruct.EquipePoint equipeInfor = new ClassStruct.EquipePoint(equipe.Split(new char[] { ',' })[0], equipe.Split(new char[] { ',' })[1], equipe.Split(new char[] { ',' })[2], int.Parse(equipe.Split(new char[] { ',' })[3]));
+                list_words = StationEquipePair.Split(new char[] { '_' })[1].Split(new char[] { ',' });
+                ClassStruct.EquipePoint equipeInfor = new ClassStruct.EquipePoint(list_words[0], list_words[1], list_words[2], int.Parse(list_words[3]), list_words[4]);
 
                 //站点的里程
                 int stationLocation = stationInfor.distance;
@@ -306,12 +307,14 @@ namespace AutoDraw
                 XmlElement subXmlStation = xmlDoc.CreateElement("Station");//创建一个<Station>节点 
                 subXmlStation.SetAttribute("Stationlocation", stationInfor.location);
                 subXmlStation.SetAttribute("StationType", stationInfor.type);
+                subXmlStation.SetAttribute("PPosition", stationInfor.pposition);
                 subXmlStation.InnerText = stationInfor.name;
 
                 //设备节点
                 XmlElement subXmlEquipe = xmlDoc.CreateElement("Equipement");//创建一个<Equipement>节点 
                 subXmlEquipe.SetAttribute("Equipelocation", equipeInfor.location);
                 subXmlEquipe.SetAttribute("EquipeType", equipeInfor.type);
+                subXmlStation.SetAttribute("PPosition", equipeInfor.pposition);
                 subXmlEquipe.InnerText = equipeInfor.name;
 
                 //线型子节点
@@ -866,10 +869,11 @@ namespace AutoDraw
                     string name = sigNode.SelectSingleNode("PName").InnerText;
                     string type = sigNode.SelectSingleNode("PType").InnerText;
                     string location = sigNode.Attributes["location"].InnerText;
+                    string re_position = sigNode.SelectSingleNode("PPosition").InnerText;
 
                     List_NotDraw += name + type + ",";
 
-                    not_draw = new ClassStruct.StationPoint(location, name, type, 0);
+                    not_draw = new ClassStruct.StationPoint(location, name, type, 0, re_position);
 
                     list_not_draw_station.Add(not_draw);
                 }

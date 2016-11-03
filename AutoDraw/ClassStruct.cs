@@ -103,6 +103,7 @@ namespace AutoDraw
             private string _location = string.Empty;
             private string _name = string.Empty;
             private string _type = string.Empty;
+            private string _pposition = string.Empty;
             private int _distance;
 
             public string location
@@ -150,12 +151,25 @@ namespace AutoDraw
                     this._distance = value;
                 }
             }
-            public KeyPoint(string StationLocation, string StationName, string StationType, int Distance)
+            public string pposition
             {
-                _location = StationLocation;
-                _name = StationName;
-                _type = StationType;
-                _distance = Distance;
+                get
+                {
+                    return this._pposition;
+                }
+                set
+                {
+                    this._pposition = value;
+                }
+            }
+
+            public KeyPoint(string StationLocation, string StationName, string StationType, int Distance,string PPosition)
+            {
+                location = StationLocation;
+                name = StationName;
+                type = StationType;
+                distance = Distance;
+                pposition = PPosition;
             }
 
             int IComparable.CompareTo(object obj)
@@ -169,7 +183,7 @@ namespace AutoDraw
         //重写为站点
         public class StationPoint : KeyPoint
         {
-            public StationPoint(string StationLocation, string StationName, string StationType,int Distance) : base(StationLocation, StationName, StationType, Distance)
+            public StationPoint(string StationLocation, string StationName, string StationType,int Distance, string PPosition) : base(StationLocation, StationName, StationType, Distance, PPosition)
             {
 
             }
@@ -178,7 +192,7 @@ namespace AutoDraw
         //重写为设备
         public class EquipePoint : KeyPoint
         {
-            public EquipePoint(string EquipeLocation, string EquipeName, string EquipeType, int Distance) : base(EquipeLocation, EquipeName, EquipeType, Distance)
+            public EquipePoint(string EquipeLocation, string EquipeName, string EquipeType, int Distance, string PPosition) : base(EquipeLocation, EquipeName, EquipeType, Distance, PPosition)
             {
 
             }

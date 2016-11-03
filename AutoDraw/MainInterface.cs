@@ -116,6 +116,8 @@ namespace AutoDraw
             int drawRound = 0;
 
             List<ClassStruct.StationPoint> StationList = new List<ClassStruct.StationPoint>();
+            List<string> list_station = new List<string>();
+
             foreach(var ConnectionAndLine in List_ConnectionAndLine)
             {
                 if (!StationList.Contains(ConnectionAndLine.station))
@@ -141,7 +143,7 @@ namespace AutoDraw
             foreach (var sorted in result)
             {
                 string[] values = sorted.Value.Split(new char[] { ',' });
-                RailWayStation.Add(new ClassStruct.StationPoint(values[0], values[1], values[2], sorted.Key));
+                RailWayStation.Add(new ClassStruct.StationPoint(values[0], values[1], values[2], sorted.Key, values[3]));
             }
             #endregion
 
@@ -3557,7 +3559,7 @@ namespace AutoDraw
 
 
         /// <summary>
-        /// 填充站点信息
+        /// 向对应的控件datagridview填充站点信息
         /// </summary>
         /// <param name="comp"></param>
         /// <param name="listGridName"></param>
@@ -3566,7 +3568,7 @@ namespace AutoDraw
         public void fileStationDataView(Control comp, List<string> listGridName, Dictionary<string, string> dictionyToFill, string tableName)
         {
             DataGridView componant = (DataGridView)comp;
-            System.Data.DataTable a = tableST.Tables["StationTable"];
+            System.Data.DataTable a = tableST.Tables[tableName];
             //stTable.Clear();
 
             foreach (var station in dictionyToFill)
@@ -3601,7 +3603,7 @@ namespace AutoDraw
         }
 
         /// <summary>
-        /// 
+        /// 向对应的控件datagridview填充站点信息
         /// </summary>
         /// <param name="comp"></param>
         /// <param name="listGridName"></param>
@@ -3626,8 +3628,8 @@ namespace AutoDraw
             }
             table.DefaultView.Sort = "公里" + " " + "ASC";
 
-            DataView dv = new DataView(table);
-            dv.Sort = "公里" + " " + "ASC";
+            //DataView dv = new DataView(table);
+            //dv.Sort = "公里" + " " + "ASC";
 
 
             stTable.DefaultView.ToTable();
@@ -3635,7 +3637,7 @@ namespace AutoDraw
             //dataGridView1.Columns.Add("里程", "名称");
             //dataGridView1.Columns.Add("EnglishName", "ChineseName"); 
             componant.DataSource = tableFill.Tables[tableName];
-            componant.Sort(componant.Columns["公里"], ListSortDirection.Ascending);
+            componant.Sort(componant.Columns[4], ListSortDirection.Ascending);
 
             /*dataGridView1.Columns.Add("设备1","equipe1");
             dataGridView1.Columns.Add("设备2", "equipe2");
@@ -4744,16 +4746,18 @@ namespace AutoDraw
                 Dictionary<string, string> RailstationPoint = new Dictionary<string, string>();
                 foreach (var par in origStation)
                 {
-                    if (par.Value.ToString().Contains("所") || par.Value.ToString().Contains("基站"))
+                    if (par.Value.ToString().Contains("站") && !par.Value.ToString().Contains("中继站") && !par.Value.ToString().Contains("基站"))
                     {
+                        
+                        RailstationPoint.Add(par.Key, par.Value);
                         STstationPoint.Add(par.Key, par.Value);
                     }
                     else
                     {
-                        RailstationPoint.Add(par.Key, par.Value);
+                        STstationPoint.Add(par.Key, par.Value);
                     }
                 }
-                origStation = applyRule(origStation); //根据新增规则筛选站点
+                //origStation = applyRule(origStation); //根据新增规则筛选站点
 
                 Dictionary<string, string> windPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPointLists");
                 Dictionary<string, string> rainPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists");
@@ -4820,11 +4824,11 @@ namespace AutoDraw
                 List<string> RainToStation = findNearestStation(tableRainLengt);//找到离每个雨点最近的基站、所亭
                 List<string> SnowToStation = findNearestStation(tableSnowLengt);//找到离每个雪点最近的基站、所亭
 
-                List<string> Station_Equi_List = new List<string>(); //各设备离最近所亭列表
-                List<string> SEWindPair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);//生成各个风点最近站点、所亭列表
+
+                List<string> SEWindPair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);//根据功能：findNearestStation返回的字符串列表，生成各个风点最近站点、所亭列表
                 List<string> SERainPair = StationToEquipInfo(RainToStation, STstationPoint, rainPoint);//生成各个雨点最近站点、所亭列表
                 List<string> SESnowPair = StationToEquipInfo(SnowToStation, STstationPoint, snowPoint);//生成各个雪点最近站点、所亭列表
-                
+
                 /*
                  * List<string> SEEarthPair = new List<string>();                                         //生成各个地震点最近站点、所亭列表
 
@@ -4847,7 +4851,7 @@ namespace AutoDraw
                 }
                  */
 
-                List<string> connectionDict = new List<string>();
+                List<string> Station_Equi_List = new List<string>(); //各设备离最近所亭列表
 
                 //汇总风、雨、雪设备的‘站点_设备'表
                 foreach (var wind in SEWindPair)
@@ -4899,12 +4903,13 @@ namespace AutoDraw
                 //写入‘基站-设备’的连接信息。
                 Station_Equipe_Line_List = XF.createConnectionXml(xmlFilePath + "\\setting.xml", lineOfFournisseur, Station_Equi_List);
 
+                /*List<string> connectionDict = new List<string>();
                 foreach (var _station_Equipe in Station_Equi_List)
                 {
                     string station = _station_Equipe.Split(new char[] { '_' })[0];
                     string equipe = _station_Equipe.Split(new char[] { '_' })[1];
                     connectionDict.Add(station + "-" + equipe);
-                }
+                }*/
                 #region 该控件已隐藏。功能暂时废弃
                 /*
 
@@ -5026,10 +5031,10 @@ namespace AutoDraw
 
 
         /// <summary>
-        /// 找到离横坐标（防灾设备）对应的监控点最近的基站、所亭
+        /// 找到离横坐标（防灾设备）对应的监控点最近的基站、所亭.
         /// </summary>
         /// <param name="tableDistance"></param>
-        /// <returns></returns>
+        /// <returns>输出字符串列表，每项格式为“x-x”，如“0-2”表示第1个设备离第3个站点最近</returns>
         public List<string> findNearestStation(int[,] tableDistance)
         {
             List<string> connectStation = new List<string>();
@@ -5526,7 +5531,7 @@ namespace AutoDraw
                                     ed.WriteMessage("重新绘图案。");
                                     //如果确认删除，则删除xml文件中对应的连接数据
                                     XmlFunction xf = new XmlFunction();
-                                    ClassStruct.StationPoint not_draw_station = new ClassStruct.StationPoint(sLocation, sName, sType, 0);
+                                    ClassStruct.StationPoint not_draw_station = new ClassStruct.StationPoint(sLocation, sName, sType, 0,"");
                                     xf.addNotDrawBlock(xmlFilePath + "\\setting.xml", not_draw_station);
                                     //xf.removeConnection(xmlFilePath + "\\setting.xml", sName); //
 
@@ -5583,7 +5588,7 @@ namespace AutoDraw
                 if(MessageBox.Show("是否删除项目：\n\t" + ItemType+","+ subItemName+","+ subItemLocation + "?", "注意", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
                     XmlFunction xf = new XmlFunction();
-                    xf.supNotDrawBlock(xmlFilePath + "\\setting.xml", new ClassStruct.StationPoint(subItemLocation, subItemName, ItemType, 0));
+                    xf.supNotDrawBlock(xmlFilePath + "\\setting.xml", new ClassStruct.StationPoint(subItemLocation, subItemName, ItemType, 0, ""));
                     refreshAbandoneBlock(xmlFilePath + "\\setting.xml");
                 }
 
