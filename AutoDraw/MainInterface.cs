@@ -69,7 +69,15 @@ namespace AutoDraw
         /// </summary>
         List<string> ListFournniseur = new List<string>();
         Dictionary<string, string> LineTypeInfo = new Dictionary<string, string>();
+        
+        //站点-设备列表
+        List<ClassStruct.ConnectionAndLine> Station_Equipe_Line_List = new List<ClassStruct.ConnectionAndLine>();
 
+        Dictionary<string, string> STstationPoint; //站点列表
+        Dictionary<string, string> RailstationPoint; //车站列表
+
+        //选中供应商线缆类型
+        List<ClassStruct.LineType> lineOfFournisseur;
 
         public MainInterface()
         {
@@ -1534,6 +1542,7 @@ namespace AutoDraw
         //string filePath;
         private void MainInterface_Load(object sender, EventArgs e)
         {
+            //B_FunDraw.Enabled = false;
             InforStatusLabel.Text = "";
             colName = new List<string>();
             colName.Add("里程");
@@ -2906,7 +2915,7 @@ namespace AutoDraw
             CreateNode(xmlDoc, WayPointNode, "EarthPointLists", "");//地震点
 
 
-            CreateNode(xmlDoc, root, "Connection", ""); //监控设备与站点的连接信息
+            CreateNode(xmlDoc, root, "Connections", ""); //监控设备与站点的连接信息
             
             try
             {
@@ -4725,183 +4734,8 @@ namespace AutoDraw
             if (listView1.Items.Count!=0) //检查是否有导入图块
             {
 
-                if (C_Fournisseur.SelectedItem.ToString() == "") //检查是否有选择供应商下拉框
-                {
-                    MessageBox.Show("请选择设备供应商！", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                XmlFunction XF = new XmlFunction();
-
-                if (XF.readProjrtInfo(xmlFilePath + "\\setting.xml") == null || XF.readProjrtInfo(xmlFilePath + "\\setting.xml").ProjectName == "?") //检查是否有设置图纸名称
-                {
-                    MessageBox.Show("请先设置图纸名称。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    return;
-                }
-
-                #region 读取数据
-                Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists"); //读取站点列表
-                Dictionary<string, string> STstationPoint = new Dictionary<string, string>();
-                Dictionary<string, string> RailstationPoint = new Dictionary<string, string>();
-                foreach (var par in origStation)
-                {
-                    if (par.Value.ToString().Contains("站") && !par.Value.ToString().Contains("中继站") && !par.Value.ToString().Contains("基站"))
-                    {
-                        
-                        RailstationPoint.Add(par.Key, par.Value);
-                        STstationPoint.Add(par.Key, par.Value);
-                    }
-                    else
-                    {
-                        STstationPoint.Add(par.Key, par.Value);
-                    }
-                }
-                //origStation = applyRule(origStation); //根据新增规则筛选站点
-
-                Dictionary<string, string> windPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPointLists");
-                Dictionary<string, string> rainPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists");
-                Dictionary<string, string> snowPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPointLists");
-                Dictionary<string, string> earthPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "EarthPointLists");
-                #endregion
-
-                #region 生成二维数组
-                int stationNum = STstationPoint.Count();
-
-                int[,] tableWindLengt = new int[windPoint.Count, stationNum]; //生成风距离表
-                int[,] tableRainLengt = new int[rainPoint.Count, stationNum]; //生成雨距离表
-                int[,] tableSnowLengt = new int[snowPoint.Count, stationNum]; //生成雪距离表
-
-                //填充风距离表
-                int W_w = 0;
-                int W_h = 0;
-
-                int R_w = 0;
-                int R_h = 0;
-
-
-                int S_w = 0;
-                int S_h = 0;
-
-                //填充风点,计算风点与站点间距
-                foreach (var Sstation in STstationPoint)
-                {
-                    W_w = 0;
-                    foreach (var wind in windPoint)
-                    {
-                        tableWindLengt[W_w, W_h] = (int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(wind.Value.ToString().Split(new char[] { ',' })[2]));
-                        W_w++;
-                    }
-                    W_h++;
-                }
-
-                //填充雨距离表,计算雨点与站点间距
-                foreach (var Sstation in STstationPoint)
-                {
-                    R_w = 0;
-                    foreach (var rain in rainPoint)
-                    {
-                        tableRainLengt[R_w, R_h] = (int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(rain.Value.ToString().Split(new char[] { ',' })[2]));
-                        R_w++;
-                    }
-                    R_h++;
-                }
-
-                //填充雪距离表,计算雪点与站点间距
-                foreach (var Sstation in STstationPoint)
-                {
-                    S_w = 0;
-                    foreach (var snow in snowPoint)
-                    {
-                        tableSnowLengt[S_w, S_h] = (int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(snow.Value.ToString().Split(new char[] { ',' })[2]));
-                        S_w++;
-                    }
-                    S_h++;
-                }
-                #endregion
-
-                List<string> WindToStation = findNearestStation(tableWindLengt);//找到离每个风点最近的基站、所亭
-                List<string> RainToStation = findNearestStation(tableRainLengt);//找到离每个雨点最近的基站、所亭
-                List<string> SnowToStation = findNearestStation(tableSnowLengt);//找到离每个雪点最近的基站、所亭
-
-
-                List<string> SEWindPair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);//根据功能：findNearestStation返回的字符串列表，生成各个风点最近站点、所亭列表
-                List<string> SERainPair = StationToEquipInfo(RainToStation, STstationPoint, rainPoint);//生成各个雨点最近站点、所亭列表
-                List<string> SESnowPair = StationToEquipInfo(SnowToStation, STstationPoint, snowPoint);//生成各个雪点最近站点、所亭列表
-
-                /*
-                 * List<string> SEEarthPair = new List<string>();                                         //生成各个地震点最近站点、所亭列表
-
-                foreach (KeyValuePair<string, string> earth in earthPoint)
-                {
-                    string[] values = earth.Value.Split(new char[] { ',' });
-                    string stationNameType = values[1];
-                    string stationValue = "";
-                    if (stationNameType.Contains("牵引变电所"))
-                    {
-                        string stationName = stationNameType.Split(new char[] { '牵' })[0];
-                        string stationType = '牵' + stationNameType.Split(new char[] { '牵' })[1];
-                        stationValue = stationName + "," + stationType + earth.Value.Split(new char[] { ',' })[2];
-                    }
-                    else
-                    {
-
-                    }
-                    SEEarthPair.Add(earth.Key + "," + stationValue + "_" + earth.Key + "," + earth.Value);
-                }
-                 */
-
-                List<string> Station_Equi_List = new List<string>(); //各设备离最近所亭列表
-
-                //汇总风、雨、雪设备的‘站点_设备'表
-                foreach (var wind in SEWindPair)
-                {
-                    Station_Equi_List.Add(wind);
-                }
-                foreach (var rain in SERainPair)
-                {
-                    Station_Equi_List.Add(rain);
-                }
-                foreach (var snow in SESnowPair)
-                {
-                    Station_Equi_List.Add(snow);
-                }
-
-
-                //写入连接情况
-                //XmlFunction xF = new XmlFunction();
-                XF.removeConnection(xmlFilePath + "\\setting.xml"); //删除所有connection节点
-
-                selectedWayPoint.Nodes.Clear(); //清空点
-
-                #region 读取线缆规则类型
-                LineTypeInfo = XF.loadLineType(xmlFilePath + "\\setting.xml"); //读取线缆类型表
-
-                List<ClassStruct.LineType> lineOfFournisseur = new List<ClassStruct.LineType>();
-                //Dictionary<string, string> LineByFournisseur = new Dictionary<string, string>();
-                foreach(KeyValuePair<string,string> linelist in LineTypeInfo)
-                {
-                    if (linelist.Value.Contains(C_Fournisseur.SelectedItem.ToString()))  //根据下拉框选择的设备商名字筛选线型规则
-                    { 
-                        //LineByFournisseur.Add(linelist.Key, linelist.Value);
-                        string[] splitValue = linelist.Value.Split(new char[] { ',' });
-
-
-                        ClassStruct.LineType lineDefinition = new ClassStruct.LineType(splitValue[1], linelist.Key, splitValue[4], double.Parse(splitValue[2]), splitValue[3], double.Parse(splitValue[5]), double.Parse(splitValue[6]));
-
-                        lineOfFournisseur.Add(lineDefinition);
-
-
-                    }
-
-
-                }
-                #endregion
-
-
-                List<ClassStruct.ConnectionAndLine> Station_Equipe_Line_List = new List<ClassStruct.ConnectionAndLine>();
-                //写入‘基站-设备’的连接信息。
-                Station_Equipe_Line_List = XF.createConnectionXml(xmlFilePath + "\\setting.xml", lineOfFournisseur, Station_Equi_List);
+                //XmlFunction XF = new XmlFunction(
+                
 
                 /*List<string> connectionDict = new List<string>();
                 foreach (var _station_Equipe in Station_Equi_List)
@@ -4972,8 +4806,27 @@ namespace AutoDraw
                 //绘制系统图
 
 
-                //绘制电缆径路示意图。传递RailstationPoint站点信息用户绘制车站标，传递connectionDict连接信息绘制设备、线缆
-                DrawPicture(RailstationPoint, Station_Equipe_Line_List);
+                try
+                {
+                    if (RailstationPoint.Count == 0 || Station_Equipe_Line_List.Count == 0)
+                    {
+                        XmlFunction XF = new XmlFunction();
+                        Station_Equipe_Line_List = XF.loadConnectionXml(xmlFilePath + "\\setting.xml");
+                    }
+                    else
+                    {
+
+                        //绘制电缆径路示意图。传递RailstationPoint站点信息用户绘制车站标，传递connectionDict连接信息绘制设备、线缆
+                        DrawPicture(RailstationPoint, Station_Equipe_Line_List);
+                        B_FunDraw.Enabled = true;
+                    }
+                }
+                catch (System.Exception ee)
+                {
+
+                    B_FunDraw.Enabled = false; ;
+                    throw;
+                }
             }
             else
             {
@@ -5621,6 +5474,186 @@ namespace AutoDraw
                     ListFournniseur.Add(fournisseur);
                 }
             }
+        }
+
+        private void B_ReCalcule_Click(object sender, EventArgs e)
+        {
+            if (C_Fournisseur.SelectedItem.ToString() == "") //检查是否有选择供应商下拉框
+            {
+                MessageBox.Show("请选择设备供应商！", "注意", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            XmlFunction XF = new XmlFunction();
+
+            if (XF.readProjrtInfo(xmlFilePath + "\\setting.xml") == null || XF.readProjrtInfo(xmlFilePath + "\\setting.xml").ProjectName == "?") //检查是否有设置图纸名称
+            {
+                MessageBox.Show("请先设置图纸名称。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                return;
+            }
+
+            #region 读取数据
+            Dictionary<string, string> origStation = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists"); //读取站点列表
+            STstationPoint = new Dictionary<string, string>(); //站点列表
+            RailstationPoint = new Dictionary<string, string>();  //车站列表
+            foreach (var par in origStation)
+            {
+                if (par.Value.ToString().Contains("站") && !par.Value.ToString().Contains("中继站") && !par.Value.ToString().Contains("基站"))
+                {
+
+                    RailstationPoint.Add(par.Key, par.Value);
+                    STstationPoint.Add(par.Key, par.Value);
+                }
+                else
+                {
+                    STstationPoint.Add(par.Key, par.Value);
+                }
+            }
+            //origStation = applyRule(origStation); //根据新增规则筛选站点
+
+            Dictionary<string, string> windPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "WindPointLists");
+            Dictionary<string, string> rainPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "RainPointLists");
+            Dictionary<string, string> snowPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "SnowPointLists");
+            Dictionary<string, string> earthPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "EarthPointLists");
+            #endregion
+
+            #region 生成二维数组
+            int stationNum = STstationPoint.Count();
+
+            int[,] tableWindLengt = new int[windPoint.Count, stationNum]; //生成风距离表
+            int[,] tableRainLengt = new int[rainPoint.Count, stationNum]; //生成雨距离表
+            int[,] tableSnowLengt = new int[snowPoint.Count, stationNum]; //生成雪距离表
+
+            //填充风距离表
+            int W_w = 0;
+            int W_h = 0;
+
+            int R_w = 0;
+            int R_h = 0;
+
+
+            int S_w = 0;
+            int S_h = 0;
+
+            //填充风点,计算风点与站点间距
+            foreach (var Sstation in STstationPoint)
+            {
+                W_w = 0;
+                foreach (var wind in windPoint)
+                {
+                    tableWindLengt[W_w, W_h] = (int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(wind.Value.ToString().Split(new char[] { ',' })[2]));
+                    W_w++;
+                }
+                W_h++;
+            }
+
+            //填充雨距离表,计算雨点与站点间距
+            foreach (var Sstation in STstationPoint)
+            {
+                R_w = 0;
+                foreach (var rain in rainPoint)
+                {
+                    tableRainLengt[R_w, R_h] = (int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(rain.Value.ToString().Split(new char[] { ',' })[2]));
+                    R_w++;
+                }
+                R_h++;
+            }
+
+            //填充雪距离表,计算雪点与站点间距
+            foreach (var Sstation in STstationPoint)
+            {
+                S_w = 0;
+                foreach (var snow in snowPoint)
+                {
+                    tableSnowLengt[S_w, S_h] = (int.Parse(Sstation.Value.ToString().Split(new char[] { ',' })[2]) - int.Parse(snow.Value.ToString().Split(new char[] { ',' })[2]));
+                    S_w++;
+                }
+                S_h++;
+            }
+            #endregion
+
+            List<string> WindToStation = findNearestStation(tableWindLengt);//找到离每个风点最近的基站、所亭
+            List<string> RainToStation = findNearestStation(tableRainLengt);//找到离每个雨点最近的基站、所亭
+            List<string> SnowToStation = findNearestStation(tableSnowLengt);//找到离每个雪点最近的基站、所亭
+
+
+            List<string> SEWindPair = StationToEquipInfo(WindToStation, STstationPoint, windPoint);//根据功能：findNearestStation返回的字符串列表，生成各个风点最近站点、所亭列表
+            List<string> SERainPair = StationToEquipInfo(RainToStation, STstationPoint, rainPoint);//生成各个雨点最近站点、所亭列表
+            List<string> SESnowPair = StationToEquipInfo(SnowToStation, STstationPoint, snowPoint);//生成各个雪点最近站点、所亭列表
+
+            /*
+             * List<string> SEEarthPair = new List<string>();                                         //生成各个地震点最近站点、所亭列表
+
+            foreach (KeyValuePair<string, string> earth in earthPoint)
+            {
+                string[] values = earth.Value.Split(new char[] { ',' });
+                string stationNameType = values[1];
+                string stationValue = "";
+                if (stationNameType.Contains("牵引变电所"))
+                {
+                    string stationName = stationNameType.Split(new char[] { '牵' })[0];
+                    string stationType = '牵' + stationNameType.Split(new char[] { '牵' })[1];
+                    stationValue = stationName + "," + stationType + earth.Value.Split(new char[] { ',' })[2];
+                }
+                else
+                {
+
+                }
+                SEEarthPair.Add(earth.Key + "," + stationValue + "_" + earth.Key + "," + earth.Value);
+            }
+             */
+
+            List<string> Station_Equi_List = new List<string>(); //站点和离它最近的各类型前端设备的列表
+
+            //汇总风、雨、雪设备的‘站点_设备'表
+            foreach (var wind in SEWindPair)
+            {
+                Station_Equi_List.Add(wind);
+            }
+            foreach (var rain in SERainPair)
+            {
+                Station_Equi_List.Add(rain);
+            }
+            foreach (var snow in SESnowPair)
+            {
+                Station_Equi_List.Add(snow);
+            }
+
+
+            //写入连接情况
+            //XmlFunction xF = new XmlFunction();
+            XF.removeConnection(xmlFilePath + "\\setting.xml"); //删除所有connection节点
+
+            selectedWayPoint.Nodes.Clear(); //清空点
+
+            #region 读取线缆规则类型
+            LineTypeInfo = XF.loadLineType(xmlFilePath + "\\setting.xml"); //读取线缆类型表
+
+            lineOfFournisseur = new List<ClassStruct.LineType>();
+            //Dictionary<string, string> LineByFournisseur = new Dictionary<string, string>();
+            foreach (KeyValuePair<string, string> linelist in LineTypeInfo)
+            {
+                if (linelist.Value.Contains(C_Fournisseur.SelectedItem.ToString()))  //根据下拉框选择的设备商名字筛选线型规则
+                {
+                    //LineByFournisseur.Add(linelist.Key, linelist.Value);
+                    string[] splitValue = linelist.Value.Split(new char[] { ',' });
+
+
+                    ClassStruct.LineType lineDefinition = new ClassStruct.LineType(splitValue[1], linelist.Key, splitValue[4], double.Parse(splitValue[2]), splitValue[3], double.Parse(splitValue[5]), double.Parse(splitValue[6]));
+
+                    lineOfFournisseur.Add(lineDefinition);
+
+
+                }
+
+
+            }
+            #endregion
+
+            //写入‘基站-设备’的连接信息。
+            Station_Equipe_Line_List = XF.createConnectionXml(xmlFilePath + "\\setting.xml", lineOfFournisseur, Station_Equi_List);
+            B_FunDraw.Enabled = true;
         }
     }
 }

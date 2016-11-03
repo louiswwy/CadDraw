@@ -410,9 +410,23 @@ namespace AutoDraw
             xmlDoc.Save(xmlFile);
         }
 
-        public void loadConnectionXml(string xmlFile)
+        public List<ClassStruct.ConnectionAndLine> loadConnectionXml(string xmlFile)
         {
+            List<ClassStruct.ConnectionAndLine> loaded_Connection_Information = new List<ClassStruct.ConnectionAndLine>();
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+            XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
+            XmlNode subroot = root.SelectSingleNode("Connections");//查找<Connections> 
 
+            if (subroot != null)
+            {
+
+            }
+            else
+            {
+                return null;
+            }
+            return loaded_Connection_Information;
         }
 
         #endregion
