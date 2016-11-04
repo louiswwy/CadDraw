@@ -302,6 +302,7 @@ namespace AutoDraw
 
         public class LineInfor : LineType
         {
+            private string _fullname;
             private double _lineLength;
 
             public double lineLength
@@ -315,8 +316,24 @@ namespace AutoDraw
                     this._lineLength = value;
                 }
             }
+            public string fullname
+            {
+                get
+                {
+                    return this._fullname;
+                }
+                set
+                {
+                    this._fullname = value;
+                }
+            }
 
             public LineInfor() : base() { }
+            public LineInfor(string Full_Name,double line_Length)
+            {
+                lineLength = line_Length;
+                fullname = Full_Name;
+            }
 
             public LineInfor(string ShortName, string LineName, string FournisseurName, double LineType, string LineXin, double MinDistance, double MaxDistance, double LengthLine) : base(ShortName, LineName, FournisseurName, LineType, LineXin, MinDistance, MaxDistance)
             {

@@ -412,21 +412,60 @@ namespace AutoDraw
 
         public List<ClassStruct.ConnectionAndLine> loadConnectionXml(string xmlFile)
         {
-            List<ClassStruct.ConnectionAndLine> loaded_Connection_Information = new List<ClassStruct.ConnectionAndLine>();
+            List<ClassStruct.ConnectionAndLine> List_loaded_Connection_Information = new List<ClassStruct.ConnectionAndLine>();
+            ClassStruct.ConnectionAndLine loaded_Connection_Information; 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlFile);
             XmlNode root = xmlDoc.SelectSingleNode("Projet");//查找<Projet> 
             XmlNode subroot = root.SelectSingleNode("Connections");//查找<Connections> 
 
-            if (subroot != null)
+            if (subroot != null&& subroot.HasChildNodes)
             {
+                XmlNodeList childNodesList = subroot.ChildNodes;
+                foreach (XmlElement childNode in childNodesList)
+                {
+                    XmlNode StationNode       = childNode.SelectSingleNode("Station");
+                    XmlElement stationElement = (XmlElement)StationNode;
+                    string stationName        = stationElement.InnerText.ToString();
+                    string stationLocation    = stationElement.GetAttribute("Stationlocation");
+                    string stationType        = stationElement.GetAttribute("StationType");
+                    string stationPosition    = stationElement.GetAttribute("PPosition");
+
+                    XmlNode EquipeNode        = childNode.SelectSingleNode("Equipement");
+                    XmlElement equipeElement  = (XmlElement)EquipeNode;
+                    string equipeName         = equipeElement.InnerText.ToString();
+                    string equipeLocation     = equipeElement.GetAttribute("Equipelocation");
+                    string equipeType         = equipeElement.GetAttribute("EquipeType");
+                    string equipePosition     = equipeElement.GetAttribute("PPosition");
+
+                    XmlNode LineNode = childNode.SelectSingleNode("Line");
+                    XmlElement lineElement = (XmlElement)LineNode;
+                    string lineName = lineElement.InnerText.ToString();
+                    string lineLength = lineElement.GetAttribute("distance");
+                    PFunction pf = new PFunction();
+
+                    List<string> listLoc = new List<string>();
+                    pf.isExMatch(stationLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+                    double station_distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+
+                    ClassStruct.StationPoint station = new ClassStruct.StationPoint(stationLocation, stationName, stationType, System.Convert.ToInt32(station_distance), stationPosition);
+
+                    pf.isExMatch(equipeLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+                    double equipe_distance = Int32.Parse(listLoc[1]) * 1000 + Int32.Parse(listLoc[2]);
+                    ClassStruct.EquipePoint equipe = new ClassStruct.EquipePoint(equipeLocation, equipeName, equipeType, System.Convert.ToInt32(equipe_distance), equipePosition);
+
+                    ClassStruct.LineInfor line = new ClassStruct.LineInfor(lineName, System.Convert.ToDouble(lineLength));
+                    loaded_Connection_Information = new ClassStruct.ConnectionAndLine(station, equipe, line);
+                    List_loaded_Connection_Information.Add(loaded_Connection_Information);
+                }
+                    
 
             }
             else
             {
                 return null;
             }
-            return loaded_Connection_Information;
+            return List_loaded_Connection_Information;
         }
 
         #endregion

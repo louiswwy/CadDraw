@@ -91,15 +91,17 @@ namespace AutoDraw
         }
 
         /// <summary>
-        /// 绘制防灾设备电缆径路图
+        /// 绘制防灾系统图纸（防灾设备电缆径路图、系统示意图）
         /// </summary>
-        /// <param name="dictRailStation">基站、所亭表</param>
-        /// <param name="connectionDict">‘基站-防灾设备’连接情况</param>
-        public void DrawPicture(Dictionary<string,string> dictRailStation, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine)
+        /// <param name="dictStation">车站、基站、所亭表</param>
+        /// <param name="dictRailStation">车站表</param>
+        /// <param name="List_ConnectionAndLine">车站-设备连接表</param>
+        public void DrawPicture(Dictionary<string, string> dictStation, Dictionary<string,string> dictRailStation, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine)
         {
             XmlFunction xF = new XmlFunction();
             ClassStruct.ProjectInfo projetInfor;
 
+            //读取最新的项目信息
             projetInfor = xF.readProjrtInfo(xmlFilePath + "\\setting.xml");
             DocumentLock m_DocumentLock = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.LockDocument();
 
@@ -126,21 +128,32 @@ namespace AutoDraw
             List<ClassStruct.StationPoint> StationList = new List<ClassStruct.StationPoint>();
             List<string> list_station = new List<string>();
 
-            foreach(var ConnectionAndLine in List_ConnectionAndLine)
+            foreach(KeyValuePair<string,string> pair in dictStation)
             {
-                if (!StationList.Contains(ConnectionAndLine.station))
+                string[] lists = pair.Value.ToString().Split(new char[] { ',' });
+                //int a = System.Convert.ToInt32(lists[2]);
+                
+
+                ClassStruct.StationPoint Station = new ClassStruct.StationPoint(pair.Key, lists[0], lists[1], System.Convert.ToInt32(lists[2]), lists[3]);
+                StationList.Add(Station);
+            }
+            /*foreach(var ConnectionAndLine in List_ConnectionAndLine)
+            {
+                if (!StationList(ConnectionAndLine.station))
                 {
                     StationList.Add(ConnectionAndLine.station);
                 }
                 //StationList.Add(item.Split(new char[] { '-' })[0]); //车站
-            }
+            }*/
 
             //List<string>  Stations= StationList.Union(StationList).ToList();  //去除重复项 得到无重复的基站、所亭的列表
 
             List<string> unCheckConnection = new List<string>();
 
             #region 对车站列表排序
+            //图纸默认插入点
             Point3d insertSystemPoint = new Point3d(insertOriginSignlePoint.X, insertOriginSignlePoint.Y + 600, 0);
+
             List<KeyValuePair<int, string>> tempdictionary = new List<KeyValuePair<int, string>>(); 
             List<ClassStruct.StationPoint> RailWayStation = new List<ClassStruct.StationPoint>();
             foreach (KeyValuePair<string, string> pair in dictRailStation)
@@ -155,6 +168,7 @@ namespace AutoDraw
             }
             #endregion
 
+            //系统图to be check
             DrawSystemPicture(insertSystemPoint, RailWayStation, StationList, List_ConnectionAndLine, fontStyleId);
 
 
@@ -162,13 +176,14 @@ namespace AutoDraw
             {
                 stationBeDraw = _station;
                 equipeBeDraw = new List<ClassStruct.EquipePoint>();
-
+                List<ClassStruct.ConnectionAndLine> connection_to_be_draw = new List<ClassStruct.ConnectionAndLine>();
                 //以所亭信息为准合并同类项
                 //foreach (var item in connectionDict)
                 foreach (var item in List_ConnectionAndLine)
                 {
                     if (item.station.name == stationBeDraw.name && item.station.location == stationBeDraw.location && item.station.type == stationBeDraw.type)
                     {
+                        connection_to_be_draw.Add(item);
                         equipeBeDraw.Add(item.equipe); //将绘制的设备列表
                     }
 
@@ -184,6 +199,10 @@ namespace AutoDraw
 
                 int STLocation = stationBeDraw.distance; //所亭里程
 
+                ClassStruct.StationPoint LeftStation;
+                ClassStruct.StationPoint RightStation;
+
+                
                 List<string> stationList = new List<string>(); //站点信息List表
                 //确定基站在哪个区间内，从后向前比较
                 foreach (var stat in dictRailStation)
@@ -225,7 +244,7 @@ namespace AutoDraw
 
                 #endregion
 
-                drawSingleStationPicture(insertSignlePoint, fontStyleId, projetInfor, stationBeDraw, leftRightStation, equipeBeDraw, List_ConnectionAndLine, drawRound);// connectionDict);//绘制单基站
+                drawSingleStationPicture(insertSignlePoint, fontStyleId, projetInfor, stationBeDraw, leftRightStation, equipeBeDraw, connection_to_be_draw, drawRound);// connectionDict);//绘制单基站
 
             }
 
@@ -316,7 +335,7 @@ namespace AutoDraw
                     {
                         attTQ.Add("图纸名称", projetInfo.PrintNamePattern.PrintName + "-" + pictureNum);
                     }
-                    attTQ.Add("图纸比例", "1：100");
+                    attTQ.Add("图纸比例", "");
                     attTQ.Add("绘制日期", System.DateTime.Now.Year + "." + System.DateTime.Now.Month);
                     attTQ.Add("页数", "第1张，共1张");
 
@@ -378,13 +397,13 @@ namespace AutoDraw
                     //站间里程
                     //DBText DistanceText = (DBText)insertText(textDistance, new Point3d(innerStartPoint.X + 264, innerStartPoint.Y + 240, 0), fontStyleId);
                     //db2.AddToModelSpace(DistanceText);
-                    
+                    //标注
                     AlignedDimension dimAlignedStations = new AlignedDimension();
                     dimAlignedStations.XLine1Point = new Point3d(innerStartPoint.X + 175 + 188, innerStartPoint.Y + 238 + 4, 0);
                     dimAlignedStations.XLine2Point = new Point3d(innerStartPoint.X + 175 - 8.21, innerStartPoint.Y + 238 + 4, 0);
                     dimAlignedStations.DimLinePoint = GeTools.MidPoint(new Point3d(innerStartPoint.X + 175 + 188, innerStartPoint.Y + 238 + 4, 0), new Point3d(innerStartPoint.X + 175 - 8.21, innerStartPoint.Y + 238 + 4, 0)).PolarPoint(0, 10);
                     //dimAlignedStations.te
-                    dimAlignedStations.DimensionText = Math.Round(Convert.ToDouble(textDistance) / 1000, 1).ToString() + "km";
+                    dimAlignedStations.DimensionText = Math.Round(Convert.ToDouble(textDistance) / 1000, 1).ToString() + "km"; //站间距
                     db2.AddToModelSpace(dimAlignedStations);
 
 
@@ -409,13 +428,14 @@ namespace AutoDraw
                     Dictionary<string, ClassStruct.KeyPoint> drawComponent = new Dictionary<string, ClassStruct.KeyPoint>();
 
                     drawFunction drawF = new drawFunction();
+
                     #region 对设备、基站的里程排序
                     //比较设备和基站的里程大小
                     List<KeyValuePair<int, string>> lstorder=new List<KeyValuePair<int, string>>();
                     Dictionary<string, int> lichengList = new Dictionary<string, int>();
                     try
                     {
-                        lichengList.Add(StationToBeDraw.distance + "," + StationToBeDraw.type, StationToBeDraw.distance);
+                        lichengList.Add(StationToBeDraw.distance + "," + StationToBeDraw.type + "," + StationToBeDraw.name + "," + StationToBeDraw.pposition, StationToBeDraw.distance);
                         foreach (var a in List_EquipmentInfor)
                         {
                             lichengList.Add(a.distance + "," + a.type, a.distance);
@@ -678,7 +698,7 @@ namespace AutoDraw
 
                     //绘制图纸名字
                     StringBuilder DrawNameString = new StringBuilder();
-                    DrawNameString.Append("施工图" + System.Environment.NewLine + StationToBeDraw.type + "(" + StationToBeDraw.location + ")" + System.Environment.NewLine + "防灾安全监控系统电缆径路示意图");
+                    DrawNameString.Append("施工图" + System.Environment.NewLine + StationToBeDraw.name + "(" + StationToBeDraw.location + ")" + System.Environment.NewLine + "防灾安全监控系统电缆径路示意图");
                     MText DrawName = new MText();
                     DrawName.Location = new Point3d(innerStartPoint.X + 299, innerStartPoint.Y + 13.5, 0);
                     DrawName.TextStyleId = fontStyleId;
@@ -4808,23 +4828,37 @@ namespace AutoDraw
 
                 try
                 {
-                    if (RailstationPoint.Count == 0 || Station_Equipe_Line_List.Count == 0)
+                    XmlFunction XF = new XmlFunction();
+
+                    if (RailstationPoint == null || RailstationPoint.Count == 0 || Station_Equipe_Line_List == null)
                     {
-                        XmlFunction XF = new XmlFunction();
+                        RailstationPoint = new Dictionary<string, string>();
+                        STstationPoint = XF.loadWayPoint(xmlFilePath + "\\setting.xml", "StationPointLists"); //读取站点列表
                         Station_Equipe_Line_List = XF.loadConnectionXml(xmlFilePath + "\\setting.xml");
+                        foreach(var tempStation in STstationPoint)
+                        {
+                            if (tempStation.Value.Contains("车站"))
+                            {
+                                RailstationPoint.Add(tempStation.Key, tempStation.Value);
+                            }
+                            
+                        }
+                        string a = "";
+                        //Station_Equipe_Line_List = XF.loadConnectionXml(xmlFilePath + "\\setting.xml");
                     }
                     else
                     {
 
-                        //绘制电缆径路示意图。传递RailstationPoint站点信息用户绘制车站标，传递connectionDict连接信息绘制设备、线缆
-                        DrawPicture(RailstationPoint, Station_Equipe_Line_List);
                         B_FunDraw.Enabled = true;
                     }
+
+                    //绘制电缆径路示意图。传递RailstationPoint站点信息用户绘制车站标，传递connectionDict连接信息绘制设备、线缆
+                    DrawPicture(STstationPoint, RailstationPoint, Station_Equipe_Line_List);
                 }
                 catch (System.Exception ee)
                 {
 
-                    B_FunDraw.Enabled = false; ;
+                    //B_FunDraw.Enabled = false; ;
                     throw;
                 }
             }
