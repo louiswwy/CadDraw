@@ -171,6 +171,9 @@ namespace AutoDraw
             //系统图to be check
             DrawSystemPicture(insertSystemPoint, RailWayStation, StationList, List_ConnectionAndLine, fontStyleId);
 
+            XmlFunction xf = new XmlFunction();
+            LineTypeInfo = xf.loadLineType(xmlFilePath + "\\setting.xml");
+
 
             foreach (var _station in StationList) //
             {
@@ -198,53 +201,41 @@ namespace AutoDraw
                 //string[] a = stationBeDraw.ToString().Split(new char[] { ',' });
 
                 int STLocation = stationBeDraw.distance; //所亭里程
-
-                ClassStruct.StationPoint LeftStation;
-                ClassStruct.StationPoint RightStation;
-
-                
-                List<string> stationList = new List<string>(); //站点信息List表
-                //确定基站在哪个区间内，从后向前比较
-                foreach (var stat in dictRailStation)
-                {
-                    stationList.Add(stat.Key + "," + stat.Value); //dictionary -> list
-                }
-
-                string leftStation = ""; //左侧站点
-                string RighStation = ""; //右侧站点
-
+                                
+                ClassStruct.StationPoint leftStation; //左侧站点
+                ClassStruct.StationPoint RighStation; //右侧站点
+                List<ClassStruct.StationPoint> leftRightStation = new List<ClassStruct.StationPoint>();
                 //绘图系统图起点位置 （左下角）
 
-
-                for (int _rsCount = 0; _rsCount < stationList.Count; _rsCount++)
+                //RailWayStation
+                for (int _rsCount = 0; _rsCount < RailWayStation.Count; _rsCount++)
                 {
-                    if (STLocation < int.Parse(stationList[_rsCount].Split(new char[] { ',' })[3])) //当所亭所在里程比当前站点小时
+                    if (STLocation < RailWayStation[_rsCount].distance) //当所亭所在里程比当前站点小时
                     {
-                        RighStation = stationList[_rsCount];//右侧站点等于该车站
-
-                        if (_rsCount > 0) //当_rsCount大于0时，说明左侧还有车站
-                        {
-                            leftStation = stationList[_rsCount - 1];// 左侧车站为列表中前一个车站
-                            break;
-                        }
-                    }
-                    else if (STLocation > int.Parse(stationList[_rsCount].Split(new char[] { ',' })[3]) && _rsCount == stationList.Count - 1) //当基站里程比最远车站还要大时
-                    {
-                        RighStation = "";
-                        leftStation = stationList[_rsCount];
+                        RighStation = new ClassStruct.StationPoint(RailWayStation[_rsCount].location, RailWayStation[_rsCount].name, RailWayStation[_rsCount].type, RailWayStation[_rsCount].distance, RailWayStation[_rsCount].pposition);//stationList[_rsCount];//右侧站点等于该车站
+                        leftStation = new ClassStruct.StationPoint(RailWayStation[_rsCount - 1].location, RailWayStation[_rsCount - 1].name, RailWayStation[_rsCount - 1].type, RailWayStation[_rsCount - 1].distance, RailWayStation[_rsCount - 1].pposition);//stationList[_rsCount];//右侧站点等于该车站
+                        leftRightStation.Add(leftStation);
+                        leftRightStation.Add(RighStation);
                         break;
                     }
 
+
                 }
-
-                List<string> leftRightStation = new List<string>();
-
-                leftRightStation.Add(leftStation);
-                leftRightStation.Add(RighStation);
+                
 
                 #endregion
 
-                drawSingleStationPicture(insertSignlePoint, fontStyleId, projetInfor, stationBeDraw, leftRightStation, equipeBeDraw, connection_to_be_draw, drawRound);// connectionDict);//绘制单基站
+                try
+                {
+                    drawSingleStationPicture(insertSignlePoint, fontStyleId, projetInfor, stationBeDraw, leftRightStation, equipeBeDraw, connection_to_be_draw, drawRound, LineTypeInfo);// connectionDict);//绘制单基站
+                }
+                catch (System.Exception ee)
+                {
+
+                    MessageBox.Show("出现错误！" + System.Environment.NewLine + "\t错误信息:" + ee.ToString(), "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    throw;
+                }
+                
 
             }
 
@@ -261,7 +252,7 @@ namespace AutoDraw
         /// <param name="StationToBeDraw">基站、所亭</param>
         /// <param name="LeftRightStation">相对于基站的左右车站</param>
         /// <param name="List_EquipmentInfor">防灾设备清单</param>
-        public void drawSingleStationPicture(Point2d insertSignlePoint, ObjectId fontStyleId, ClassStruct.ProjectInfo projetInfo, ClassStruct.StationPoint StationToBeDraw, List<string> LeftRightStation, List<ClassStruct.EquipePoint> List_EquipmentInfor, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine,int drawNum)//List<string> connectionDict)
+        public void drawSingleStationPicture(Point2d insertSignlePoint, ObjectId fontStyleId, ClassStruct.ProjectInfo projetInfo, ClassStruct.StationPoint StationToBeDraw, List<ClassStruct.StationPoint> LeftRightStation, List<ClassStruct.EquipePoint> List_EquipmentInfor, List<ClassStruct.ConnectionAndLine> List_ConnectionAndLine, int drawNum, Dictionary<string, string> LineTypeInfo)//List<string> connectionDict)
         {
             Point2d outerStartPoint = insertSignlePoint;
             Point2d outerEndPoint = new Point2d(outerStartPoint.X + 420, outerStartPoint.Y + 297);
@@ -366,27 +357,27 @@ namespace AutoDraw
                     int departStation = 0;
                     int arriveStation = 0;
 
-                    if (LeftRightStation[0] != "")
+                    if (LeftRightStation[0] != null)
                     {
                         Dictionary<string, string> attArrive = new Dictionary<string, string>();
                        
-                        attArrive.Add("站名", LeftRightStation[1].Split(new char[] { ',' })[1]);
-                        attArrive.Add("里程", LeftRightStation[1].Split(new char[] { ',' })[0]);
+                        attArrive.Add("站名", LeftRightStation[0].name);
+                        attArrive.Add("里程", LeftRightStation[0].location);
                         spaceId.InsertBlockReference("0", "到达站站点标示", new Point3d(innerStartPoint.X + 175 + 188, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attArrive);
 
                         //换算成距离
-                        departStation = Int32.Parse(LeftRightStation[0].Split(new char[] { ',' })[3]);
+                        departStation = LeftRightStation[0].distance;
                     }
 
-                    if (LeftRightStation[1] != "")
+                    if (LeftRightStation[1] != null)
                     {
                         Dictionary<string, string> attdepart = new Dictionary<string, string>();
-                        attdepart.Add("站名", LeftRightStation[0].Split(new char[] { ',' })[1]);
-                        attdepart.Add("里程", LeftRightStation[0].Split(new char[] { ',' })[0]);
+                        attdepart.Add("站名", LeftRightStation[1].name);
+                        attdepart.Add("里程", LeftRightStation[1].location);
                         spaceId.InsertBlockReference("0", "始发站站点标示", new Point3d(innerStartPoint.X + 175-8.21, innerStartPoint.Y + 238, 0), new Scale3d(1), 0, attdepart);
 
                         //换算成距离
-                        arriveStation = Int32.Parse(LeftRightStation[1].Split(new char[] { ',' })[3]);
+                        arriveStation = LeftRightStation[1].distance;
                     }
 
                     string textDistance = " ";
@@ -415,8 +406,6 @@ namespace AutoDraw
                     //绘图起始点
                     Point3d equipeInsertPoint = new Point3d(innerStartPoint.X + 170, innerStartPoint.Y + 180, 0);
 
-                    
-
                     List<Point3d> registBoxInsertPoint = new List<Point3d>();  //记录控制箱插入点用于画线
                     List<List<Point3d>> registEquipeInsertPoint = new List<List<Point3d>>();  //记录防灾控制箱至设备的多段线的端点
 
@@ -431,38 +420,33 @@ namespace AutoDraw
 
                     #region 对设备、基站的里程排序
                     //比较设备和基站的里程大小
-                    List<KeyValuePair<int, string>> lstorder=new List<KeyValuePair<int, string>>();
+                    List<KeyValuePair<int, string>> order_List_Station_and_Equipement=new List<KeyValuePair<int, string>>();
                     Dictionary<string, int> lichengList = new Dictionary<string, int>();
-                    try
-                    {
-                        lichengList.Add(StationToBeDraw.distance + "," + StationToBeDraw.type + "," + StationToBeDraw.name + "," + StationToBeDraw.pposition, StationToBeDraw.distance);
+     
+                        lichengList.Add(StationToBeDraw.location + "," + StationToBeDraw.type + "," + StationToBeDraw.name + "," + StationToBeDraw.pposition, StationToBeDraw.distance);
                         foreach (var a in List_EquipmentInfor)
                         {
-                            lichengList.Add(a.distance + "," + a.type, a.distance);
+                            lichengList.Add(a.location + "," + a.type + "," + a.name + "," + a.pposition, a.distance);
                         }
                         lichengList.OrderBy(c => c.Value).ToList(); 
-                    }
-                    catch (System.Exception ee)
-                    {
-                        MessageBox.Show("" + ee.ToString());
-                        throw;
-                    }
+                    
+            
 
                     //对list排序
-                    var result = from pair in lichengList orderby pair.Key select pair; 
+                    var result = from pair in lichengList orderby pair.Value select pair; 
 
                     foreach (var a in result)
                     {
-                        string aa = a.Key.ToString().Split(new char[] { ',' })[1];
+                        string aa = a.Key.ToString();
 
-                        lstorder.Add(new KeyValuePair<int, string>(a.Value, aa));
+                        order_List_Station_and_Equipement.Add(new KeyValuePair<int, string>(a.Value, aa));
                     }
                     #endregion
 
                     Dictionary<string, double> LineLength = new Dictionary<string, double>();//本张图中使用的线缆类型及
                     int numInsert = 0; //以绘制几个图形
                     //根据设备、基站里程绘图
-                    foreach (KeyValuePair<int,string> LiCheng_Type in lstorder) //根据设备、基站的里程绘图 按
+                    foreach (KeyValuePair<int,string> LiCheng_Type in order_List_Station_and_Equipement) //根据设备、基站的里程绘图 按
                     {
                         if (StationToBeDraw.distance == LiCheng_Type.Key&& StationToBeDraw.type == LiCheng_Type.Value) //绘制基站
                         {
@@ -480,6 +464,7 @@ namespace AutoDraw
                                 DBText earthText = (DBText)drawF.insertText("地震传感器", new Point3d(equipeInsertPoint.X + marginEqui * numInsert + 13, equipeInsertPoint.Y + 3, 0), 3, TextHorizontalMode.TextLeft, fontStyleId);
                                 db2.AddToModelSpace(earthText);  //添加地震点文字
                             }
+
                             registStationInsertPoint = new Point3d(equipeInsertPoint.X + marginEqui * numInsert, equipeInsertPoint.Y + 2, 0); //记录插入点用于画线
 
                             registGouChaoInsertPoint.Add(new Point3d(equipeInsertPoint.X + marginEqui * numInsert + 1, equipeInsertPoint.Y, 0));  //绘制两条红线用于表示基站至信号电缆槽的挖沟
@@ -541,7 +526,14 @@ namespace AutoDraw
                                         }
                                     }
 
-                                    lineText.Append(blockName.Replace("_g", "") + "至" + StationToBeDraw.type + "防灾监控单元" + System.Environment.NewLine + TextTools.StackText(selectedLine.shortfor, "", selectedLine.lineType.ToString(), StackType.Tolerance, 0.5) + "-" + selectedLine.lineXin + "-" + selectedLine.lineLength + "m");
+                                    //lineText.Append(blockName.Replace("_G", "") + "至" + StationToBeDraw.type + "防灾监控单元" + System.Environment.NewLine + TextTools.StackText(selectedLine.shortfor, "", selectedLine.lineType.ToString(), StackType.Tolerance, 0.5) + "-" + selectedLine.lineXin + "-" + selectedLine.lineLength + "m");
+                                    PFunction pF = new PFunction();
+                                    string[] temp=selectedLine.fullname.ToString().Split(new char[] { ' ' });
+                                    //pf.isExMatch(sLocation, @"^([A-Z]+)(\d+)\+(\d{0,4})$", out listLoc);
+                                    List<string> listLoc = new List<string>();
+                                    pF.isExMatch(temp[0], @"^([A-Z]+)(\d+)$", out listLoc);
+                                    string b = blockName.Replace("_G", "");
+                                    lineText.Append(blockName.Replace("_G", "") + "至" + StationToBeDraw.type + "防灾监控单元" + System.Environment.NewLine + TextTools.StackText(listLoc[0], "", listLoc[1], StackType.Tolerance, 0.5));
 
                                     MText LineType_Length = new MText();
                                     LineType_Length.Location = new Point3d(equipeInsertPoint.X + 1.4 + marginEqui * numInsert + 5, equipeInsertPoint.Y + 40 - 45.4 + 4, 0);
@@ -568,26 +560,28 @@ namespace AutoDraw
                                     #region  记录使用的线缆及其长度
                                     if (LineLength.Count == 0)
                                     {
-                                        LineLength.Add(selectedLine.name, selectedLine.lineLength);
+                                        LineLength.Add(selectedLine.fullname, selectedLine.lineLength);
                                     }
                                     else
                                     {
                                         //foreach (KeyValuePair<string, double> line in LineLength)
                                         {
-                                            if (!LineLength.Keys.Contains(selectedLine.name))
+                                           // if (!LineLength.Keys.Contains(selectedLine.fullname))
+                                            foreach (var item in LineLength)
                                             {
-                                                LineLength.Add(selectedLine.name, selectedLine.lineLength);
+                                                if (!item.Key.Contains(selectedLine.fullname))
+                                                {
+                                                    LineLength.Add(selectedLine.name, selectedLine.lineLength);
+                                                }
+                                                else
+                                                {
+                                                    var a = LineLength[selectedLine.fullname];
+                                                    LineLength[selectedLine.fullname] = LineLength[selectedLine.fullname] + selectedLine.lineLength;
+                                                    break;
+                                                }
 
-                                                //break;
                                             }
-                                            else
-                                            {
-                                                //LineLength.Add(name, length + selectedLine.lineLength);
-                                                LineLength[selectedLine.name] = LineLength[selectedLine.name] + selectedLine.lineLength;
 
-                                                //break;
-
-                                            }
                                         }
                                     }
                                     #endregion
@@ -648,7 +642,7 @@ namespace AutoDraw
                     GongChenTable.Add("挖填光、电缆槽,100X50,m," + Num_Chao + ", ");
                     GongChenTable.Add("钢管防护,%%d50,m," + Num_GangGuan + ", ");
                     GongChenTable.Add("编焊电缆成端,,个," + Num_ChenDuan + ", ");
-                    foreach (KeyValuePair<string, double> line in LineLength)
+                    foreach (KeyValuePair<string, double> line in LineLength)///
                     {
                         GongChenTable.Add("敷设信号电缆," + line.Key + ",米," + line.Value + ", ");
                     }
@@ -758,8 +752,9 @@ namespace AutoDraw
                 catch (System.Exception ee)
                 {
 
-                    MessageBox.Show("出现错误！" + System.Environment.NewLine + "\t错误信息:" + ee.ToString(), "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("出现错误！" + System.Environment.NewLine + "\t错误信息:" + ee.ToString() + "\n\n" + ee.StackTrace + "\n\n" + ee.TargetSite, "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     trans2.Abort();
+                    return;
                 }
             }
 
@@ -4860,6 +4855,7 @@ namespace AutoDraw
 
                     //B_FunDraw.Enabled = false; ;
                     throw;
+                    return;
                 }
             }
             else
@@ -5168,7 +5164,14 @@ namespace AutoDraw
                         attSN.Add("站点名称", SigalStation.name);
                         attSN.Add("站点类型", SigalStation.type);
                         attSN.Add("站点里程", SigalStation.location);
-                        spaceId.InsertBlockReference("0", "系统_站点", new Point3d(insertPoint.X + 30 * rowTime, insertPoint.Y, 0), new Scale3d(1), 0, attSN);
+                        if (SigalStation.type.Contains("车站"))
+                        {
+                            spaceId.InsertBlockReference("0", "系统_站点_车站", new Point3d(insertPoint.X + 30 * rowTime, insertPoint.Y, 0), new Scale3d(1), 0, attSN); 
+                        }
+                        else
+                        {
+                            spaceId.InsertBlockReference("0", "系统_站点_非车站", new Point3d(insertPoint.X + 30 * rowTime, insertPoint.Y, 0), new Scale3d(1), 0, attSN); 
+                        }
 
                         //绘制设备
                         List<ClassStruct.EquipePoint> connectedEqipe = new List<ClassStruct.EquipePoint>();

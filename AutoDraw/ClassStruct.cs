@@ -162,6 +162,7 @@ namespace AutoDraw
                     this._pposition = value;
                 }
             }
+            public KeyPoint() { }
 
             public KeyPoint(string StationLocation, string StationName, string StationType, int Distance,string PPosition)
             {
@@ -183,6 +184,10 @@ namespace AutoDraw
         //重写为站点
         public class StationPoint : KeyPoint
         {
+            public StationPoint()
+            {
+
+            }
             public StationPoint(string StationLocation, string StationName, string StationType,int Distance, string PPosition) : base(StationLocation, StationName, StationType, Distance, PPosition)
             {
 

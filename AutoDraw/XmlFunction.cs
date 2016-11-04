@@ -314,7 +314,7 @@ namespace AutoDraw
                 XmlElement subXmlEquipe = xmlDoc.CreateElement("Equipement");//创建一个<Equipement>节点 
                 subXmlEquipe.SetAttribute("Equipelocation", equipeInfor.location);
                 subXmlEquipe.SetAttribute("EquipeType", equipeInfor.type);
-                subXmlStation.SetAttribute("PPosition", equipeInfor.pposition);
+                subXmlEquipe.SetAttribute("PPosition", equipeInfor.pposition);
                 subXmlEquipe.InnerText = equipeInfor.name;
 
                 //线型子节点

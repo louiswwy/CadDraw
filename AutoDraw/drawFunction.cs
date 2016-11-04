@@ -158,7 +158,7 @@ namespace AutoDraw
                         CreateRailWayMark(db, trans, insertPoint, fontId);//, "XX上行线/下行线");
                     }
 
-                    if (!bt.Has("系统_站点"))
+                    if (!bt.Has("系统_站点_非车站") || !bt.Has("系统_站点_车站"))
                     {
                         CreateSystemBlock(db, trans, insertPoint, fontId);//绘制系统图需要的图块
                     }
@@ -184,6 +184,20 @@ namespace AutoDraw
         /// <returns></returns>
         public bool CreateSystemBlock(Database db, Transaction trans, Point3d insertPoint, ObjectId FontId)
         {
+            bool isSuccs = false;
+            bool bool_NoStation=Create_System_Block_Non_Station(db, trans, insertPoint, FontId);
+
+            bool bool_Station=Create_System_Block_Station(db, trans, insertPoint, FontId);
+
+            if (bool_NoStation == true && bool_Station == true)
+            {
+                isSuccs = true;
+            }
+            return isSuccs;
+        }
+
+        public bool Create_System_Block_Non_Station(Database db, Transaction trans, Point3d insertPoint, ObjectId FontId)
+        {
             bool a = true;
             // Open the Block table for read
             BlockTable acBlkTbl = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -192,7 +206,7 @@ namespace AutoDraw
             BlockTableRecord acBlkTblRec = new BlockTableRecord();
             acBlkTbl.UpgradeOpen();
             acBlkTbl.Add(acBlkTblRec);
-            acBlkTblRec.Name = "系统_站点";
+            acBlkTblRec.Name = "系统_站点_非车站";
 
             Point2d LeftUpPoint = new Point2d(insertPoint.X - 7.5, insertPoint.Y); //外侧方框左上角
 
@@ -219,7 +233,7 @@ namespace AutoDraw
                 BigRectangle.AddVertexAt(3, new Point2d(LeftUpPoint.X, rightDownPoint.Y), 0, 0.1, 0.1);
                 BigRectangle.LinetypeScale = 20;
                 BigRectangle.Closed = true;
-                BigRectangle.LinetypeId= loneTypeId;
+                BigRectangle.LinetypeId = loneTypeId;
                 acBlkTblRec.AppendEntity(BigRectangle);
                 trans.AddNewlyCreatedDBObject(BigRectangle, true);
                 #endregion
@@ -243,7 +257,7 @@ namespace AutoDraw
 
                 #region 直线
                 Polyline Line = new Polyline();
-                Line.CreatePolyline(new Point2d(cicleCentre.X, cicleCentre.Y - 2.49), new Point2d(cicleCentre.X, cicleCentre.Y - 19.82));
+                Line.CreatePolyline(new Point2d(cicleCentre.X, cicleCentre.Y - 2.6), new Point2d(cicleCentre.X, cicleCentre.Y - 19.82));
                 acBlkTblRec.AppendEntity(Line);
                 trans.AddNewlyCreatedDBObject(Line, true);
                 #endregion
@@ -314,6 +328,131 @@ namespace AutoDraw
             return a;
 
         }
+
+        public bool Create_System_Block_Station(Database db, Transaction trans, Point3d insertPoint, ObjectId FontId)
+        {
+            bool a = true;
+            // Open the Block table for read
+            BlockTable acBlkTbl = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+            // Open the Block table record Model space for write
+            BlockTableRecord acBlkTblRec = new BlockTableRecord();
+            acBlkTbl.UpgradeOpen();
+            acBlkTbl.Add(acBlkTblRec);
+            acBlkTblRec.Name = "系统_站点_车站";
+
+            Point2d LeftUpPoint = new Point2d(insertPoint.X - 7.5, insertPoint.Y); //外侧方框左上角
+
+            Point2d rightDownPoint = new Point2d(insertPoint.X + 7.5, insertPoint.Y - 32);//外侧方框右下角
+
+            Point3d cicleCentre = new Point3d(insertPoint.X, insertPoint.Y - 3.37, 0);//椭圆圆心
+
+            Point2d SULeftUp = new Point2d(cicleCentre.X - 2.73, cicleCentre.Y - 19.82); //监控终端图块左上
+
+            #region 绘制图形
+            //方框
+
+            LinetypeTable acLinTbl = trans.GetObject(db.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+
+            if (acLinTbl.Has("DASH") == true)
+            {
+                ObjectId loneTypeId = acLinTbl["DASH"]; //dash线型
+
+                #region 外框
+                Polyline BigRectangle = new Polyline(4);
+                BigRectangle.AddVertexAt(0, LeftUpPoint, 0, 0.1, 0.1);
+                BigRectangle.AddVertexAt(1, new Point2d(rightDownPoint.X, LeftUpPoint.Y), 0, 0.1, 0.1);
+                BigRectangle.AddVertexAt(2, rightDownPoint, 0, 0.1, 0.1);
+                BigRectangle.AddVertexAt(3, new Point2d(LeftUpPoint.X, rightDownPoint.Y), 0, 0.1, 0.1);
+                BigRectangle.LinetypeScale = 20;
+                BigRectangle.Closed = true;
+                BigRectangle.LinetypeId = loneTypeId;
+                acBlkTblRec.AppendEntity(BigRectangle);
+                trans.AddNewlyCreatedDBObject(BigRectangle, true);
+                #endregion
+
+                #region 监控单元图块
+                Polyline mLinesSU = new Polyline(4);
+                mLinesSU.AddVertexAt(0, SULeftUp, 0, 0.5, 0.5);
+                mLinesSU.AddVertexAt(1, new Point2d(SULeftUp.X + 5.46, SULeftUp.Y), 0, 0.5, 0.5);
+                mLinesSU.AddVertexAt(2, new Point2d(SULeftUp.X + 5.46, SULeftUp.Y - 7.67), 0, 0.5, 0.5);
+                mLinesSU.AddVertexAt(3, new Point2d(SULeftUp.X, SULeftUp.Y - 7.67), 0, 0.5, 0.5);
+                mLinesSU.Closed = true;
+                mLinesSU.Color = Autodesk.AutoCAD.Colors.Color.FromRgb(0, 255, 255);
+                acBlkTblRec.AppendEntity(mLinesSU);
+                trans.AddNewlyCreatedDBObject(mLinesSU, true);
+
+                //文字SU
+                DBText ControlBoxText = (DBText)insertText("SU", new Point3d(SULeftUp.X + 2.73, SULeftUp.Y - 3.83, 0), 3, TextHorizontalMode.TextCenter, FontId);
+                acBlkTblRec.AppendEntity(ControlBoxText);
+                trans.AddNewlyCreatedDBObject(ControlBoxText, true);
+                #endregion
+
+                #region 直线
+                Polyline Line = new Polyline();
+                Line.CreatePolyline(new Point2d(insertPoint.X, insertPoint.Y), new Point2d(cicleCentre.X, cicleCentre.Y - 19.82));
+                acBlkTblRec.AppendEntity(Line);
+                trans.AddNewlyCreatedDBObject(Line, true);
+                #endregion
+
+
+                #endregion
+
+            }
+            else
+            {
+                //MessageBox.Show("错误！缺少线型！");
+            }
+            
+
+            #region 添加块属性
+
+            AttributeDefinition stationName = new AttributeDefinition(Point3d.Origin, "名称", "站点名称", "输入站点名称：", FontId);
+            stationName.TextStyleId = FontId;
+            stationName.WidthFactor = 0.7;
+            stationName.Height = 3;//文字高度
+            stationName.HorizontalMode = TextHorizontalMode.TextRight;
+            stationName.VerticalMode = TextVerticalMode.TextVerticalMid;
+            stationName.Invisible = false;
+            stationName.AlignmentPoint = new Point3d(LeftUpPoint.X - 8.5, LeftUpPoint.Y, 0);
+            stationName.Rotation = 90 * Math.PI / 180;
+            acBlkTblRec.AppendEntity(stationName);
+            trans.AddNewlyCreatedDBObject(stationName, true);
+
+            AttributeDefinition stationType = new AttributeDefinition(Point3d.Origin, "类型", "站点类型", "输入类型名称：", FontId);
+            stationType.TextStyleId = FontId;
+            stationType.WidthFactor = 0.7;
+            stationType.Height = 3;//文字高度
+            stationType.HorizontalMode = TextHorizontalMode.TextRight;
+            stationType.VerticalMode = TextVerticalMode.TextVerticalMid;
+            stationType.Invisible = false;
+            stationType.AlignmentPoint = new Point3d(LeftUpPoint.X - 4, LeftUpPoint.Y, 0);
+            stationType.Rotation = 90 * Math.PI / 180;
+            acBlkTblRec.AppendEntity(stationType);
+            trans.AddNewlyCreatedDBObject(stationType, true);
+
+
+            AttributeDefinition stationLoca = new AttributeDefinition(Point3d.Origin, "????+???", "站点里程", "输入站点里程：", FontId);
+            stationLoca.TextStyleId = FontId;
+            stationLoca.WidthFactor = 0.7;
+            stationLoca.Height = 3;//文字高度
+            stationLoca.HorizontalMode = TextHorizontalMode.TextLeft;
+            stationLoca.VerticalMode = TextVerticalMode.TextVerticalMid;
+            stationLoca.Invisible = false;
+            stationLoca.AlignmentPoint = new Point3d(LeftUpPoint.X - 4, rightDownPoint.Y, 0);
+            stationLoca.Rotation = 90 * Math.PI / 180;
+            acBlkTblRec.AppendEntity(stationLoca);
+            trans.AddNewlyCreatedDBObject(stationLoca, true);
+
+
+            #endregion
+            db.TransactionManager.AddNewlyCreatedDBObject(acBlkTblRec, true);
+            acBlkTblRec.DowngradeOpen();
+
+            return a;
+
+        }
+
         //如果不存在则添加铁轨标识
         private void CreateRailWayMark(Database db, Transaction trans, Point3d insertPoint,ObjectId FontId)//, string RailWayDirection)
         {
@@ -404,6 +543,7 @@ namespace AutoDraw
             acBlkTbl.DowngradeOpen();
         }
 
+        #endregion
         private void SetStyleForAttribut(AttributeDefinition att, bool invisible)
         {
             att.Height = 0.15;//高度
@@ -593,7 +733,7 @@ namespace AutoDraw
 
         }
 
-        #endregion
+        //#endregion
 
         /// <summary>
         /// 绘制通信、信号电缆槽示意图
